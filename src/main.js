@@ -1,4 +1,61 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import { storeState } from './vuex/store.js'
 
-createApp(App).mount('#app')
+import {Toast,useToast} from "vue-toastification";
+// Import the CSS or use your own!
+import "vue-toastification/dist/index.css";
+
+import VueLoading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
+const app = createApp(App);
+
+// config libabry
+// toast("Default toast");
+// toast.info("Info toast");
+// toast.success("Success toast");
+// toast.error("Error toast");
+// toast.warning("Warning toast");
+// cần dùng thì inject["toast"]
+const optionsToast = {
+    position: "bottom-right",
+    timeout: 3000,
+    closeOnClick: true,
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+    draggable: true,
+    draggablePercent: 0.6,
+    showCloseButtonOnHover: false,
+    hideProgressBar: true,
+    closeButton: "button",
+    icon: true,
+    rtl: false
+  };
+
+var toast = useToast(optionsToast);
+
+//loading config
+// cach dung
+// me.loader = me.$loading.show();
+// setTimeout(()=>{me.loader.hide();},5000);
+const optionsLoading = {
+    canCancel: true, // default false
+    color: 'white',
+    loader: 'spinner',
+    width: 64,
+    height: 64,
+    backgroundColor: '#5e5e5e',
+    opacity: 0.5,
+    zIndex: 999,
+
+  };
+
+// config biến toàn cục
+app.provide("toast",toast);
+
+app.use(VueLoading,optionsLoading);
+
+app.use(storeState);
+
+app.mount("#app");

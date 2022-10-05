@@ -1,26 +1,30 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <DialogNotification :configModal="{
+    width: 500,
+    height: 500
+  }" />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import DialogNotification from './components/commonComponent/DialogNotification.vue'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    DialogNotification
+  },
+  created()
+  {
+    let me = this;
+  },
+  methods:{
+    
   }
 }
 </script>
 
 <style>
+@import url('./assets/css/main.css');
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

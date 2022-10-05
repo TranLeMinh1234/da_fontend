@@ -1,0 +1,19 @@
+.background-modal{
+    position: absolute;
+    background-color: rgba(0,0,0,.45);
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+.modal{
+    background-color: white;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    box-shadow: 0px 0px 0px transparent;
+    border-radius: 0px 0px 8px 8px;
+    overflow: auto;
+}
