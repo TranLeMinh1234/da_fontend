@@ -1,0 +1,214 @@
+#Home{
+    width: 100%;
+    height: 100%;
+    background-image: url('../../tempimg.jpg');
+}
+
+#menu-Home
+{
+    height: 100%;
+    width: auto;
+    background-color: rgba(0,0,0,.7);
+}
+
+.logo-app
+{
+    padding: 20px 60px 30px 50px;
+}
+
+.logo-app div:nth-child(2)
+{
+    font-size: 24px;
+    font-weight: 500;
+    padding-left: 8px;
+}
+
+.basic-menu{
+    width: inherit;
+    height: auto;
+}
+
+.basic-menu .option-link{
+    display: block;
+    text-decoration: none;
+    color: white;
+    padding: 16px 20px 16px 40px;
+}
+
+.basic-menu .option-link:hover{
+    background-color: #212121;
+}
+
+.basic-menu .option-link .logo-option{
+}
+
+.basic-menu .option-link .name-option{
+    font-size: 15px;
+    padding: 0px 0px 0px 20px;
+    font-weight: 600;
+}
+
+.group-task-menu
+{
+    height: auto;
+    width: inherit;
+    color: white;
+}
+
+.group-task-menu .feature
+{
+    height: auto;
+    overflow-y: auto;
+    width: inherit;
+    padding: 10px 0px 10px 0px;
+}
+
+.group-task-menu .feature .search-group-task
+{
+    border-bottom: 1px solid rgb(117, 117, 117);
+    width: 60%;
+}
+
+.group-task-menu .feature input{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    line-height: 20px;
+    padding: 0px 20px 6px 4px;
+    color: white;
+    font-weight: 600;
+}
+
+.group-task-menu .feature input::placeholder{
+    font-size: 14px;
+    font-weight: 600;
+}
+.group-task-menu .feature .search-group-task:hover
+{
+    border-bottom: 1px solid #2196f3 !important;
+}
+
+.group-task-menu .feature .search-group-task div{
+    margin-top: 5px;
+}
+
+.group-task-menu .feature div:not(:nth-child(1))
+{
+    margin-left: 10px;
+}
+
+#Home #compact-menu
+{
+    height: 100%;
+    width: 1px;
+    border: 1px solid transparent;
+    position: relative;
+}
+
+#Home #compact-menu:hover
+{
+    height: 100%;
+    width: 1px;
+    border: 1px solid rgb(61, 140, 243);
+}
+
+#Home #compact-menu:hover div{
+    display: block;
+}
+
+/* #Home #compact-menu div{
+    
+} */
+
+#Home #compact-menu .cirle{
+    width: 20px;
+    height: 20px;
+    background-color: #2196f3;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border-radius: 20px;
+    display: none;
+}
+
+#Home #compact-menu .cirle div{
+    margin: 2px;
+}
+
+.group-task
+{
+    overflow-y: auto;
+}
+
+.group-task .lst-group-title
+{
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.group-task .type-group
+{
+    padding-left: 20px;
+    align-items: center;
+}
+
+.group-task .lst-group
+{
+    width: 100%;
+    height: auto;
+}
+
+.group-task .lst-group .name-group
+{
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 12px;
+    max-width: 180px;
+}
+
+.group-task .lst-group .item-lst
+{
+    padding: 16px 16px 16px 30px;
+}
+
+.group-task .lst-group .item-lst:hover
+{
+    background-color: #212121;
+    cursor: pointer;
+}
+
+#Home #primary-content
+{
+    flex: 1;
+    height: 100%;
+    color: white;
+    position: relative;
+}
+
+#Home #primary-content .clock
+{
+    font-size: 60px;
+}
+
+#Home #primary-content .welcome-info
+{
+    left: 20px;
+    position: absolute;
+    bottom: 20px;
+    font-weight: 600;
+}
+
+#Home #primary-content .hello-sentence
+{
+
+}
+
+
+
+
+
+
+
+

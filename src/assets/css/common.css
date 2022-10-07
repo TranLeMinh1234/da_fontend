@@ -1,0 +1,65 @@
+.bgr-image-contain{
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.bgr-image-cover{
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.d-flex{
+    display: flex !important;
+}
+
+.d-block
+{
+    display: block;
+}
+
+.txt-white
+{
+    color: white;
+}
+
+.txt-threedots
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.center-items{
+    justify-content: center;
+    align-items: center;
+}
+
+.j-center
+{
+    justify-content: center;
+}
+
+.al-center
+{
+    align-items: center;
+}
+
+.c-poiter
+{
+    cursor: pointer;
+}
+
+.d-none
+{
+    display: none !important;
+}
+
+.pd-l-16
+{
+    padding-left: 16px;
+}
+
+.pd-l-24
+{
+    padding-left: 24px;
+}

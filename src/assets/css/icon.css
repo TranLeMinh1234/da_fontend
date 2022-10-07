@@ -1,0 +1,133 @@
+.file-icon
+{
+    background-image: url('../icon/ICON.svg');
+}
+
+.setting-icon{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -580px -580px;
+    width: 22px;
+    height: 23px;
+    background-color: white;
+}
+
+.app-icon{
+    background-position: -608px -64px;
+    width: 32px;
+    height: 32px;
+}
+
+.bell-icon{
+    background-position: -132px -132px;
+    width: 23px;
+    height: 25px;
+}
+
+.commnet-icon{
+    background-position: -612px -100px;
+    width: 23px;
+    height: 23px;
+}
+
+.attachment-icon{
+    background-position: -100px -36px;
+    width: 22px;
+    height: 22px;
+}
+
+.big-search-icon{
+    background-position: -164px -132px;
+    width: 26px;
+    height: 26px;
+}
+
+.medium-search-icon{
+    background-position: -200px -72px;
+    width: 26px;
+    height: 26px;
+}
+
+.refresh-icon{
+    background-position: -515px -452px;
+    width: 24px;
+    height: 23px;
+}
+
+.home-icon{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -36px -132px;
+    width: 24px;
+    height: 23px;
+    background-color: white;
+}
+
+.task-myself-icon{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -516px -132px;
+    width: 24px;
+    height: 23px;
+    background-color: white;
+}
+
+.chart-icon{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -644px -36px;
+    width: 24px;
+    height: 23px;
+    background-color: white;
+}
+
+.compact-icon{
+    background-position: -676px -644px;
+    width: 24px;
+    height: 24px;
+}
+
+.compact-menu-icon{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -328px -104px;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+}
+
+.expand-menu-icon{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -296px -104px;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+}
+
+.down-arrow-icon
+{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -234px -104px;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+}
+
+.up-arrow-icon
+{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -264px -104px;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+}
+
+.personal-group-icon
+{
+    background-position: -160px -352px;
+    width: 32px;
+    height: 32px;
+}
+
+
+
+
+
+
+
+

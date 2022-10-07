@@ -17,3 +17,8 @@
     border-radius: 0px 0px 8px 8px;
     overflow: auto;
 }
+
+.background-modal .border-top 
+{
+    border-radius: 8px !important;
+}

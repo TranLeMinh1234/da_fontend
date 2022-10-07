@@ -1,6 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { storeState } from './vuex/store.js'
+import { commonFunction } from './common/js/commFunction.js';
+import { zindexManage } from './common/js/zindexManage.js';
+import { router } from './vuerouter/router.js';
 
 import {Toast,useToast} from "vue-toastification";
 // Import the CSS or use your own!
@@ -57,5 +60,10 @@ app.provide("toast",toast);
 app.use(VueLoading,optionsLoading);
 
 app.use(storeState);
+
+app.use(router)
+
+app.config.globalProperties.$commonFunction = commonFunction;
+app.config.globalProperties.$zindexManage = zindexManage;
 
 app.mount("#app");
