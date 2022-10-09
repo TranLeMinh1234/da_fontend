@@ -56,6 +56,11 @@ export default {
             {
                 return rawProps.elementUseDropDown;
             }
+        },
+        isHaveArrow:
+        {
+            type: Boolean,
+            default: true
         }
     },
     methods:

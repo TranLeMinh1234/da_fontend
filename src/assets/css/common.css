@@ -63,3 +63,28 @@
 {
     padding-left: 24px;
 }
+
+.cl-red
+{
+    color: red;
+}
+
+.txt-italic
+{
+    font-style: italic;
+}
+
+.fz-12
+{
+    font-size: 12px;
+}
+
+.pd-t-2
+{
+    padding-top: 2px;
+}
+
+.fit-content{
+    height: fit-content;
+    width: fit-content;
+}
