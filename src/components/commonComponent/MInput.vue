@@ -1,5 +1,5 @@
 <template>
-    <div style="margin: 44px 44px 44px 44px" class="m-input">
+    <div class="m-input">
         <div>
             <input 
                 :type="type" 
@@ -48,7 +48,7 @@ export default {
                 input: function(event)
                 {
                     me.valueValidate = event.target.value;
-                    me.$emit('update:',me.valueValidate);
+                    me.$emit('update:modelValue',me.valueValidate);
                     me.validateSelf();
                 }
             }

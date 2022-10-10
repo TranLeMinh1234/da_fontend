@@ -18,12 +18,31 @@
 }
 
 .btn-primary:hover{
-    animation-name: btnHover;
+    animation-name: btnPrimaryHover;
     animation-duration: 600ms;
     animation-fill-mode: forwards;
 }
 
-@keyframes btnHover {
+@keyframes btnPrimaryHover {
+    100%{
+        background-color: #0f8aee;
+    }
+}
+
+.btn-login
+{
+    background-color: #0073e6;
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.btn-login:hover{
+    animation-name: btnLoginHover;
+    animation-duration: 600ms;
+    animation-fill-mode: forwards;
+}
+
+@keyframes btnLoginHover {
     100%{
         background-color: #0f8aee;
     }

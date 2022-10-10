@@ -1,10 +1,12 @@
 import Home from '../components/ViewComponent/Home.vue';
 import Test from '../components/ViewComponent/Test.vue';
+import Login from '../components/ViewComponent/Login.vue';
 import { createRouter,createWebHistory} from 'vue-router';
 
 var routes = [
     { path: '/', component: Home },
-    { path: '/Test', component: Test }
+    { path: '/Test', component: Test },
+    { path: '/Login', component: Login }
 ];
   
 // 3. Create the router instance and pass the `routes` option

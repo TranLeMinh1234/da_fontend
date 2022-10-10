@@ -1,5 +1,7 @@
 <template>
-    <slot></slot>
+    <div ref="baseFromObserve">
+        <slot></slot>
+    </div>
 </template>
 
 <script>
@@ -23,12 +25,18 @@ export default {
         validateForm(){
             let me = this;
             let result = true;
-            let lstComponent = me.$slots.default();
+
+            let lstComponent = [];
+            for(var childComponentRef in me.$refsSlot)
+            {
+                if(childComponentRef.includes('inp'))
+                    lstComponent.push(me.$refsSlot[childComponentRef]);
+            }
             let errorList = [];
             for(let i = 0; i < lstComponent.length; i++)
             {
                 let component = lstComponent[i];
-                let resultValidate = component.ref.i.refs.child.validateSelf();
+                let resultValidate = component.validateSelf();
                 if(!resultValidate.isValid)
                 {
                     errorList.push(resultValidate);

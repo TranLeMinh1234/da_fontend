@@ -1,0 +1,55 @@
+#login{
+    width: 100%;
+    height: 100%;
+    background-image: url('../../login.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.header-login
+{
+    height: 100px;
+    width: 100%;
+}
+
+.body-login
+{
+    width: 100%;
+    height: 250px;
+}
+
+#register
+{
+    width: 100%;
+    height: 100%;
+    background-image: url('../../login.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.body-register
+{
+    width: 100%;
+    height: auto;
+}
+
+.avatar
+{
+    width: 200px;
+    height: 200px;
+    border-radius: 50px;
+    object-fit: cover;
+}
+
+.footer-register
+{
+    width: 100%;
+    height: 100px;
+}
+
+.back-login
+{
+    top: 38px;
+    left: 30px;
+    cursor: pointer;
+}

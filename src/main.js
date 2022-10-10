@@ -5,6 +5,10 @@ import { commonFunction } from './common/js/commFunction.js';
 import { zindexManage } from './common/js/zindexManage.js';
 import { router } from './vuerouter/router.js';
 
+//axios
+import axios from 'axios';
+import VueAxios from 'vue-axios';
+
 import {Toast,useToast} from "vue-toastification";
 // Import the CSS or use your own!
 import "vue-toastification/dist/index.css";
@@ -65,5 +69,7 @@ app.use(router)
 
 app.config.globalProperties.$commonFunction = commonFunction;
 app.config.globalProperties.$zindexManage = zindexManage;
+
+app.use(VueAxios, axios);
 
 app.mount("#app");
