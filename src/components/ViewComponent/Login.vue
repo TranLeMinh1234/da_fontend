@@ -11,9 +11,11 @@
             </div>
             <div class="body-login">
                 <div class="w-80 mg-auto">
-                    <MInput nameField="Email" rule="required" v-model="dataLogin.email" placeholder="Nhập email"/>      
-                    <MInput nameField="Mật khẩu" type="password" rule="required" v-model="dataLogin.passWord" placeholder="Nhập mật khẩu"/>      
-                    <button class="btn btn-login w-100">Đăng nhập</button>
+                    <BaseForm ref="formLogin">
+                        <MInput nameField="Email" rule="required" ref="inp10" v-model="dataLogin.email" placeholder="Nhập email"/>      
+                        <MInput nameField="Mật khẩu" type="password" ref="inp11" rule="required" v-model="dataLogin.passWord" placeholder="Nhập mật khẩu"/>      
+                    </BaseForm>
+                    <button class="btn btn-login w-100" @click="executeLogin()">Đăng nhập</button>
                     <div class="txt-al-center pd-t-16">
                         Chưa có tài khoản? <span class="fw-600 txt-blue c-poiter" @click="goRegister()">Đăng ký</span>
                     </div>
@@ -91,8 +93,13 @@
 import BaseForm from '../commonComponent/BaseForm.vue';
 import Modal from '../commonComponent/Modal.vue';
 import MInput from '../commonComponent/MInput.vue';
+import {baseCallApi} from '../../common/js/BaseCallApi.js';
+import BaseComponent from '../commonComponent/BaseComponent.vue';
+import { mapGetters, mapMutations } from 'vuex';
+
 export default {
     name: 'Login',
+    extends: BaseComponent,
     created()
     {
         let me = this;
@@ -106,7 +113,14 @@ export default {
         Modal,
         MInput
     },
+    mounted(){
+        let me = this;
+    },
+    computed:{
+        ...mapGetters('tokenManage',['isExistsToken','tokenCallApi'])
+    },
     methods: {
+        ...mapMutations('tokenManage',['setToken','clearToken']),
         backLogin()
         {
             let me = this;
@@ -140,32 +154,91 @@ export default {
             let validateResult = me.$refs.formRegiter.validate();
             if(validateResult)
             {
-                 me.axios.post('https://localhost:44304/api/login/register',me.dataRegister)
+                baseCallApi.Post('api/login/register', me.dataRegister)
                 .then(res => {
-                    if(res.data)
+                    if(res.data && res.data.success)
                     {
                         if(me.formData && me.formData.has('formFiles'))
                         {
                             me.formData.append('typeAttachment',1);
                             me.formData.append('attachmentId',res.data.data);
-                            me.axios.post('https://localhost:44304/file/upload',me.formData, {
+                            baseCallApi.Post('file/upload',me.formData, {
                                 headers: {
                                     'Content-Type': 'multipart/form-data'
                                 }
-                            }).then(resUpload => {console.log(resUpload)});
+                            }).then(resUpload => {
+                                me.toast.success("Đăng ký thành công!");
+                                me.mode = me.enumMode.login;
+                            });
+                        }
+                        else
+                        {
+                            me.toast.success("Đăng ký thành công!");
+                            me.mode = me.enumMode.login;
+                        }
+                    }
+                    else
+                    {
+                        switch(res.data.errorCode[0])
+                        {
+                            case "PassWordRepeatedNotMatch":
+                                me.$refs.inp8.raiseNotiErrorCustom('Nhắc lại mật khẩu chưa chính xác');
+                                break;
+                            case "EmailExists":
+                                me.$refs.inp6.raiseNotiErrorCustom('Email này đã được đăng ký');
+                                break;
+                            default:
+                                break;
                         }
                     }
                 });
+            }
+        },
+        executeLogin()
+        {
+            let me = this;
+            me.$refs.formLogin.$refsSlot = me.$refs;
+            let resultValidate = me.$refs.formLogin.validate();
+            // me.$refs.inp10.raiseNotiErrorCustom('askjdklasjdklasd')
+            if(resultValidate)
+            {
+                baseCallApi.Post('api/login/login', me.dataLogin)
+                .then(
+                    res => {
+                        if(res?.data && res.data?.success)
+                        {
+                           me.setToken(res.data.data);
+                           me.$router.push({path: '/'});
+                        }
+                        else
+                        {
+                            switch(res.data.errorCode[0])
+                            {
+                                case "WrongPassWord":
+                                    me.$refs.inp11.raiseNotiErrorCustom('Mật khẩu không đúng');
+                                    break;
+                                case "WrongEmail":
+                                    me.$refs.inp10.raiseNotiErrorCustom('Email nhập chưa đúng hoặc không tồn tại');
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                )
+                .catch(res=> 
+                    console.log(res)
+                );
             }
         }
     },
     data()
     {
         return {
-            mode: 2,
+            mode: 1,
             dataLogin: {
-                email: '',
-                passWord: ''
+                email: 'tlminh40300@gmail.com',
+                passWord: 'minhmap123'
             },
             dataRegister: {
                 userId: null,

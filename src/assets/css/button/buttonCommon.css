@@ -47,3 +47,28 @@
         background-color: #0f8aee;
     }
 }
+
+.btn-icon
+{
+    outline: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px !important;
+    padding: 0px 16px !important;
+    border-radius: 24px !important;
+    text-align: center;
+    height: 32px;
+}
+
+.btn-silver
+{
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.bulkhead
+{
+    width: 2px;
+    border: 1px solid white;
+    height: 60%;
+}

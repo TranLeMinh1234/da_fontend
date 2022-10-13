@@ -1,9 +1,12 @@
 import { createApp } from 'vue'
+import CKEditor from '@ckeditor/ckeditor5-vue';
 import App from './App.vue'
 import { storeState } from './vuex/store.js'
 import { commonFunction } from './common/js/commFunction.js';
 import { zindexManage } from './common/js/zindexManage.js';
 import { router } from './vuerouter/router.js';
+
+//ckeditor
 
 //axios
 import axios from 'axios';
@@ -58,6 +61,8 @@ const optionsLoading = {
 
   };
 
+app.use(CKEditor);
+
 // config biến toàn cục
 app.provide("toast",toast);
 
@@ -65,7 +70,7 @@ app.use(VueLoading,optionsLoading);
 
 app.use(storeState);
 
-app.use(router)
+app.use(router);
 
 app.config.globalProperties.$commonFunction = commonFunction;
 app.config.globalProperties.$zindexManage = zindexManage;

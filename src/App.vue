@@ -3,26 +3,33 @@
 </template>
 
 <script>
-import BaseComponent from './components/commonComponent/BaseComponent.vue';
 import Home from './components/ViewComponent/Home.vue';
 import Test from './components/ViewComponent/Test.vue';
 export default {
   name: 'App',
-  extends: BaseComponent,
-  components: {
-    Home,
-    Test
-  },
+  components: () =>
+    {
+        let me = this;
+        return {
+            Home,
+            Test,
+        };
+    },
   created()
   {
     let me = this;
   },
   methods:{
-    tlminh()
-    {
-      let me = this;
+    
+  },
+  data() {
+    return {
+      isShowDetail: false,
+      configModal: null,
+      props: null,
+      componentParent: null
     }
-  }
+  },
 }
 </script>
 

@@ -83,6 +83,27 @@
                 <div class="hello-sentence">Xin chào Trần Lê Minh</div>
                 <div class="clock"></div>
             </div>
+            <div class="header d-flex al-center j-end">
+                <div class="header-feature d-flex al-center j-spread-around pd-r-16">
+                    <div class="btn-add-all">
+                        <button class="btn-icon btn-silver d-flex al-center c-poiter">
+                            <div class="d-flex al-center">
+                                <div class="file-icon plush-white-icon"></div>
+                                <div>Thêm công việc</div>
+                            </div>
+                            <div class="bulkhead mg-l-6"></div>
+                            <div class="file-icon down-arrow-icon mg-l-10"></div>
+                        </button>
+                    </div>
+                    <div class="file-icon big-white-search-icon c-poiter"></div>
+                    <div class="file-icon bell-white-icon c-poiter"></div>
+                    <div class="file-icon more-feature-white-icon c-poiter"></div>
+                    <div class="personal-setting bgr-image-cover"></div>
+                </div>
+            </div>
+            <div class="body">
+                <router-view></router-view>
+            </div>
         </div>
     </div>
 </template>

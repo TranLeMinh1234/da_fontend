@@ -1,10 +1,20 @@
 import Home from '../components/ViewComponent/Home.vue';
 import Test from '../components/ViewComponent/Test.vue';
 import Login from '../components/ViewComponent/Login.vue';
+import DailyTask from '../components/ViewComponent/DailyTask.vue'
 import { createRouter,createWebHistory} from 'vue-router';
 
 var routes = [
-    { path: '/', component: Home },
+    { 
+        path: '/',
+        component: Home,
+        children: [
+            {
+                path: '/DailyTask',
+                component: DailyTask
+            }
+        ]
+    },
     { path: '/Test', component: Test },
     { path: '/Login', component: Login }
 ];

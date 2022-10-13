@@ -55,7 +55,15 @@ export default {
             me.messNotiError = ' ';
         }
         return resultValidate;
-      } 
+      },
+      raiseNotiErrorCustom(messNotiError)
+      {
+        let me = this;
+        let infoValidate = me.getInfoValidate();
+        me.isValid = false;
+        me.messNotiError = messNotiError;
+        infoValidate.element.focus();
+      }
     },
     data()
     {

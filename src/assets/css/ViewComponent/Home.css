@@ -200,11 +200,32 @@
     font-weight: 600;
 }
 
-#Home #primary-content .hello-sentence
+#primary-content .header
 {
-
+    width: 100%;
+    height: 50px;
+    background-color: transparent;
+    margin-top: 12px;
 }
 
+#primary-content .header .header-feature
+{
+    width: 365px;
+}
+
+#primary-content .header .personal-setting
+{
+    height: 30px;
+    width: 30px;
+    border-radius: 15px;
+    background-image: url(../../defaultAvatar.png);
+}
+
+#primary-content .body
+{
+    width: 100%;
+    height: calc(100% - 62px);
+}
 
 
 

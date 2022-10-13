@@ -1,0 +1,71 @@
+.task-detail
+{
+    width: 100%;
+    height: 100%;
+    color: #1f1f1f;
+}
+
+.task-detail .header-feature
+{
+    padding: 24px;
+    width: 100%;
+    border-bottom: 1px solid silver;
+}
+
+.task-detail .header-feature .lst-feature
+{
+    width: 200px
+}
+
+.task-detail .body-task
+{
+    width: 100%;
+    height: auto;
+}
+
+.task-detail .body-task .primary-content
+{
+    width: 80%;
+    height: 100%;
+    border-right: 1px solid silver;
+    padding: 8px 24px 24px;
+}
+.task-detail .body-task .not-primary-content
+{
+    width: calc(100% - 80% - 1px);
+    height: 100%;
+}
+
+.task-detail .body-task .name-task
+{
+    font-size: 20px !important;
+}
+
+.task-detail .user-assigned{
+    font-size: 13px !important;
+    width: 100%;
+    margin-top: .5rem;
+}
+
+.task-detail .user-assigned span{
+    color: #2196f3;
+    font-weight: 600;
+}
+
+.task-detail .primary-content .one-edit-item{
+    height: 53px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+}
+
+.task-detail .one-edit-item:nth-child(1) .avatar
+{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: red;
+}
+
+.task-detail .one-edit-item:nth-child(2) 
+{
+}

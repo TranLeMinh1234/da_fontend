@@ -1,0 +1,23 @@
+.sort-table{
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.sort-table .column-task
+{
+    height: 98%;
+    width: 322px;
+}
+
+.sort-table .column-task .header-column
+{
+    width: 100%;
+    height: 60px;
+    background-color: red;
+}
+
+.sort-table .column-task .name-column
+{
+    width: 60%;
+}

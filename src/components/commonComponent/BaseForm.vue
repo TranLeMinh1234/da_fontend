@@ -36,10 +36,13 @@ export default {
             for(let i = 0; i < lstComponent.length; i++)
             {
                 let component = lstComponent[i];
-                let resultValidate = component.validateSelf();
-                if(!resultValidate.isValid)
+                if(component)
                 {
-                    errorList.push(resultValidate);
+                    let resultValidate = component.validateSelf();
+                    if(!resultValidate.isValid)
+                    {
+                        errorList.push(resultValidate);
+                    }
                 }
             }
 

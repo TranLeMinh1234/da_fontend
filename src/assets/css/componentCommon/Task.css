@@ -1,0 +1,36 @@
+.task
+{
+    background-color: white;
+    width: 96%;
+    height: auto;
+    border-radius: 16px;
+    margin: 8px auto 0px auto;
+    font-size: 15px;
+    padding: 18px;
+}
+
+.task .name-task
+{
+    color: black;
+    width: 100%;
+    height: auto;
+}
+
+.task .fast-feature
+{
+    width: 100%;
+    padding-top: 20px;
+}
+
+.fast-feature .assigned-user
+{
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+}
+
+.fast-feature .assigned-user + .datepicker-icon
+{
+    margin-left: 10px;
+}
+

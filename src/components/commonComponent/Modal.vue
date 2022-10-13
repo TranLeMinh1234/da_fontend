@@ -6,7 +6,16 @@
             :style="{
                 zIndex: zindex
             }"
+            ref="bgModal"
         >
+            <div 
+                class="add-scroll"
+                :style="{
+                    width: '100%',
+                    backgroundColor: 'transparent'
+                }"
+            >
+            </div>
             <div 
                 :class="['modal', configModal.borderTop ? 'border-top':'']"
                 :style="{
@@ -16,6 +25,14 @@
             >
                 <slot></slot>
             </div>
+            <!-- <div 
+                class="add-scroll"
+                :style="{
+                    width: '100%',
+                    backgroundColor: 'transparent'
+                }"
+            >
+            </div> -->
         </div>
     </Teleport>
 </template>
@@ -29,23 +46,47 @@ export default {
         me.mainApp().$zindexManage.getBiggestZindex() 
         : this.$zindexManage.getBiggestZindex();
     },
-    mounted(){},
+    mounted(){
+        let me = this;
+        if(me.isShow)
+        {
+           me.calculate();
+        }
+    },
     computed:{
         
     },
     watch: {
-        isShow()
+        isShow(newValue)
         {
             let me = this;
-            typeof me.mainApp == "function"? me.mainApp().$zindexManage.clearBiggestIndex() 
-            : this.$zindexManage.clearBiggestIndex();
+            if(!me.isShow)
+            {
+                typeof me.mainApp == "function"? me.mainApp().$zindexManage.clearBiggestIndex() 
+                : this.$zindexManage.clearBiggestIndex();
+            }
+            else
+            {
+                me.calculate();
+            }
         }
     },
     beforeUnmount(){
         
     },
     methods:{
-       
+       calculate()
+       {
+            let me = this;
+            me.$nextTick(()=>{
+                let addScrolls = me.$refs.bgModal.querySelectorAll('.add-scroll');
+                let modal = me.$refs.bgModal.querySelector('.modal');   
+                addScrolls.forEach(addScroll => {
+                    if(document.body.offsetHeight - modal.offsetHeight < 0)
+                        addScroll.style.height = Math.abs((document.body.offsetHeight - modal.offsetHeight)) + 'px';
+                });
+            })
+       }
     },
     props:{
         configModal: {
