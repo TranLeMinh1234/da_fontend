@@ -124,6 +124,11 @@
     padding-top: 16px;
 }
 
+.pd-t-10
+{
+    padding-top: 10px;
+}
+
 .fit-content{
     height: fit-content;
     width: fit-content;
@@ -136,6 +141,11 @@
 .w-80
 {
     width: 80% !important;
+}
+
+.w-90
+{
+    width: 90% !important;
 }
 
 .w-100
@@ -176,6 +186,15 @@
 .mg-auto
 {
     margin: auto;
+}
+
+.mg-t-10{
+    margin-top: 10px;
+}
+
+.mg-l-4
+{
+    margin-left: 4px;
 }
 
 .mg-l-6
@@ -236,4 +255,41 @@
 .color-blue-taskdetail
 {
     color: #2196f3;
+}
+
+.j-space-between{
+    justify-content: space-between;
+}
+
+.label
+{
+    padding: 8px 16px 8px 16px;
+    border-radius: 10px;
+}
+
+.flex-1
+{
+    flex: 1;
+}
+
+.pd-8{
+    padding: 8px;
+}
+
+.pd-l-8
+{
+    padding-left: 8px;
+}
+
+.pd-tbt-8{
+    padding: 8px 0px 8px 0px;
+}
+
+.fl-wrap
+{
+    flex-flow: wrap;
+}
+
+.bottom-border-silver{
+    border-bottom: 1px solid silver;
 }

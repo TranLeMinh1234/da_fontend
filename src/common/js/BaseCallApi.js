@@ -13,7 +13,7 @@ class BaseCallApi{
         {
             buildQueryData+=`${property}=${data[property]}&`;
         }
-        buildQueryData = buildQueryData.splice(buildQueryData.length-1,1);
+        buildQueryData = buildQueryData.slice(buildQueryData.length-1,1);
         return axios.get(this.doMain + '/' + routeApi + buildQueryData, option);
     }
 
@@ -34,7 +34,7 @@ class BaseCallApi{
         {
             buildQueryData+=`${property}=${data[property]}&`;
         }
-        buildQueryData = buildQueryData.splice(buildQueryData.length-1,1);
+        buildQueryData = buildQueryData.slice(buildQueryData.length-1,1);
         return axios.delete(this.doMain + '/' + routeApi + buildQueryData,option);
     }
 }

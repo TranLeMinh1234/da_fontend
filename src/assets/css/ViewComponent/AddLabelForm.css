@@ -1,0 +1,119 @@
+.add-label-form
+{
+    width: 100%;
+    height: 100%;
+}
+
+.header-add-label-form{
+    width: 100%;
+    padding: 20px;
+}
+
+.header-add-label-form .name-form
+{
+    font-size: 20px;
+}
+
+.add-label-form .pd-standard
+{
+    padding: 0px 20px 0px 20px;
+}
+
+.add-label-form .lst-label-add .label + .label{
+    margin-left: 6px;
+}
+
+.lst-label-add .label{
+    position: relative;
+    margin: 4px 0px 4px 0px;
+}
+
+.lst-label-add .label .feature-label{
+    position: absolute;
+    top: -8px;
+    right: -8px;
+}
+
+.lst-label-add .label:hover .feature-label{
+    display: block !important;
+}
+
+.add-label-form .line-spread
+{
+    width: 100%;
+    border-bottom: 1px solid silver;
+}
+
+.add-label-form .lst-label
+{
+    height: auto;
+}
+
+.add-label-form .lst-label .inp-color-label
+{
+}
+
+.add-label-form .inp-color-label .fake-choose-color
+{
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.add-label-form .inp-color-label input[type="color"]
+{
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+}
+
+.add-label-form .inp-color-label input[type="text"]
+{
+    width: 235px;
+    border: none;
+    outline: none;
+    font-size: 18px;
+}
+
+.add-label-form .inp-color-label .done-edit
+{
+    text-decoration: underline;
+}
+
+.add-label-form .lst-label .lst-choose{
+    overflow: auto;
+    height: 300px;
+    width: 100%;
+}
+
+.add-label-form .lst-label .lst-choose .color-label{
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+}
+
+.add-label-form .lst-choose .label-choose
+{
+    position: relative;
+}
+
+.add-label-form .lst-choose .label-choose .feature-line
+{
+    position: absolute;
+    right: 0;
+}
+
+.add-label-form .lst-choose .label-choose:hover
+{
+    background-color: #e1eeff;
+}
+
+.add-label-form .lst-choose .label-choose:hover .feature-line{
+    display: flex !important;
+}
+
+.add-label-form .footer{
+    width: 100%;
+    height: 80px;
+}

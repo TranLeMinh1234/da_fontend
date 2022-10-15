@@ -51,8 +51,8 @@
 
 .medium-search-icon{
     background-position: -200px -72px;
-    width: 26px;
-    height: 26px;
+    width: 16px;
+    height: 16px;
 }
 
 .refresh-icon{
@@ -227,6 +227,86 @@
     height: 14px;
 }
 
+.check-list-icon
+{
+    background-position: -644px -580px;
+    width: 24px;
+    height: 24px;
+}
 
+.checked-icon
+{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -584px -424px;
+    width: 16px;
+    height: 16px;
+    background-color: #28aa37!important;
+}
 
+.not-checked-icon
+{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -552px -424px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #707070;
+}
 
+.plush-blue-icon
+{
+    background-position: -164px -164px;
+    width: 24px;
+    height: 24px;
+}
+
+.attach-label-icon
+{
+    background-position: -676px -612px;
+    width: 24px;
+    height: 24px;
+}
+
+.hole-trash-icon
+{
+    background-position: -580px -196px;
+    width: 24px;
+    height: 24px;
+}
+
+.exit-cirle-icon
+{
+    background-position: -550px -134px;
+    width: 24px;
+    height: 24px;
+}
+
+.add-label-detail-icon
+{
+    background-position: -96px -708px;
+    width: 32px;
+    height: 32px;
+}
+
+.delete-line-icon
+{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -740px -356px;
+    width: 24px;
+    height: 24px;
+    background-color: red;
+}
+
+.blue-edit-icon
+{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -676px -356px;
+    width: 24px;
+    height: 24px;
+    background-color: #2196f3;
+}
+
+.big-child-task-icon{
+    background-position: -644px -612px;
+    width: 26px;
+    height: 26px;
+}

@@ -3,9 +3,13 @@
     width: 100%;
 }
 
+.m-input .background-input
+{
+    position: relative;
+}
+
 .m-input input
 {
-    padding: 14px 14px 14px 14px;
     border: 1px solid silver;
     border-radius: 8px;
     font-size: 12px;
@@ -23,4 +27,12 @@
 {
     border: 1px solid red !important;
     box-shadow: 0px 0px 2px rgb(102, 102, 102);
+}
+
+.m-input .background-input .file-icon
+{
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translate(-50%,-50%);
 }

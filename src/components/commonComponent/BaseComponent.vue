@@ -6,7 +6,7 @@
 import DialogNotification from './DialogNotification.vue'
 import {createApp} from 'vue';
 import {baseCallApi} from '../../common/js/BaseCallApi.js';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 export default {
     name: "BaseClass",
     inject:["toast"],
@@ -16,16 +16,31 @@ export default {
     },
     mounted(){},
     computed:{
-        ...mapGetters('tokenManage', ['tokenCallApi','isExistsToken'])
+        ...mapGetters('tokenManage', ['tokenCallApi','isExistsToken']),
+        ...mapGetters('userManage', ['userInfo','isExistsUserInfo'])
     },
     methods: {
+        ...mapMutations('userManage',['setUserInfo','clearUserInfo']),
         checkLogin()
         {
             let me = this;
             if(!me.isExistsToken)
             {
-                debugger;
                 me.$router.replace({path: '/login'})
+            }
+            else
+            {
+                if(!me.isExistsUserInfo)
+                {
+                    me.callApi('get','api/user/getUserInfo',null,null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+                            let data = res.data.data;
+                            me.setUserInfo(data);
+                        }
+                    });
+                }
             }
         },
         showDialogNotification(configModal, contentCustom, callBack)
@@ -46,8 +61,12 @@ export default {
         },
         callApi(method, routeApi, data, option)
         {
+            let me = this;
             method = method.toLowerCase();
-            optionCommon = option;
+            let optionCommon = option;
+            if(!optionCommon)
+                optionCommon = {};
+
             if(!optionCommon.headers)
                 optionCommon.headers = {};
 
@@ -57,17 +76,13 @@ export default {
             switch(method)
             {
                 case 'get':
-                    baseCallApi.Get(routeApi,data,optionCommon);
-                    break;
+                    return baseCallApi.Get(routeApi,data,optionCommon);
                 case 'post':
-                    baseCallApi.Post(routeApi,data,optionCommon);
-                    break;
+                    return baseCallApi.Post(routeApi,data,optionCommon);
                 case 'put':
-                    baseCallApi.Put(routeApi,data,optionCommon);
-                    break;
+                    return baseCallApi.Put(routeApi,data,optionCommon);
                 case 'delete':
-                    baseCallApi.Delete(routeApi,data,optionCommon);
-                    break;
+                    return baseCallApi.Delete(routeApi,data,optionCommon);
                 default:
                     break;
             }

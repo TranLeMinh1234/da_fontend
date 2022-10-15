@@ -40,7 +40,7 @@ export default {
                 width: '800px',
                 height: 'auto',
             },{
-                taskId: taskId,
+                taskId: taskId?taskId:'515219ba-4c98-11ed-bdc3-0242ac120002',
                 typeTask: EnumTypeTask.Personal,
                 editMode: EnumEditMode.Edit
             },null);
