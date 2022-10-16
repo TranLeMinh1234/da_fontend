@@ -4,7 +4,7 @@
             <div class="lst-feature d-flex al-center j-spread-around">
                 <div class="file-icon c-poiter command-direct-icon"></div>
                 <div class="file-icon c-poiter child-task-icon"></div>
-                <div class="file-icon c-poiter attachment-icon"></div>
+                <div class="file-icon c-poiter attachment-icon" @click="uploadFileAttachment"></div>
                 <div class="file-icon c-poiter attach-label-icon" @click="showFormAddLabel()"></div>
                 <div class="file-icon c-poiter copy-link-icon"></div>
                 <div class="file-icon c-poiter more-feature-icon"></div>
@@ -121,7 +121,10 @@
                         >
                             <div class="">{{index + 1}}.{{childTask.taskName}}</div>
                             <div class="d-flex al-center feature-line d-none">
-                                <div class="file-icon hole-trash-icon c-poiter" v-show="childTask.createdByEmail == userInfo.email"></div>
+                                <div 
+                                    class="file-icon hole-trash-icon c-poiter" 
+                                    @click="deleteChildTask(childTask.taskId)"
+                                    v-show="childTask.createdByEmail == userInfo.email"></div>
                             </div>
                         </div>
                     </div>
@@ -138,6 +141,31 @@
                         <div class="fw-600 pd-l-6 color-blue-taskdetail">Thêm việc</div>
                     </div>
                 </div>
+                <div class="pd-t-16 six-edit-task" v-if="dataEdit.lstFileAttachment.length > 0">
+                    <div class="header d-flex al-center">
+                        <div class="file-icon big-attachment-icon"></div>
+                        <div class="fw-600 pd-l-10">Tệp đính kèm</div>
+                    </div>
+                    <div class="w-100">
+                        <div class="lst-attach-file d-flex al-center fl-wrap">
+                            <FileAttach
+                                v-for="fileAttach in dataEdit.lstFileAttachment" :key="fileAttach.fileId"
+                                :data="fileAttach"
+                                @deleteFileAttach="deleteFileAttach"
+                            />
+                        </div>
+                    </div>
+                    <div class="add-lst d-flex al-center pd-8 c-poiter fit-content" @click="uploadFileAttachment(event)">
+                        <div class="file-icon plush-blue-icon"></div>
+                        <div class="fw-600 pd-l-6 color-blue-taskdetail">Thêm tệp</div>
+                    </div>
+                </div>
+                <div class="pd-t-16 seven-edit-task">
+                    <div class="header d-flex al-center">
+                        <div class="file-icon big-attachment-icon"></div>
+                        <div class="fw-600 pd-l-10">Bình luận</div>
+                    </div>
+                </div>
             </div>
             <div class="not-primary-content">
             </div>
@@ -146,23 +174,26 @@
     <Modal :isShow="isShowDetail" :configModal="configModal">
         <component :is="nameDetailComponent" :option="props" @closePopup="closeSubPopup"></component>
     </Modal>
+    <input type="file" class="d-none" id="inp-attach-file" accept="image/*">
 </template>
 
 <script>
-import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
+import {EnumEditMode,EnumTypeTask,EnumAttachment} from '../../common/js/Enum.js';
 import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
 import { uuid } from 'vue-uuid';
 import Modal from '../commonComponent/Modal.vue';
 import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import AddLabelForm from '../ViewComponent/AddLabelForm.vue';
 import { mapGetters, mapMutations } from 'vuex';
+import FileAttach from '../commonComponent/FileAttach.vue';
 
 export default {
     name: "TaskDetail",
     extends: BaseViewDetail,
     components:{
         Modal,
-        AddLabelForm
+        AddLabelForm,
+        FileAttach
     },
     props:
     {
@@ -183,6 +214,7 @@ export default {
         let me = this;
         me.getListTaskChild();
         me.getListCheckList();
+        me.getFileAttachment();
     },
     mounted(){
         let me = this;
@@ -208,12 +240,73 @@ export default {
         }
     },
     methods: {
+        getFileAttachment()
+        {
+            let me = this;
+            me.callApi('get',`file/getattachfile/${me.option.taskId}`)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    me.dataRoot.lstFileAttachment = data;
+                    me.dataEdit.lstFileAttachment = data;
+                    me.checkFinishLoadData();
+                }
+            });
+        },
+        uploadFileAttachment(event)
+        {
+            let me = this;
+            let inpUploadAttachFile = document.getElementById('inp-attach-file');
+            inpUploadAttachFile.onchange = function(eventChange)
+            {
+                me.formData = new FormData();
+                for(let i = 0; i < inpUploadAttachFile.files.length; i++)
+                {
+                    let file = inpUploadAttachFile.files[i];
+                    me.formData.append('formFiles', file);
+                    me.formData.append('typeAttachment', EnumAttachment.AttachTask);
+                    me.formData.append('attachmentId', me.option.taskId);
+                    me.callApi('post','file/upload',me.formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then(resUpload => {
+                        
+                        if(resUpload.data.success)
+                        {
+                            let data = resUpload.data.data;
+                            me.dataEdit.lstFileAttachment.push(data);
+                            me.toast.success("Đính kèm thành công!");
+                        }
+                    });
+                }
+            };
+            inpUploadAttachFile.click();
+        },
+        deleteFileAttach(fileId){
+            let me = this;
+            me.callApi('delete',`file/${fileId}`)
+            .then(res => 
+                {
+                    if(res.data.success)    
+                    {
+                        me.dataEdit.lstFileAttachment = me.dataEdit.lstFileAttachment.filter(item => item.fileId != fileId);
+                    }
+                }
+            );
+        },
+        deleteChildTask(taskId)
+        {
+            let me = this;
+            me.dataEdit.lstChildTask = me.dataEdit.lstChildTask.filter(item => item.taskId != taskId);
+        },
         checkFinishLoadData()
         {
             let me = this;
             if(!me.countLoad) me.countLoad = 0;
             me.countLoad++;
-            if(me.countLoad == 2)
+            if(me.countLoad == 3)
                 console.log('loaddone');
         },
         getListCheckList()
@@ -253,10 +346,11 @@ export default {
             if(me.fakeNameChildTask !== '')
             {
                 let dataSave = {
-                    taskId: null,
+                    taskId: uuid.v1(),
                     taskName: me.fakeNameChildTask,
                     typeTask: me.option.typeTask,
-                    PathTreeTask: (me.dataEdit.PathTreeTask? me.dataEdit.PathTreeTask : '') + "/" + me.option.taskId
+                    PathTreeTask: (me.dataEdit.PathTreeTask? me.dataEdit.PathTreeTask : '') + "/" + me.option.taskId,
+                    createdByEmail: me.userInfo.email
                 };
                 me.callApi('post', 'api/task/insertChildTask', dataSave, null)
                 .then(res => {
@@ -269,7 +363,11 @@ export default {
                         me.toast.success('Thêm công việc con thành công');
                     }
                 });
-               
+            }
+            else
+            {
+                me.fakeContentCheckList = '';
+                me.addingChildTask = false;
             }
         },
         addChildTaskInput()
@@ -326,7 +424,7 @@ export default {
             {
                 let dataSave =  
                 {
-                    checkTaskId: null,
+                    checkTaskId: uuid.v1(),
                     content: me.fakeContentCheckList,
                     status: false,
                     taskId: me.option.taskId
@@ -337,11 +435,17 @@ export default {
                     if(res.data.success)
                     {
                         me.dataEdit.lstCheckTask.push(dataSave);
+                        me.addingCheckList = false;
+                        me.fakeContentCheckList = '';
                         me.toast.success("Thêm checklist thành công!");
                     }
                 });
             }
-            me.addingCheckList = false;
+            else
+            {
+                me.addingCheckList = false;
+                me.fakeContentCheckList = '';    
+            }
         },
         addCheckList()
         {
@@ -352,8 +456,14 @@ export default {
         deleteCheckTask(checkTaskId)
         {
             let me = this;
-            me.dataEdit.lstCheckTask = me.dataEdit.lstCheckTask.filter(checkTask => 
-                checkTask.checkTaskId != checkTaskId);
+            me.callApi('delete',`api/checktask/${checkTaskId}`)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.lstCheckTask = me.dataEdit.lstCheckTask.filter(checkTask => 
+                        checkTask.checkTaskId != checkTaskId);        
+                }
+            });
         },
         deleteLabelFromList(labelId)
         {
@@ -436,6 +546,18 @@ export default {
                     //     taskId: '2',
                     //     taskName: 'Task 2'
                     // }
+                ],
+                lstFileAttachment: [
+                //    {
+                //         fileId: '0f3a7af9-2609-4c3a-b900-c35982178eaa',
+                //         fileName: '0f3a7af9-2609-4c3a-b900-c35982178eaa_acdbb4bc-d5b8-4a0f-88b1-376efbf966a3.jpg',
+                //         extensionOfFile: '.jpg',
+                //         filePath: '',
+                //         typeAttachment: 1,
+                //         attachmentId: this.option.taskId,
+                //         createdTime: null,
+                //         createdByEmail: null
+                //    }
                 ]
             }
         }

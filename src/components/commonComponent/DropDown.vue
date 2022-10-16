@@ -1,16 +1,19 @@
 <template>
-    <div 
-        :class="['dropdown', isShowDropDown? '': 'd-none']"
-        :style="{
-            width: configDropDown?.width + 'px',
-            height: configDropDown?.height + 'px',
-            top: displayY(),
-            left: displayX(),
-        }"
-    >
-        <div :class="['arrow-droprown ','arrow-' + configDropDown?.directArrow]"></div>
-        <slot></slot>
-    </div>
+
+    <teleport to='body'>
+        <div 
+            :class="['dropdown', isShowDropDown? '': 'd-none']"
+            :style="{
+                width: configDropDown?.width + 'px',
+                height: configDropDown?.height + 'px',
+                top: displayY,
+                left: displayX,
+            }"
+        >
+            <div :class="['arrow-droprown ','arrow-' + configDropDown?.directArrow]"></div>
+            <slot></slot>
+        </div>
+    </teleport>
 </template>
 
 <script>
@@ -63,12 +66,16 @@ export default {
             default: true
         }
     },
-    methods:
-    {
+    watch:{
+    },
+    computed: {
         displayX()
         {
             let me = this;
             let result = 0;
+            if(!me.configDropDown)
+                return result;
+
             if(me.configDropDown.directArrow.includes('top'))
             {
                 result = me.configDropDown.positionXShow - me.configDropDown.width/2;
@@ -92,13 +99,15 @@ export default {
         {
             let me = this;
             let result = 0;
+            if(!me.configDropDown)
+                return result;
             if(me.configDropDown.directArrow.includes('top'))
             {
-                result = me.configDropDown.positionYShow + 36;
+                result = me.configDropDown.positionYShow + 28;
             }
             else if(me.configDropDown.directArrow.includes('bottom'))
             {
-                result = me.configDropDown.positionYShow - me.configDropDown.height - 36;
+                result = me.configDropDown.positionYShow - me.configDropDown.height - 28;
             }
             else if(me.configDropDown.directArrow.includes('left'))
             {
@@ -111,6 +120,10 @@ export default {
             }
             return result + 'px';
         }
+    },
+    methods:
+    {
+        
     }
 }
 </script>

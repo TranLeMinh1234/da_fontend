@@ -2,7 +2,7 @@
     <div class="icon-dropdown">
         <div 
             :class="['icon-component', 'file-icon', iconClass]" 
-            @click="isShowDropDown = true"
+            @click="executeShowDropDown()"
         >
         </div>
         <DropDown 
@@ -28,18 +28,40 @@ export default {
     },
     mounted(){
         let me = this;
-        me.elementUseDropDown = me.$el.querySelector('.icon-component');
-        let postionIcon = me.elementUseDropDown.getBoundingClientRect();
-        me.config.positionXShow = postionIcon.left + postionIcon.width/2;
-        me.config.positionYShow = postionIcon.top + postionIcon.height/2;
-        me.configDropDown = me.config;
+        me.findPositionIcon();
+    },
+    watch: {
+        isShowDropDown: function(newValue){
+            let me = this;
+            if(newValue)
+            {
+                me.findPositionIcon();
+            }
+        }
     },
     methods: 
     {
+        executeShowDropDown()
+        {
+            let me = this;
+            me.$emit('showDropDownEvent');
+        },
+        findPositionIcon()
+        {
+            let me = this;
+            me.elementUseDropDown = me.$el.querySelector('.icon-component');
+            let postionIcon = me.elementUseDropDown.getBoundingClientRect();
+            me.config.positionXShow = postionIcon.left + postionIcon.width/2;
+            me.config.positionYShow = postionIcon.top + postionIcon.height/2;
+            me.configDropDown = null;
+            me.$nextTick(()=>{
+                me.configDropDown = me.config;
+            })
+        },
         hideDropDown()
         {
             let me = this;
-            me.isShowDropDown = false;
+            me.$emit('closeDropDownEvent');
         }
     },
     props: {
@@ -58,13 +80,16 @@ export default {
         iconClass:{
             type: String,
             default: ""
+        },
+        isShowDropDown: {
+            type: Boolean,
+            default: false
         }
     },
     data()
     {
         return {
             elementUseDropDown: null,
-            isShowDropDown: false,
             configDropDown: undefined
         }
     }

@@ -12,5 +12,12 @@ var EnumTypeTask = {
     Group: 3
 }
 
+var EnumAttachment =
+{ 
+    AttachAvatar: 1,
+    AttachTask: 2,
+    AttachComment: 3,
+}
 
-export {EnumEditMode,EnumTypeTask};
+
+export {EnumEditMode,EnumTypeTask,EnumAttachment};

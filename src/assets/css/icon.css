@@ -43,6 +43,12 @@
     height: 24px;
 }
 
+.big-attachment-icon{
+    background-position: -708px -612px;
+    width: 24px;
+    height: 24px;
+}
+
 .big-search-icon{
     background-position: -164px -132px;
     width: 26px;
@@ -309,4 +315,26 @@
     background-position: -644px -612px;
     width: 26px;
     height: 26px;
+}
+
+.file-attach-icon{
+    background-position: -612px -291px;
+    width: 26px;
+    height: 26px;
+}
+
+.more-feature-blue-icon
+{
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -356px -36px;
+    width: 24px;
+    height: 24px;
+    background-color: #2196f3;
+}
+
+.download-icon
+{
+    background-position: -648px -104px;
+    width: 18px;
+    height: 18px;
 }
