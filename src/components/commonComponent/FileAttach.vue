@@ -5,7 +5,7 @@
             backgroundColor: checkImgFileExtension(data.extensionOfFile) ? 'black' : 'silver'
         }"
     >
-        <div class="feature">
+        <div :class="['feature', displayFeature? '':'d-none']">
             <IconDropDown
                 :config="{
                     width: 130,
@@ -78,6 +78,10 @@ export default {
                     createdByEmail: null
                 };
             }
+        },
+        displayFeature: {
+            type: Boolean,
+            default: true
         }
     },
     methods:{
@@ -100,7 +104,11 @@ export default {
         },
         formatCreatedTime(time)
         {
-            return time? '10/10/2022 16:02' : 'Không xác định';
+            let me = this;
+            let dateObject = me.$commonFunction.parseStringServerToDate(time);
+            return time? 
+            `${dateObject.getDate()}/${dateObject.getMonth()+1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}`
+            : 'Không xác định';
         },
         linkImg(fileName)
         {

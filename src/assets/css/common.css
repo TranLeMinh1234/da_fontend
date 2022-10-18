@@ -293,3 +293,11 @@
 .bottom-border-silver{
     border-bottom: 1px solid silver;
 }
+
+.p-relative{
+    position: relative;
+}
+
+.p-absolute{
+    position: absolute;
+}

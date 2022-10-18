@@ -152,6 +152,7 @@
                                 v-for="fileAttach in dataEdit.lstFileAttachment" :key="fileAttach.fileId"
                                 :data="fileAttach"
                                 @deleteFileAttach="deleteFileAttach"
+                                :displayFeature="true"
                             />
                         </div>
                     </div>
@@ -165,20 +166,41 @@
                         <div class="file-icon big-attachment-icon"></div>
                         <div class="fw-600 pd-l-10">Bình luận</div>
                     </div>
+                    <div class="bottom-border-silver w-100 pd-t-10"></div>
+                    <Comment 
+                        class="mg-t-10"
+                        v-for="comment in dataEdit.lstComment" :key="comment.commentId"
+                        :data="comment"
+                        @deleteFileAttach="deleteFileAttachComment"
+                        @commitComment="commitComment"
+                        :mode="modeCommentControl.Edit"
+                        :taskId="option.taskId"
+                        @deleteComment="deleteComment"
+                        @attachNewFileCommentAdd="attachNewFileCommentAdd"
+                    />
+                    <Comment 
+                        class="mg-t-10"
+                        :data="dataEdit.CommentFake"
+                        @deleteFileAttach="deleteFileAttachComment"
+                        @attachNewFileCommentAdd="attachNewFileCommentAdd"
+                        @commitComment="commitComment"
+                        :mode="modeCommentControl.Add"
+                        :taskId="option.taskId"
+                    />
                 </div>
             </div>
             <div class="not-primary-content">
             </div>
         </div>
     </div>
-    <Modal :isShow="isShowDetail" :configModal="configModal">
+    <Modal :isShow="isShowDetail" :configModal="configModal" ref="modal">
         <component :is="nameDetailComponent" :option="props" @closePopup="closeSubPopup"></component>
     </Modal>
     <input type="file" class="d-none" id="inp-attach-file" accept="image/*">
 </template>
 
 <script>
-import {EnumEditMode,EnumTypeTask,EnumAttachment} from '../../common/js/Enum.js';
+import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl} from '../../common/js/Enum.js';
 import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
 import { uuid } from 'vue-uuid';
 import Modal from '../commonComponent/Modal.vue';
@@ -186,14 +208,17 @@ import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import AddLabelForm from '../ViewComponent/AddLabelForm.vue';
 import { mapGetters, mapMutations } from 'vuex';
 import FileAttach from '../commonComponent/FileAttach.vue';
+import Comment from '../commonComponent/Comment.vue'
 
 export default {
     name: "TaskDetail",
     extends: BaseViewDetail,
+    emits: ['closePopup'],
     components:{
         Modal,
         AddLabelForm,
-        FileAttach
+        FileAttach,
+        Comment
     },
     props:
     {
@@ -215,6 +240,8 @@ export default {
         me.getListTaskChild();
         me.getListCheckList();
         me.getFileAttachment();
+        me.getListLabel();
+        me.getCommentsTask();
     },
     mounted(){
         let me = this;
@@ -240,6 +267,124 @@ export default {
         }
     },
     methods: {
+        deleteComment(commentId){
+            let me = this;
+            me.callApi(`delete`,`api/comment/${commentId}`)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.lstComment = me.dataEdit.lstComment.filter(comment => comment.commentId != commentId);
+                }
+            });
+        },
+        getCommentsTask()
+        {
+            let me = this;
+            me.callApi('get',`api/task/comment/${me.option.taskId}`)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    me.dataEdit.lstComment = data;
+                    me.checkFinishLoadData();
+                }
+            });
+        },
+        commitComment(commentAfterEdit,modeOfComment){
+            let me = this;
+            debugger;
+            if(modeOfComment == EnumModeUseControl.Add)
+            {
+                Object.assign(me.dataEdit.CommentFake.lstFileAttachment, commentAfterEdit.lstFileAttachment);
+                me.dataEdit.CommentFake.commentId = uuid.v1();
+                me.dataEdit.CommentFake.content = '';
+                me.dataEdit.CommentFake.lstFileAttachment = [];
+                me.dataEdit.lstComment.push(commentAfterEdit);
+            }
+            else
+            {
+                let commentEditing = me.dataEdit.lstComment.find(comment => comment.commentId == commentAfterEdit.commentId);
+                let deletedFiles = commentEditing?.lstDeletedFileTemp;
+                if( deletedFiles && deletedFiles.length > 0)
+                {
+                    me.callApi('post', 'file/deletemulti', deletedFiles, null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+                            me.dataEdit.lstComment.forEach(comment => {
+                                if(comment.commentId == commentAfterEdit.commentId)
+                                    comment.lstDeletedFileTemp = [];
+                            })
+                        }
+                    });
+                }
+            }
+        },
+        attachNewFileCommentAdd(commentId, newFile, modeOfComment){
+            let me = this;  
+            debugger;
+            if(modeOfComment == EnumModeUseControl.Add)
+                me.dataEdit.CommentFake.lstFileAttachment.push(newFile);
+            else
+            {
+                me.dataEdit.lstComment.forEach(comment => {
+                    if(comment.commentId == commentId)
+                        comment.lstFileAttachment.push(newFile);
+                })
+            }
+
+        },
+        deleteFileAttachComment(commentId,fileId,modeOfComment)
+        {
+            let me = this;
+            if(modeOfComment == EnumModeUseControl.Add)
+            {
+                me.callApi('delete',`file/${fileId}`)
+                .then(res => 
+                    {
+                        if(res.data.success)    
+                        {
+                            me.dataEdit.CommentFake.lstFileAttachment = 
+                            me.dataEdit.CommentFake.lstFileAttachment.filter(file => {
+                                return file.fileId != fileId;
+                            });
+                           
+                        }
+                    }
+                );
+            }
+            else
+            {
+                me.dataEdit.lstComment.forEach(comment => {
+                    if(comment.commentId == commentId)
+                    {
+                        comment.lstFileAttachment = comment.lstFileAttachment.filter(file => file.fileId != fileId);
+                        if(!comment.lstDeletedFileTemp)
+                        {
+                            comment.lstDeletedFileTemp = [];
+                        }
+                        comment.lstDeletedFileTemp.push(fileId);
+                    }
+                });
+            }
+        },
+        getListLabel(){
+            let me = this;
+            me.callApi('get',`api/task/label/${me.option.taskId}`)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    if(!data)
+                    {
+                        data = [];
+                    }
+                    // me.dataRoot.lstLabel = data;
+                    me.dataEdit.lstLabel = data;
+                    me.checkFinishLoadData();
+                }
+            });
+        },
         getFileAttachment()
         {
             let me = this;
@@ -248,7 +393,7 @@ export default {
                 if(res.data.success)
                 {
                     let data = res.data.data;
-                    me.dataRoot.lstFileAttachment = data;
+                    // me.dataRoot.lstFileAttachment = data;
                     me.dataEdit.lstFileAttachment = data;
                     me.checkFinishLoadData();
                 }
@@ -277,7 +422,6 @@ export default {
                         {
                             let data = resUpload.data.data;
                             me.dataEdit.lstFileAttachment.push(data);
-                            me.toast.success("Đính kèm thành công!");
                         }
                     });
                 }
@@ -304,10 +448,12 @@ export default {
         checkFinishLoadData()
         {
             let me = this;
-            if(!me.countLoad) me.countLoad = 0;
+            if(!me.countLoad) 
+                me.countLoad = 0;
             me.countLoad++;
-            if(me.countLoad == 3)
-                console.log('loaddone');
+            if(me.countLoad == 5)
+            {
+            }
         },
         getListCheckList()
         {
@@ -319,7 +465,7 @@ export default {
                     let data = res.data.data;
                     if(data && data.length > 0)
                     {
-                        me.dataRoot.lstCheckTask = data;
+                        // me.dataRoot.lstCheckTask = data;
                         me.dataEdit.lstCheckTask = data;
                     }
                     me.checkFinishLoadData();
@@ -334,7 +480,7 @@ export default {
                 if(res.data.success)
                 {
                     let data = res.data.data;
-                    me.dataRoot.lstChildTask = data;
+                    // me.dataRoot.lstChildTask = data;
                     me.dataEdit.lstChildTask = data;
                     me.checkFinishLoadData();
                 }
@@ -360,7 +506,6 @@ export default {
                         me.dataEdit.lstChildTask.push(data);
                         me.fakeContentCheckList = '';
                         me.addingChildTask = false;
-                        me.toast.success('Thêm công việc con thành công');
                     }
                 });
             }
@@ -437,7 +582,6 @@ export default {
                         me.dataEdit.lstCheckTask.push(dataSave);
                         me.addingCheckList = false;
                         me.fakeContentCheckList = '';
-                        me.toast.success("Thêm checklist thành công!");
                     }
                 });
             }
@@ -468,8 +612,16 @@ export default {
         deleteLabelFromList(labelId)
         {
             let me = this;
-            me.dataEdit.lstLabel = me.dataEdit.lstLabel.filter(label => 
-                label.labelId != labelId);
+            me.callApi('delete',`api/task/label/${me.option.taskId}/${labelId}`)
+            .then(
+                res => {
+                    if(res.data.success)
+                    {
+                        me.dataEdit.lstLabel = me.dataEdit.lstLabel.filter(label => 
+                            label.labelId != labelId);
+                    }
+                }
+            );
         },
         showFormAddLabel()
         {
@@ -489,6 +641,8 @@ export default {
     data()
     {
         return{
+            modeCommentControl: EnumModeUseControl,
+
             //modal
             nameDetailComponent: '',
             props: undefined,
@@ -518,14 +672,14 @@ export default {
             },
 
             //data handle
-            dataRoot:
-            {
-                description: '',
-                path: '',
-                lstCheckTask: [],
-                lstLabel: [],
-                lstChildTask: []
-            },
+            // dataRoot:
+            // {
+            //     description: '',
+            //     path: '',
+            //     lstCheckTask: [],
+            //     lstLabel: [],
+            //     lstChildTask: []
+            // },
             dataEdit: {
                 description: '',
                 path: '',
@@ -542,10 +696,6 @@ export default {
                     //     taskId: '1',
                     //     taskName: 'Task 1'
                     // },
-                    // {
-                    //     taskId: '2',
-                    //     taskName: 'Task 2'
-                    // }
                 ],
                 lstFileAttachment: [
                 //    {
@@ -558,7 +708,42 @@ export default {
                 //         createdTime: null,
                 //         createdByEmail: null
                 //    }
-                ]
+                ],
+                lstComment: [
+                    // {
+                    //     commentId: uuid.v1(),
+                    //     createdByEmail: null,
+                    //     createdTime: new Date(),
+                    //     content: 'alo 123',
+                    //     lstFileAttachment: [
+                    //         {
+                    //             fileId: '0f3a7af9-2609-4c3a-b900-c35982178eaa',
+                    //             fileName: '0f3a7af9-2609-4c3a-b900-c35982178eaa_acdbb4bc-d5b8-4a0f-88b1-376efbf966a3.jpg',
+                    //             extensionOfFile: '.jpg',
+                    //             filePath: '',
+                    //             typeAttachment: EnumAttachment.AttachComment,
+                    //             attachmentId: this.option.taskId,
+                    //             createdTime: null,
+                    //             createdByEmail: null
+                    //        },
+                    //     ],
+                    //     user: 
+                    //     {
+                    //         email: "tlminh40300@gmail.com",
+                    //         fileAvatar: 'c304fbcb-7520-4ad9-b6d0-c020ee826330_rPL27_5f.jpg',
+                    //         firstName: "Trần",
+                    //         lastName: "Lê Minh"
+                    //     }
+                    // }
+                ],
+                CommentFake: {
+                    commentId: uuid.v1(),
+                    createdByEmail: null,
+                    createdTime: null,
+                    content: '',
+                    lstFileAttachment: [],
+                    user: null
+                }
             }
         }
     }

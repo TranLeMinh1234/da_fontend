@@ -19,6 +19,7 @@
 <script>
 export default {
     name: "DropDown",
+    emits: ["hideDropDown"],
     created(){},
     mounted(){
         let me = this;

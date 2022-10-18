@@ -208,7 +208,7 @@ export default {
                         if(res?.data && res.data?.success)
                         {
                            me.setToken(res.data.data);
-                           me.$router.push({path: '/'});
+                           me.$router.push({path: '/DailyTask'});
                         }
                         else
                         {

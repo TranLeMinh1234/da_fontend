@@ -45,12 +45,27 @@ export default {
         me.zindex = typeof me.mainApp == "function"? 
         me.mainApp().$zindexManage.getBiggestZindex() 
         : this.$zindexManage.getBiggestZindex();
+
     },
     mounted(){
         let me = this;
+        if(me.$refs.bgModal)
+        {
+            me.addScrolls = me.$refs.bgModal.querySelectorAll('.add-scroll');
+            me.modal = me.$refs.bgModal.querySelector('.modal');
+
+            // create an Observer instance
+            const resizeObserver = new ResizeObserver(entries => 
+                console.log('Body height changed:', entries[0].target.clientHeight)
+            )
+
+            // start observing a DOM node
+            resizeObserver.observe(me.modal)
+
+        }
         if(me.isShow)
         {
-           me.calculate();
+            me.calculate();
         }
     },
     computed:{
@@ -79,12 +94,23 @@ export default {
        {
             let me = this;
             me.$nextTick(()=>{
-                let addScrolls = me.$refs.bgModal.querySelectorAll('.add-scroll');
-                let modal = me.$refs.bgModal.querySelector('.modal');   
-                addScrolls.forEach(addScroll => {
-                    if(document.body.offsetHeight - modal.offsetHeight < 0)
-                        addScroll.style.height = Math.abs((document.body.offsetHeight - modal.offsetHeight)) + 'px';
-                });
+                if(me.$refs.bgModal)
+                {
+                    me.addScrolls = me.$refs.bgModal.querySelectorAll('.add-scroll');
+                    me.modal = me.$refs.bgModal.querySelector('.modal');
+
+                    // create an Observer instance
+                    const resizeObserver = new ResizeObserver(entries => {
+                            me.addScrolls.forEach(addScroll => {
+                                if(document.body.offsetHeight - me.modal.offsetHeight < 0)
+                                    addScroll.style.height = Math.abs((document.body.offsetHeight - me.modal.offsetHeight)) + 'px';
+                            });
+                        }
+                    )
+
+                    // start observing a DOM node
+                    resizeObserver.observe(me.modal)
+                }
             })
        }
     },

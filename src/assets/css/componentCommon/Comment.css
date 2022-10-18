@@ -1,0 +1,40 @@
+.comment{
+    width: 100%;
+    height: auto;
+}
+
+.comment .user-avar{
+    object-fit: cover;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}
+
+.comment .content-comment
+{
+    width: 80%;
+    background-color: #f1f1f1;
+    margin-left: 10px;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.comment .edit-comment
+{
+    flex: 1;
+    margin-left: 20px;
+}
+
+
+.feature-comment{
+    margin: auto 0px auto 12px;
+}
+
+.comment .lst-attach-file{
+    margin: 8px 0px 0px 48px;
+    width: 70%;
+}
+
+.comment .lst-attach-file .attach-file{
+    margin: 8px 0px 0px 8px;
+}

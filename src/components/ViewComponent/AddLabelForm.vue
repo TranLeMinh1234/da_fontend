@@ -79,6 +79,7 @@ import BaseComponent from '../commonComponent/BaseComponent.vue';
 export default {
     name: 'AddLabelForm',
     extends: BaseComponent,
+    emits: ['closePopup'],
     components:{
         MInput
     },
@@ -92,6 +93,8 @@ export default {
             let me = this;
             let functionCallBack = function(objectParent)
             {
+                let arrayPush = [];
+                let arrayLabelIdAdd = [];
                 me.lstAdd.forEach(labelAdd => {
                     let isStored = false;
                     objectParent.dataEdit.lstLabel.forEach(label => {
@@ -101,9 +104,34 @@ export default {
 
                     if(!isStored)
                     {
-                        objectParent.dataEdit.lstLabel.push(labelAdd);
+                        arrayPush.push(labelAdd);
+                        arrayLabelIdAdd.push(labelAdd.labelId);
                     }
                 })
+                
+                me.callApi('post','api/task/label',
+                {
+                    "taskId": objectParent.option.taskId,
+                    "listLabelId": JSON.stringify(arrayLabelIdAdd)
+                },null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        objectParent.dataEdit.lstLabel = objectParent.dataEdit.lstLabel.concat(arrayPush);
+                    }
+                    else
+                    {
+                        let errorCodes = res.data.errorCode;
+                        switch(errorCodes[0])
+                        {
+                            case "EmptyData":
+                                me.toast.warning('Các thẻ này đã được gắn')
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
             };
             me.closePopup(functionCallBack);
         },

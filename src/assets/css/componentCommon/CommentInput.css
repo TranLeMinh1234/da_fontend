@@ -1,0 +1,44 @@
+.comment-input{
+    height: 50px;
+    width: 100%;
+}
+
+.comment-input .background-input
+{
+    position: relative;
+}
+
+.comment-input textarea
+{
+    border: 1px solid silver;
+    border-radius: 8px;
+    font-size: 12px;
+    width: 100%;
+    outline: none;
+    line-break: loose;
+    resize: none;
+}
+
+.comment-input textarea:focus
+{
+    border: 1px solid #2196f3;
+    box-shadow: 0px 0px 2px rgb(102, 102, 102);
+}
+
+.error
+{
+    border: 1px solid red !important;
+    box-shadow: 0px 0px 2px rgb(102, 102, 102);
+}
+
+.comment-input .background-input .feature-comment
+{
+    position: absolute;
+    top: 50%;
+    right: 0px;
+    transform: translate(-50%,-50%);
+}
+
+.comment-input .add-mode{
+    width: 100% !important; 
+}

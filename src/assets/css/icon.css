@@ -311,6 +311,13 @@
     background-color: #2196f3;
 }
 
+.edit-icon
+{
+    background-position: -676px -356px;
+    width: 24px;
+    height: 24px;
+}
+
 .big-child-task-icon{
     background-position: -644px -612px;
     width: 26px;

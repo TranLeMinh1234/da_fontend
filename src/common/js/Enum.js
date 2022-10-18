@@ -19,5 +19,9 @@ var EnumAttachment =
     AttachComment: 3,
 }
 
+var EnumModeUseControl = {
+    Edit: 2,
+    Add: 1
+};
 
-export {EnumEditMode,EnumTypeTask,EnumAttachment};
+export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl};

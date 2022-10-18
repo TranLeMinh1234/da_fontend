@@ -24,6 +24,12 @@ var commonFunction = {
             }
         );
         newDialog.mount(mountEl);
+    },
+    parseStringServerToDate(time)
+    {
+        if(!time)
+            return null;
+        return new Date(Date.parse(time));
     }
 };
 
