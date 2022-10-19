@@ -3,6 +3,7 @@
     width: 100%;
     height: 100%;
     color: #1f1f1f;
+    position: relative;
 }
 
 .task-detail .header-feature
@@ -14,7 +15,14 @@
 
 .task-detail .header-feature .lst-feature
 {
-    width: 200px
+    width: 200px;
+    position: relative;
+}
+
+.task-detail .header-feature .lst-feature .exit-popup-icon
+{
+    position: relative;
+    z-index: 9999999;
 }
 
 .task-detail .body-task
@@ -25,15 +33,16 @@
 
 .task-detail .body-task .primary-content
 {
-    width: 80%;
+    width: 76%;
     height: 100%;
     border-right: 1px solid silver;
     padding: 8px 24px 24px;
 }
 .task-detail .body-task .not-primary-content
 {
-    width: calc(100% - 80% - 1px);
-    height: 100%;
+    width: calc(100% - 76% - 1px);
+    background-color: #fafafa;
+    height: revert;
 }
 
 .task-detail .body-task .name-task
@@ -63,7 +72,6 @@
     width: 40px;
     height: 40px;
     border-radius: 20px;
-    background-color: red;
 }
 
 .task-detail .one-edit-item:nth-child(2) 
@@ -174,4 +182,36 @@
 
 .six-edit-task .lst-attach-file .attach-file{
     margin: 8px 0px 0px 4px;
+}
+
+.not-primary-content .extra-feature
+{
+    height: 60px;
+    width: 100%;
+    border-bottom: 1px solid silver;
+}
+
+.not-primary-content .created-by-task{
+    padding: 14px;
+}
+
+.task-detail .background-adding-task{
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 999999;
+    background-color: #ffffffc5;
+}
+
+.task-detail .background-adding-task input{
+    padding: 20px 10px 20px 0px;
+    position: absolute;
+    top: 80px;
+    left: 20px;
+    border: none;
+    font-size: 20px;
+    outline: none;
+    width: 70%;
 }

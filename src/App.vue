@@ -19,6 +19,9 @@ export default {
   {
     let me = this;
   },
+  mounted() {
+    
+  },
   methods:{
     
   },

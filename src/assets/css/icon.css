@@ -345,3 +345,25 @@
     width: 18px;
     height: 18px;
 }
+
+.remind-task-icon
+{
+    background-position: -292px -36px;
+    width: 24px;
+    height: 24px;
+}
+
+.created-by-icon{
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    background-position: -40px -104px;
+}
+
+.description-task-icon
+{
+    width: 24px;
+    height: 24px;
+    background-position: -740px -580px;
+}

@@ -124,7 +124,6 @@ export default {
             inpUploadAttachFile.onchange = function(eventChange)
             {
                 me.formData = new FormData();
-                debugger;
                 for(let i = 0; i < inpUploadAttachFile.files.length; i++)
                 {
                     let file = inpUploadAttachFile.files[i];

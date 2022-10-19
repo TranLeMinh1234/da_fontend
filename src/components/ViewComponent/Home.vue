@@ -87,7 +87,7 @@
                 <div class="header-feature d-flex al-center j-spread-around pd-r-16">
                     <div class="btn-add-all">
                         <button class="btn-icon btn-silver d-flex al-center c-poiter">
-                            <div class="d-flex al-center">
+                            <div class="d-flex al-center" @click="openFormAddNewTask">
                                 <div class="file-icon plush-white-icon"></div>
                                 <div>Thêm công việc</div>
                             </div>
@@ -102,17 +102,30 @@
                 </div>
             </div>
             <div class="body">
-                <router-view></router-view>
+                <router-view v-slot="{ Component }">
+                    <component ref="view" :is="Component" />
+                </router-view>
             </div>
         </div>
     </div>
+    <Modal :isShow="isShowDetail" :configModal="configModal">
+        <component ref="dynamicComponent" :is="nameDetailComponent" :option="props" @closePopup="closePopup"></component>
+    </Modal>
 </template>
 
 <script>
-import BaseComponent from '../commonComponent/BaseComponent.vue';
+import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
+import Modal from '../commonComponent/Modal.vue';
+import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
+import TaskDetail from './TaskDetail.vue';
+
 export default {
     name: "Home",
-    extends: BaseComponent,
+    extends: BaseViewDetail,
+    components: {
+        Modal,
+        TaskDetail
+    },
     mounted()
     {
         let me = this;
@@ -139,6 +152,35 @@ export default {
                 me.timeNow.setSeconds(me.timeNow.getSeconds() + 1);
             },1000);
             
+        },
+        closePopup(callbackInsideComponent, typeComponent)
+        {
+            let me = this;
+            me.nameDetailComponent = '';
+            me.configModal = undefined;
+            me.props = undefined;
+            me.callbackOutsideComponent = undefined;
+            if(callbackInsideComponent)
+            {
+                debugger;
+                if(typeComponent == "ViewComponent")
+                    callbackInsideComponent(me.$refs.view);
+                else
+                    callbackInsideComponent(me.$refs.dynamicComponent);
+            }
+            me.isShowDetail = false;
+        },
+        openFormAddNewTask()
+        {
+            let me = this;
+            me.showDetail('TaskDetail',{
+                width: '900px',
+                height: 'auto',
+            },{
+                taskId: null,
+                typeTask: EnumTypeTask.Personal,
+                editMode: EnumEditMode.Add
+            },null);
         },
         showHideMenu()
         {
@@ -188,7 +230,13 @@ export default {
                 {
                     nameGroup: 'Công việc hội nhóm'
                 }
-            ]
+            ],
+
+            nameDetailComponent: '',
+            props: null,
+            isShowDetail: false,
+            configModal: null,
+            callbackOutsideComponent: null
         }
     }
 }

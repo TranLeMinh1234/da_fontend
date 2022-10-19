@@ -1,18 +1,31 @@
 <template>
     <div class="sort-table d-flex">
-        <div v-for="(column,index) in lstColumnTask" :key="index"
+        <div v-for="column in lstColumnTask" :key="column.proccessId"
             class="column-task"
             :style="{
-                backgroundColor: columnColor
+                backgroundColor: column.columnSetting.color
             }"
             >
                 <div 
-                    :class="['header-column', 'd-flex', 'center-items', 'c-poiter', isHaveHeader? '': 'd-none']">
+                    :class="
+                        [
+                            'header-column', 'd-flex', 'center-items', 'c-poiter', 
+                            isHaveHeader? '': 'd-none',
+                        ]"
+                    :style="{
+                        backgroundColor: column.columnSetting.colorHeader
+                    }"
+                >
                         <div class="name-column txt-threedots txt-al-center">
                             {{column.name}}
                         </div>
                 </div>
-                <Task v-for="task in column.lstTask" :key="task.id" @dblclick="showDetailTask(task.id)"/>
+                <Task 
+                    v-for="task in column.lstTask" 
+                    :key="task.id" 
+                    @dblclick="showDetailTask(task.taskId)"
+                    :data="task"
+                />
         </div>
     </div>
 </template>
@@ -76,46 +89,23 @@ export default {
         isHaveHeader: {
             type: Boolean,
             default: true
+        },
+        lstColumnTask: {
+            type: Array,
+            default: []
         }
     },
     methods: {
         showDetailTask(taskId)
         {
             let me = this;
+            debugger;
             me.$emit('showDetailTask', taskId);
         }
     },
     data(){
         return {
-            lstColumnTask: [
-                {
-                    taskId: '1',
-                    name: 'Cột 1',
-                    ColorHeader: 'blue',
-                    ColorText: 'white',
-                    sortOrder: 1,
-                    lstTask: [
-                        {
-                            taskId: '1',
-                            taskName: 'Sua loi jira'
-                        }
-                    ]
-                },
-                {
-                    taskId: '2',
-                    name: 'Cột 2',
-                    ColorHeader: 'blue',
-                    ColorText: 'white',
-                    sortOrder: 1
-                },
-                {
-                    taskId: '3',
-                    name: 'Cột 3',
-                    ColorHeader: 'blue',
-                    ColorText: 'white',
-                    sortOrder: 1
-                }
-            ],
+            
         }
     }
 }

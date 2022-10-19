@@ -25,11 +25,15 @@ export default {
         closePopup(callbackInsideComponent)
         {
             let me = this;
-            me.isShowDetail = false;
             me.nameDetailComponent = '';
             me.configModal = undefined;
             me.props = undefined;
             me.callbackOutsideComponent = undefined;
+            if(callbackInsideComponent)
+            {
+                callbackInsideComponent(me);
+            }
+            me.isShowDetail = false;
         }
     },
     data()

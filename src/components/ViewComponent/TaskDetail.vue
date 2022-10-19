@@ -1,5 +1,9 @@
 <template>
+    
     <div class="task-detail">
+        <div class="background-adding-task" v-if="isAddingTask">
+            <input type="text" v-model="nameNewTask" placeholder="Nhập tên công việc" ref="inpNewTask" @blur="addNewTask">
+        </div>
         <div class="header-feature d-flex j-end">
             <div class="lst-feature d-flex al-center j-spread-around">
                 <div class="file-icon c-poiter command-direct-icon"></div>
@@ -12,12 +16,13 @@
             </div>
         </div>
         <div class="body-task d-flex">
-            <div class="primary-content">
-                <div class="name-task txt-threedots fw-600">kasjdk jask jaskasjdk jask jas</div>
-                <div class="user-assigned">Người giao việc: <span>Ngô Vân Hải</span></div>
+            <div :class="['primary-content', isAddingTask? 'mg-t-60':'']">
+                <div class="name-task txt-threedots fw-600" v-if="!isAddingTask">{{dataEdit.taskName}}</div>
+                <div class="user-assigned" v-if="!isAddingTask">Người giao việc: <span>{{dataEdit.assignedBy?.firstName}} {{dataEdit.assignedBy?.lastName}}</span></div>
+                <div class="user-assigned" v-if="isAddingTask">Người giao việc:</div>
                 <div class="one-edit-task d-flex w-100 pd-t-16 j-spread-around">
                     <div class="one-edit-item assigned-user w-48 d-flex al-center">
-                        <img src="../../assets/defaultAvatar.png" alt="" class="avatar mg-l-10">
+                        <img :src="linkImg(dataEdit.assignedFor?.fileAvatarName)" alt="" class="avatar mg-l-10">
                         <div class="info-assigned-user pd-l-16">
                             <div>Người thực hiện</div>
                             <div class="fw-600">Trần Lê Minh</div>
@@ -31,15 +36,27 @@
                     </div>
                 </div>
                 <div class="pd-t-16 two-edit-task">
-                    <div v-if="dataEdit.description" v-html="dataEdit.description">
-                        
+                    
+                    <div v-if="!isEditingDescription">
+                        <div class="d-flex al-center fit-content c-poiter"  @click="changeModeEditingDescription(true)">
+                            <div class="file-icon description-task-icon"></div>
+                            <div class="pd-l-10 fw-600">Nhập mô tả</div>
+                        </div>
+                        <div class="w-100" v-html="dataEdit.description">
+
+                        </div>
                     </div>
-                    <div v-if="!dataEdit.description">
-                        <div class="d-flex al-center">
+                    <div v-if="isEditingDescription">
+                        <div class="d-flex al-center fit-content" @click="changeModeEditingDescription(true)">
                             <div class="file-icon blue-description-edit-icon"></div>
                             <div class="color-blue-taskdetail pd-l-10">Nhập mô tả</div>
                         </div>
                         <ckeditor @ready="onReady" :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
+                        <div class="d-flex mg-t-10">
+                            <button class="btn btn-white-silver" @click="changeModeEditingDescription(false)">Hủy bỏ</button>
+                            <button class="btn btn-primary mg-l-10" @click="commitDescription">Lưu</button>
+                        </div>
+
                     </div>
                 </div>
                 <div class="pd-t-16 three-edit-task">
@@ -190,6 +207,22 @@
                 </div>
             </div>
             <div class="not-primary-content">
+                <div class="d-flex al-center remind-task extra-feature c-poiter">
+                    <div class="file-icon remind-task-icon mg-l-10"></div>
+                    <div class="pd-l-10">Nhắc việc</div>
+                </div>
+                <div class="d-flex extra-info-task created-by-task" v-if="!isAddingTask">
+                    <div class="file-icon created-by-icon mg-t-2"></div> 
+                    <div class="info pd-l-14">
+                        <div>Đã tạo bởi</div>
+                        <div class="fw-600">
+                            {{dataEdit.createdBy.firstName}} {{dataEdit.createdBy.lastName}}
+                        </div>
+                        <div class="">
+                            {{formatCreatedTime(dataEdit.createdTime)}}
+                        </div>
+                    </div>   
+                </div>
             </div>
         </div>
     </div>
@@ -201,14 +234,15 @@
 
 <script>
 import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl} from '../../common/js/Enum.js';
-import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
 import { uuid } from 'vue-uuid';
 import Modal from '../commonComponent/Modal.vue';
 import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import AddLabelForm from '../ViewComponent/AddLabelForm.vue';
 import { mapGetters, mapMutations } from 'vuex';
 import FileAttach from '../commonComponent/FileAttach.vue';
-import Comment from '../commonComponent/Comment.vue'
+import Comment from '../commonComponent/Comment.vue';
+import {baseCallApi} from '../../common/js/BaseCallApi.js';
+import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
 
 export default {
     name: "TaskDetail",
@@ -237,14 +271,18 @@ export default {
     },
     created(){
         let me = this;
-        me.getListTaskChild();
-        me.getListCheckList();
-        me.getFileAttachment();
-        me.getListLabel();
-        me.getCommentsTask();
+        if(me.option.editMode == EnumEditMode.Edit)
+        {
+            me.loadAllData();
+        }
     },
     mounted(){
         let me = this;
+        if(me.option.editMode == EnumEditMode.Add)
+        {
+            debugger;
+            me.$refs.inpNewTask.focus();
+        }
     },
     computed:
     {
@@ -267,6 +305,99 @@ export default {
         }
     },
     methods: {
+        addNewTask()
+        {
+            let me = this;
+            me.callApi('post', 'api/task/insertcustom', {
+                taskId: null,
+                taskName: me.nameNewTask,
+                typeTask: me.option.typeTask,
+                description: null,
+                AssignedByEmail: null,
+                CreatedByEmail: null,
+                CreatedTime: null,
+                PathTreeTask: null,
+                StartTime: null,
+                EndTime: null,
+                SortOrder: null,
+                AssignForEmail: null
+            },null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    me.nameNewTask = '';
+                    me.isAddingTask = false;
+                    me.option.taskId = data.taskId;
+                    me.dataEdit.taskId = data.taskId;
+                    me.dataEdit.taskName = data.taskName;
+                    me.loadAllData();
+                }
+            });
+            me.nameNewTask = '';
+        },
+        loadAllData()
+        {
+            let me = this;
+            if(me.option.editMode == EnumEditMode.Edit || me.isAddingTask == false)
+            {
+                me.getInfoTask();
+            }
+            me.getListTaskChild();
+            me.getListCheckList();
+            me.getFileAttachment();
+            me.getListLabel();
+            me.getCommentsTask();
+        },
+        getInfoTask()
+        {
+            let me = this;
+            debugger;
+            me.callApi('get', `api/task/getfullinfo/${me.dataEdit.taskId}`,null).then(
+                res => {
+                    debugger;
+                    if(res.data.success)
+                    {
+                        let data = res.data.data;
+                        me.dataEdit.taskId = data.taskId;
+                        me.dataEdit.taskName = data.taskName;
+                        me.dataEdit.createdTime = data.createdTime;
+                        me.dataEdit.PathTreeTask = data.PathTreeTask;
+                        me.dataEdit.typeTask = data.typeTask;
+                        me.dataEdit.assignedBy = {};
+                        me.dataEdit.description = data.description;
+                        me.dataEdit.sortOrder = data.sortOrder;
+                        me.dataEdit.groupTask = data.groupTask;
+                        me.dataEdit.startTime = data.startTime;
+                        me.dataEdit.endTime = data.endTime;
+                        me.dataEdit.assignForEmail = data.assignForEmail;
+                        me.dataEdit.assignedFor = data.assignedFor;
+                        me.dataEdit.assignedBy = data.assignedBy;
+                        me.dataEdit.createdBy = data.createdBy;
+                    }
+                }
+            );
+        },
+        commitDescription()
+        {
+            let me = this;
+            me.callApi('put','api/task/description', {
+                taskId: me.option.taskId,
+                description: me.editorData
+            },null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.description = me.editorData;
+                    me.isEditingDescription = false;
+                }
+            });
+        },
+        changeModeEditingDescription(status)
+        {
+            let me = this;
+            me.isEditingDescription = status;
+        },
         deleteComment(commentId){
             let me = this;
             me.callApi(`delete`,`api/comment/${commentId}`)
@@ -292,7 +423,6 @@ export default {
         },
         commitComment(commentAfterEdit,modeOfComment){
             let me = this;
-            debugger;
             if(modeOfComment == EnumModeUseControl.Add)
             {
                 Object.assign(me.dataEdit.CommentFake.lstFileAttachment, commentAfterEdit.lstFileAttachment);
@@ -322,7 +452,6 @@ export default {
         },
         attachNewFileCommentAdd(commentId, newFile, modeOfComment){
             let me = this;  
-            debugger;
             if(modeOfComment == EnumModeUseControl.Add)
                 me.dataEdit.CommentFake.lstFileAttachment.push(newFile);
             else
@@ -451,9 +580,24 @@ export default {
             if(!me.countLoad) 
                 me.countLoad = 0;
             me.countLoad++;
-            if(me.countLoad == 5)
+            if(me.countLoad == 5 && me.option.editMode == EnumEditMode.Edit)
             {
+                
             }
+            else if(me.countLoad == 4 && me.option.editMode == EnumEditMode.Add)
+            {
+
+            }
+        },
+        linkImg(fileName)
+        {
+            let me = this;
+            if(fileName)
+            {
+                return baseCallApi.doMain + '' + `/file/img/${fileName}`;
+            }
+            
+            return '../../assets/defaultAvatar.png';
         },
         getListCheckList()
         {
@@ -515,6 +659,14 @@ export default {
                 me.addingChildTask = false;
             }
         },
+        formatCreatedTime(time)
+        {
+            let me = this;
+            let dateObject = me.$commonFunction.parseStringServerToDate(time);
+            return time? 
+            `${dateObject.getDate()}/${dateObject.getMonth()+1}/${dateObject.getFullYear()} ${dateObject.getHours()}:${dateObject.getMinutes()}`
+            : 'Không xác định';
+        },
         addChildTaskInput()
         {
             let me = this;
@@ -530,7 +682,6 @@ export default {
             me.isShowDetail = false;
         },
         onReady( editor )  {
-            // Insert the toolbar before the editable area.
             editor.ui.getEditableElement().parentElement.insertBefore(
                 editor.ui.view.toolbar.element,
                 editor.ui.getEditableElement()
@@ -635,12 +786,48 @@ export default {
         clostPopup()
         {
             let me = this;
-            me.$emit('closePopup',()=>{});
+            let callbackWhenClosePopup = function(objecParent){
+                let isExistsTask = false;
+                objecParent.lstColumnTask.forEach(column => {
+                    column.lstTask?.forEach(task => {
+                        if(task.taskId == me.dataEdit.taskId)
+                        {
+                            isExistsTask = true;
+                            task = me.dataEdit;
+                            // objecParent.$nextTick(() => {
+
+                            // })
+                        }
+                    });
+                })
+
+                if(!isExistsTask)
+                {
+                    if(me.option.typeTask == EnumTypeTask.Personal && objecParent.lstColumnTask.length > 0)
+                    {
+                        if(!objecParent.lstColumnTask[0].lstTask)
+                        {
+                            objecParent.lstColumnTask[0].lstTask = [];
+                        }
+                        objecParent.lstColumnTask[0].lstTask.push(me.dataEdit);
+                    }
+                }
+            };
+            me.$emit('closePopup',
+                callbackWhenClosePopup,
+                "ViewComponent");
         }
     },
     data()
     {
         return{
+
+
+            isAddingTask: this.option.editMode == EnumEditMode.Add,
+            nameNewTask: '',
+            isLoadingData: true,
+
+            //comment            
             modeCommentControl: EnumModeUseControl,
 
             //modal
@@ -659,6 +846,7 @@ export default {
             fakeNameChildTask: '',
 
             //ckeditor
+            isEditingDescription: false,
             editor: DecoupledEditor,
             editorData: '',
             editorConfig: {
@@ -666,7 +854,7 @@ export default {
                     items: [
                         'bold','italic','underline','strikethrough','|',
                         'fontsize','fontcolor','fontfamily','|',
-                        'alignment'
+                        'alignment',
                     ]
                 }
             },
@@ -681,6 +869,15 @@ export default {
             //     lstChildTask: []
             // },
             dataEdit: {
+                taskId: this.option.taskId,
+                taskName: '[In báo cáo/Báo cáo]Truy vấn lấy vé xuất lại',
+                createdBy: {
+                    email: "tlminh40300@gmail.com",
+                    fileAvatar: 'c304fbcb-7520-4ad9-b6d0-c020ee826330_rPL27_5f.jpg',
+                    firstName: "Trần",
+                    lastName: "Lê Minh"
+                },
+                createdTime: '2022-10-17T10:51:30',
                 description: '',
                 path: '',
                 lstCheckTask: [
@@ -743,7 +940,10 @@ export default {
                     content: '',
                     lstFileAttachment: [],
                     user: null
-                }
+                },
+                assignedFor:  {},
+                assignedBy : {},
+                createdBy : {}
             }
         }
     }

@@ -72,3 +72,14 @@
     border: 1px solid white;
     height: 60%;
 }
+
+.btn-white-silver
+{
+    background-color: transparent;
+    border: none;
+}
+
+.btn-white-silver:hover{
+    background-color: #f5f5f5;
+}
+
