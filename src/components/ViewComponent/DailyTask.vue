@@ -5,6 +5,7 @@
             columnColor="transparent"
             @showDetailTask="showDetailTask"
             :lstColumnTask="lstColumnTask"
+            ref="sorttable"
         />
     </div>
     <Modal :isShow="isShowDetail" :configModal="configModal">
@@ -27,25 +28,53 @@ export default {
         TaskDetail: defineAsyncComponent(()=> import('../ViewComponent/TaskDetail.vue')),
         Modal
     },
+    created()
+    {
+        let me = this;
+        me.getDailyTask(new Date(),new Date());
+    },
     mounted(){
 
+    },
+    watch:
+    {
+       
     },
     props:{
         
     },
     methods: {
-        getDailyTask()
+        getDailyTask(startTime,endTime)
         {
             let me = this;
-            me.callApi('get','api/task/dailytask')
-            .then();
+            startTime?.setHours(0,0,0,0);
+            endTime?.setHours(24,0,0,0);
+            me.callApi('post','api/task/dailytask',{
+                "startTime": me.$commonFunction.parseDateToStringDateServer(startTime),
+                "endTime": me.$commonFunction.parseDateToStringDateServer(endTime)
+            },null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    me.lstColumnTask[0].lstTask = [];
+                    me.lstColumnTask[1].lstTask = [];
+                    me.lstColumnTask[2].lstTask = [];
+                    if(data && data.length > 0)
+                    {
+                        for(let i = 0; i < data.length; i++)
+                        {
+                            me.lstColumnTask[i%3].lstTask.push(data[i]);    
+                        }
+                    }
+                }
+            });
         },
         closePopup(callback)
         {
             let me = this;
             if(callback)
             {
-                debugger;
                 callback(me);
             }
             me.isShowDetail = false;
@@ -69,7 +98,7 @@ export default {
                 width: '900px',
                 height: 'auto',
             },{
-                taskId: taskId?taskId:'515219ba-4c98-11ed-bdc3-0242ac120002',
+                taskId: taskId,
                 typeTask: EnumTypeTask.Personal,
                 editMode: EnumEditMode.Edit
             },null);
@@ -95,10 +124,7 @@ export default {
                     },
                     sortOrder: 1,
                     lstTask: [
-                        {
-                            taskId: '515219ba-4c98-11ed-bdc3-0242ac120002',
-                            taskName: 'Sua loi jira'
-                        }
+                        
                     ]
                 },
                 {

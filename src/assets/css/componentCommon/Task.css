@@ -24,13 +24,17 @@
 
 .fast-feature .assigned-user
 {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
 }
 
 .fast-feature .assigned-user + .datepicker-icon
 {
     margin-left: 10px;
+}
+
+.task .label{
+    margin: 8px 0px 0px 8px;
 }
 

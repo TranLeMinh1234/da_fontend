@@ -151,7 +151,6 @@ export default {
         attachNewFileCommentAdd(newFile)
         {
             let me = this;
-            debugger;
             me.$emit('attachNewFileCommentAdd', me.data.commentId, newFile, me.mode);
         },
         ChangeModeEdit()

@@ -10,8 +10,13 @@
                 left: displayX,
             }"
         >
-            <div :class="['arrow-droprown ','arrow-' + configDropDown?.directArrow]"></div>
-            <slot></slot>
+            <div 
+                :class="['arrow-droprown ','arrow-' + configDropDown?.directArrow]"
+                :style="arrowPostion"
+            ></div>
+            <div class="content-dropdown" ref="rootDropDown">
+                <slot></slot>
+            </div>
         </div>
     </teleport>
 </template>
@@ -26,7 +31,10 @@ export default {
 
         //init hide click outside dropdown
         document.addEventListener('click', (event)=>{
-            if((!me.$el.contains(event.target) && !me.elementUseDropDown?.contains(event.target)) && me.isShowDropDown == true)
+            if((!me.$el.contains(event.target) && 
+                !me.elementUseDropDown?.contains(event.target)) && 
+                !me.$refs.rootDropDown.contains(event.target) &&
+                me.isShowDropDown == true)
             {
                 me.$emit('hideDropDown');
             }
@@ -44,6 +52,8 @@ export default {
                     height: 200,
                     positionXShow: 50,
                     positionYShow: 50,
+                    arrowPositionX: 0,
+                    arrowPositionY: 0,
                     directArrow: 'top',
                 };
             }
@@ -70,6 +80,43 @@ export default {
     watch:{
     },
     computed: {
+        arrowPostion(){
+            let me = this;
+            let result = {};
+            if(!me.configDropDown)
+                return result;
+            if(me.configDropDown.directArrow.includes('top'))
+            {
+                result = {
+                    left: `calc(50% + ${me.configDropDown?.arrowPositionX}px)`,
+                    top: `calc(-14px + ${me.configDropDown?.arrowPositiony})`
+                }
+            }
+            else if(me.configDropDown.directArrow.includes('bottom'))
+            {
+                result = {
+                    left: `calc(50% + ${me.configDropDown?.arrowPositionX}px)`,
+                    bottom: `calc(-48px + ${me.configDropDown?.arrowPositiony})`
+                }
+            }
+            else if(me.configDropDown.directArrow.includes('left'))
+            {
+                result = {
+                    left: `calc(-14px + ${me.configDropDown?.arrowPositionX}px)`,
+                    top: `calc(50% + ${me.configDropDown?.arrowPositiony})`
+                }
+            }
+            //right
+            else
+            {
+                result = {
+                    left: `calc(-48px + ${me.configDropDown?.arrowPositionX}px)`,
+                    top: `calc(50% + ${me.configDropDown?.arrowPositiony})`
+                }
+            }
+
+            return result;
+        },
         displayX()
         {
             let me = this;
@@ -79,11 +126,11 @@ export default {
 
             if(me.configDropDown.directArrow.includes('top'))
             {
-                result = me.configDropDown.positionXShow - me.configDropDown.width/2;
+                result = me.configDropDown.positionXShow - me.configDropDown.width/2 - me.configDropDown.arrowPositionX;
             }
             else if(me.configDropDown.directArrow.includes('bottom'))
             {
-                result = me.configDropDown.positionXShow - me.configDropDown.width/2;
+                result = me.configDropDown.positionXShow - me.configDropDown.width/2 - me.configDropDown.arrowPositionX;
             }
             else if(me.configDropDown.directArrow.includes('left'))
             {
@@ -112,12 +159,12 @@ export default {
             }
             else if(me.configDropDown.directArrow.includes('left'))
             {
-                result = me.configDropDown.positionYShow - me.configDropDown.height/2;
+                result = me.configDropDown.positionYShow - me.configDropDown.height/2 - me.configDropDown.arrowPositionY;
             }
             //right
             else
             {
-                result = me.configDropDown.positionYShow - me.configDropDown.height/2;
+                result = me.configDropDown.positionYShow - me.configDropDown.height/2 - me.configDropDown.arrowPositionY;
             }
             return result + 'px';
         }

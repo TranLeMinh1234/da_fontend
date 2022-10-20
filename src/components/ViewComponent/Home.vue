@@ -95,6 +95,42 @@
                             <div class="file-icon down-arrow-icon mg-l-10"></div>
                         </button>
                     </div>
+                    <IconDropDown
+                        :config="{
+                            width: 650,
+                            height: 100,
+                            arrowPositionX:200,
+                            arrowPositionY:200,
+                            directArrow: 'top',
+                        }"
+                        iconClass="big-white-filter-icon"
+                        :isShowDropDown="isShowFilterDailyTask"
+                        @showDropDownEvent="showFilterDailyTaskEvent"
+                        @closeDropDownEvent="closeFilterDailyTaskEvent"
+                    >
+                        <div class="w-100 d-flex al-center pd-8">
+                            <div class="d-flex al-center pd-r-16 pd-l-16">
+                                <div class="pd-r-16">Từ ngày:</div>
+                                <Datepicker 
+                                    style="width: 200px" 
+                                    v-model="filterDailyTask.startTime" 
+                                    :format="formatDatePicker"
+                                    @internalModelChange="StartDateFilterChange"/>
+                            </div>
+                            <div class="d-flex al-center pd-l-16">
+                                <div class="pd-r-16">Đến ngày:</div>
+                                <Datepicker 
+                                    style="width: 200px" 
+                                    v-model="filterDailyTask.endTime" 
+                                    :format="formatDatePicker"
+                                    @internalModelChange="EndDateFilterChange"/>
+                            </div>
+                        </div>
+                        <div class="d-flex al-center j-end w-96">
+                            <button class="btn btn-white-silver">Hủy</button>
+                            <button class="btn btn-primary mg-l-10" @click="excuteFilterDailyTask">Lọc</button>
+                        </div>
+                    </IconDropDown>
                     <div class="file-icon big-white-search-icon c-poiter"></div>
                     <div class="file-icon bell-white-icon c-poiter"></div>
                     <div class="file-icon more-feature-white-icon c-poiter"></div>
@@ -118,13 +154,40 @@ import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import Modal from '../commonComponent/Modal.vue';
 import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
 import TaskDetail from './TaskDetail.vue';
+import IconDropDown from '../commonComponent/IconDropDown.vue';
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
     name: "Home",
     extends: BaseViewDetail,
     components: {
         Modal,
-        TaskDetail
+        TaskDetail,
+        IconDropDown,
+        Datepicker
+    },
+    created(){
+        let me = this;
+        
+        me.formatDatePicker = (date) => 
+        {
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+
+            return `${day}/${month}/${year}`;
+        }
+    },
+    computed:
+    {
+        isDailyTaskView() {
+            let me = this;
+            return this.$route.fullPath.includes('DailyTask');
+        }
+    },
+    watch: {
+        
     },
     mounted()
     {
@@ -132,6 +195,32 @@ export default {
         me.initHtmlCss();
     },
     methods: {
+        excuteFilterDailyTask()
+        {
+            let me = this;
+            me.$refs.view.getDailyTask(me.filterDailyTask.startTime,me.filterDailyTask.endTime);
+        },
+        StartDateFilterChange(value,whichDate)
+        {
+            let me = this;
+            if(!value)
+                me.filterDailyTask.startTime = new Date();
+        },
+        EndDateFilterChange(value,whichDate)
+        {
+            let me = this;
+            if(!value)
+                me.filterDailyTask.endTime = new Date();
+        },
+        showFilterDailyTaskEvent(){
+            let me = this;
+            me.isShowFilterDailyTask = true;
+        },
+        closeFilterDailyTaskEvent()
+        {
+            let me = this;
+            me.isShowFilterDailyTask = false;
+        },
         initHtmlCss()
         {
             let me = this;
@@ -162,7 +251,6 @@ export default {
             me.callbackOutsideComponent = undefined;
             if(callbackInsideComponent)
             {
-                debugger;
                 if(typeComponent == "ViewComponent")
                     callbackInsideComponent(me.$refs.view);
                 else
@@ -218,6 +306,12 @@ export default {
     data()
     {
         return {
+            filterDailyTask: {
+                startTime: new Date(),
+                endTime: new Date(),
+            },
+            isShowFilterDailyTask: false,
+
             isShowMenu: true,
             isShowPersonalGroup: true,
             isShowCommunityGroup: true,

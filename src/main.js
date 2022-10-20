@@ -6,6 +6,10 @@ import { commonFunction } from './common/js/commFunction.js';
 import { zindexManage } from './common/js/zindexManage.js';
 import { router } from './vuerouter/router.js';
 
+//datepicker
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+
 //ckeditor
 
 //axios
@@ -62,6 +66,8 @@ const optionsLoading = {
   };
 
 app.use(CKEditor);
+
+app.component('Datepicker', Datepicker);
 
 // config biến toàn cục
 app.provide("toast",toast);

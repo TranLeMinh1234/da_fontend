@@ -1,5 +1,6 @@
 <template>
   <router-view></router-view>
+  <div id="dialogBind" class="d-none"></div>
 </template>
 
 <script>

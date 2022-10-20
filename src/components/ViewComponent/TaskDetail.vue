@@ -11,8 +11,25 @@
                 <div class="file-icon c-poiter attachment-icon" @click="uploadFileAttachment"></div>
                 <div class="file-icon c-poiter attach-label-icon" @click="showFormAddLabel()"></div>
                 <div class="file-icon c-poiter copy-link-icon"></div>
-                <div class="file-icon c-poiter more-feature-icon"></div>
-                <div class="file-icon c-poiter exit-popup-icon" @click="clostPopup()"></div>
+                <IconDropDown
+                    iconClass="more-feature-icon"
+                    :config="{
+                        width: 250,
+                        height: 75,
+                        directArrow: 'top'
+                    }"
+                    :isShowDropDown="isShowMoreFeatureDropDown"
+                    @showDropDownEvent="showMoreFeatureTaskDetail"
+                    @closeDropDownEvent="closeMoreFeatureTaskDetail"
+                >
+                    <div class="more-feature-taskdetail pd-8">
+                        <div class="d-flex pd-16 al-center feature-taskdetail-item c-poiter" @click="deleteTask">
+                            <div class="file-icon delete-line-icon pd-r-12"></div>
+                            <div class="cl-red">Xóa</div>
+                        </div>
+                    </div>
+                </IconDropDown>
+                <div class="file-icon c-poiter exit-popup-icon" @click="closeTaskDetailPopup()"></div>
             </div>
         </div>
         <div class="body-task d-flex">
@@ -28,12 +45,64 @@
                             <div class="fw-600">Trần Lê Minh</div>
                         </div>
                     </div>
-                    <div class="one-edit-item w-48 d-flex al-center">
+                    <!-- <div class="one-edit-item w-48 d-flex al-center">
                         <div class="file-icon select-expire-time-icon mg-l-10"></div>
                         <div class="info-assigned-user pd-l-16">
                             Chọn hạn hoàn thành
                         </div>
-                    </div>
+                    </div> -->
+                    <ItemDropDown
+                        :config="{
+                            width: 600,
+                            height: 450,
+                            directArrow: 'top'
+                        }"
+                        :isShowDropDown="isShowDeadlineDropDown"
+                        @showDropDownEvent="showDeadLineTaskDetail"
+                        @closeDropDownEvent="closeDeadLineTaskDetail"
+                        class="one-edit-item w-48 d-flex al-center"
+                    >
+                        <template #item>
+                            <div class="w-100 h-100 d-flex al-center c-poiter">
+                                <div class="file-icon select-expire-time-icon mg-l-10"></div>
+                                <div class="info-assigned-user pd-l-16">
+                                    Chọn hạn hoàn thành
+                                </div>
+                            </div>
+                        </template>
+                        <template #dropdown>
+                            <div class="d-flex header-deadline-dropdown">
+                                <div 
+                                    :class="['d-flex','tab-deadline',!isTabStartDeadline? 'tab-active':'','center-items']"
+                                    @click="isTabStartDeadline = !isTabStartDeadline"
+                                >
+                                    <div>Hạn hoàn thành</div>
+                                </div>
+                                <div 
+                                    :class="['d-flex','tab-deadline',isTabStartDeadline? 'tab-active':'','center-items']"
+                                    @click="isTabStartDeadline = !isTabStartDeadline"
+                                >
+                                    <div>Thời gian bắt đầu</div>
+                                </div>
+                            </div>
+                            <div class="date-picker d-flex">
+                                <Datepicker 
+                                v-show="!isTabStartDeadline"
+                                style="width: 100%"
+                                :format="formatDatePicker"
+                                selectText="Lưu"
+                                cancelText="Hủy bỏ"
+                                inline/>
+                                <Datepicker 
+                                v-show="isTabStartDeadline"
+                                style="width: 100%"
+                                :format="formatDatePicker"
+                                selectText="Lưu"
+                                cancelText="Hủy bỏ"
+                                inline/>
+                            </div>
+                        </template>
+                    </ItemDropDown>
                 </div>
                 <div class="pd-t-16 two-edit-task">
                     
@@ -105,14 +174,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="pd-t-16 four-edit-task" v-if="dataEdit.lstLabel.length > 0">
+                <div class="pd-t-16 four-edit-task" v-if="dataEdit.listLabel.length > 0">
                     <div class="header d-flex al-center">
                         <div class="file-icon attach-label-icon"></div>
                         <div class="fw-600 pd-l-10">Gắn thẻ</div>
                     </div>
                     <div class="d-flex lst-label al-center fl-wrap w-100 mg-t-10">
                         <div 
-                            v-for="label in dataEdit.lstLabel" :key="label.labelId"
+                            v-for="label in dataEdit.listLabel" :key="label.labelId"
                             class="label"
                             :style="{
                                 color: 'white',
@@ -236,6 +305,7 @@
 import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl} from '../../common/js/Enum.js';
 import { uuid } from 'vue-uuid';
 import Modal from '../commonComponent/Modal.vue';
+import IconDropDown from '../commonComponent/IconDropDown.vue';
 import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import AddLabelForm from '../ViewComponent/AddLabelForm.vue';
 import { mapGetters, mapMutations } from 'vuex';
@@ -243,6 +313,8 @@ import FileAttach from '../commonComponent/FileAttach.vue';
 import Comment from '../commonComponent/Comment.vue';
 import {baseCallApi} from '../../common/js/BaseCallApi.js';
 import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
+import ItemDropDown from '../commonComponent/ItemDropDown.vue';
+import Datepicker from '@vuepic/vue-datepicker';
 
 export default {
     name: "TaskDetail",
@@ -252,7 +324,10 @@ export default {
         Modal,
         AddLabelForm,
         FileAttach,
-        Comment
+        Comment,
+        IconDropDown,
+        ItemDropDown,
+        Datepicker
     },
     props:
     {
@@ -271,6 +346,15 @@ export default {
     },
     created(){
         let me = this;
+        me.formatDatePicker = (date) => 
+        {
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+
+            return `${day}/${month}/${year}`;
+        }
+
         if(me.option.editMode == EnumEditMode.Edit)
         {
             me.loadAllData();
@@ -280,7 +364,6 @@ export default {
         let me = this;
         if(me.option.editMode == EnumEditMode.Add)
         {
-            debugger;
             me.$refs.inpNewTask.focus();
         }
     },
@@ -305,36 +388,107 @@ export default {
         }
     },
     methods: {
+        showDeadLineTaskDetail()
+        {
+            let me = this;
+            me.isShowDeadlineDropDown = true;
+        },
+        closeDeadLineTaskDetail()
+        {
+            let me = this;
+            me.isShowDeadlineDropDown = false;
+        },
+        deleteTask()
+        {
+            let me = this;
+            let callbackAfterDeleteTask = function()
+            {
+                me.callApi('delete', `api/task/deleteCustom/${me.option.taskId}`,null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        let data = res.data.data;
+                        let callBackDoInDailyTaskView = function(objecParent)
+                        {
+                            objecParent.lstColumnTask.forEach(column => {
+                                column.lstTask = column.lstTask && column.lstTask.length > 0 ? 
+                                    column.lstTask.filter(task => task.taskId != me.option.taskId) 
+                                    : [];
+                            })
+                        }
+                        me.$emit('closePopup',
+                                callBackDoInDailyTaskView,
+                                "ViewComponent");
+                    }
+                });
+            }
+
+            me.showDialogConfirm({
+                width: "500px",
+                height: "260px",
+                borderTop: true
+            },{
+                'title': "Xóa công việc",
+                'content': "Sau khi thực hiện xóa công việc, tất cả các dữ liệu liên quan bao gồm: thông tin mô tả công việc, tài liệu đính kèm, các công việc con, bình luận, lịch sử hoạt động,... sẽ bị xóa khỏi hệ thống? Bạn có chắc chắn muốn thực hiện thao tác này không?"
+            }, callbackAfterDeleteTask);
+        },
+        showMoreFeatureTaskDetail()
+        {
+            let me = this;
+            me.isShowMoreFeatureDropDown = true;
+        },
+        closeMoreFeatureTaskDetail()
+        {
+            let me = this;
+            me.isShowMoreFeatureDropDown = false;
+        },
         addNewTask()
         {
             let me = this;
-            me.callApi('post', 'api/task/insertcustom', {
-                taskId: null,
-                taskName: me.nameNewTask,
-                typeTask: me.option.typeTask,
-                description: null,
-                AssignedByEmail: null,
-                CreatedByEmail: null,
-                CreatedTime: null,
-                PathTreeTask: null,
-                StartTime: null,
-                EndTime: null,
-                SortOrder: null,
-                AssignForEmail: null
-            },null)
-            .then(res => {
-                if(res.data.success)
-                {
-                    let data = res.data.data;
-                    me.nameNewTask = '';
-                    me.isAddingTask = false;
-                    me.option.taskId = data.taskId;
-                    me.dataEdit.taskId = data.taskId;
-                    me.dataEdit.taskName = data.taskName;
-                    me.loadAllData();
-                }
-            });
-            me.nameNewTask = '';
+            if(me.nameNewTask)
+            {
+                me.callApi('post', 'api/task/insertcustom', {
+                    taskId: null,
+                    taskName: me.nameNewTask,
+                    typeTask: me.option.typeTask,
+                    description: null,
+                    AssignedByEmail: null,
+                    CreatedByEmail: null,
+                    CreatedTime: null,
+                    PathTreeTask: null,
+                    StartTime: null,
+                    EndTime: null,
+                    SortOrder: null,
+                    AssignForEmail: null
+                },null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        let data = res.data.data;
+                        me.nameNewTask = '';
+                        me.isAddingTask = false;
+                        me.option.taskId = data.taskId;
+                        me.dataEdit.taskId = data.taskId;
+                        me.dataEdit.taskName = data.taskName;
+                        me.loadAllData();
+                    }
+                });
+            }
+            else
+            {
+                me.showDialogNotification(
+                    {
+                        width: '400px',
+                        height: '180px',
+                        borderTop: true
+                    },
+                    {
+                        'title': 'Cảnh báo',
+                        'content': 'Tên công việc không được bỏ trống'
+                    }, 
+                    undefined
+                )
+            }
         },
         loadAllData()
         {
@@ -352,10 +506,8 @@ export default {
         getInfoTask()
         {
             let me = this;
-            debugger;
             me.callApi('get', `api/task/getfullinfo/${me.dataEdit.taskId}`,null).then(
                 res => {
-                    debugger;
                     if(res.data.success)
                     {
                         let data = res.data.data;
@@ -508,8 +660,8 @@ export default {
                     {
                         data = [];
                     }
-                    // me.dataRoot.lstLabel = data;
-                    me.dataEdit.lstLabel = data;
+                    // me.dataRoot.listLabel = data;
+                    me.dataEdit.listLabel = data;
                     me.checkFinishLoadData();
                 }
             });
@@ -597,7 +749,7 @@ export default {
                 return baseCallApi.doMain + '' + `/file/img/${fileName}`;
             }
             
-            return '../../assets/defaultAvatar.png';
+            return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOjnJAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjkyOEJDRjNERjQzRjExRTNBMDE2RjY3ODg3MTdFOTlDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjkyOEJDRjNFRjQzRjExRTNBMDE2RjY3ODg3MTdFOTlDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6OTI4QkNGM0JGNDNGMTFFM0EwMTZGNjc4ODcxN0U5OUMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OTI4QkNGM0NGNDNGMTFFM0EwMTZGNjc4ODcxN0U5OUMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7bOPvnAAAKCElEQVR42uydW1MT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';
         },
         getListCheckList()
         {
@@ -768,7 +920,7 @@ export default {
                 res => {
                     if(res.data.success)
                     {
-                        me.dataEdit.lstLabel = me.dataEdit.lstLabel.filter(label => 
+                        me.dataEdit.listLabel = me.dataEdit.listLabel.filter(label => 
                             label.labelId != labelId);
                     }
                 }
@@ -783,22 +935,29 @@ export default {
                 borderTop: true
             }, null, null);
         },
-        clostPopup()
+        closeTaskDetailPopup()
         {
             let me = this;
             let callbackWhenClosePopup = function(objecParent){
                 let isExistsTask = false;
+                debugger;
                 objecParent.lstColumnTask.forEach(column => {
-                    column.lstTask?.forEach(task => {
-                        if(task.taskId == me.dataEdit.taskId)
+                    if(column.lstTask && column.lstTask.length > 0)
+                    {
+                        let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
+                        if(indexTaskExist > -1)
                         {
                             isExistsTask = true;
-                            task = me.dataEdit;
-                            // objecParent.$nextTick(() => {
-
-                            // })
+                            column.lstTask[indexTaskExist] = me.dataEdit;
                         }
-                    });
+                    }
+                    // column.lstTask?.forEach(task => {
+                    //     if(task.taskId == me.dataEdit.taskId)
+                    //     {
+                    //         isExistsTask = true;
+                    //         task = me.dataEdit;
+                    //     }
+                    // });
                 })
 
                 if(!isExistsTask)
@@ -821,7 +980,10 @@ export default {
     data()
     {
         return{
+            isShowDeadlineDropDown: false,
+            isTabStartDeadline: false,
 
+            isShowMoreFeatureDropDown: false,
 
             isAddingTask: this.option.editMode == EnumEditMode.Add,
             nameNewTask: '',
@@ -850,6 +1012,7 @@ export default {
             editor: DecoupledEditor,
             editorData: '',
             editorConfig: {
+                language: 'vi',
                 toolbar: {
                     items: [
                         'bold','italic','underline','strikethrough','|',
@@ -865,7 +1028,7 @@ export default {
             //     description: '',
             //     path: '',
             //     lstCheckTask: [],
-            //     lstLabel: [],
+            //     listLabel: [],
             //     lstChildTask: []
             // },
             dataEdit: {
@@ -879,59 +1042,18 @@ export default {
                 },
                 createdTime: '2022-10-17T10:51:30',
                 description: '',
-                path: '',
                 lstCheckTask: [
-                    // {
-                    //     checkTaskId: '1',
-                    //     content: 'Tạo Database',
-                    //     status: false
-                    // }
+                    
                 ],
-                lstLabel: [],
+                listLabel: [],
                 lstChildTask: [
-                    // {
-                    //     taskId: '1',
-                    //     taskName: 'Task 1'
-                    // },
+                    
                 ],
                 lstFileAttachment: [
-                //    {
-                //         fileId: '0f3a7af9-2609-4c3a-b900-c35982178eaa',
-                //         fileName: '0f3a7af9-2609-4c3a-b900-c35982178eaa_acdbb4bc-d5b8-4a0f-88b1-376efbf966a3.jpg',
-                //         extensionOfFile: '.jpg',
-                //         filePath: '',
-                //         typeAttachment: 1,
-                //         attachmentId: this.option.taskId,
-                //         createdTime: null,
-                //         createdByEmail: null
-                //    }
+                
                 ],
                 lstComment: [
-                    // {
-                    //     commentId: uuid.v1(),
-                    //     createdByEmail: null,
-                    //     createdTime: new Date(),
-                    //     content: 'alo 123',
-                    //     lstFileAttachment: [
-                    //         {
-                    //             fileId: '0f3a7af9-2609-4c3a-b900-c35982178eaa',
-                    //             fileName: '0f3a7af9-2609-4c3a-b900-c35982178eaa_acdbb4bc-d5b8-4a0f-88b1-376efbf966a3.jpg',
-                    //             extensionOfFile: '.jpg',
-                    //             filePath: '',
-                    //             typeAttachment: EnumAttachment.AttachComment,
-                    //             attachmentId: this.option.taskId,
-                    //             createdTime: null,
-                    //             createdByEmail: null
-                    //        },
-                    //     ],
-                    //     user: 
-                    //     {
-                    //         email: "tlminh40300@gmail.com",
-                    //         fileAvatar: 'c304fbcb-7520-4ad9-b6d0-c020ee826330_rPL27_5f.jpg',
-                    //         firstName: "Trần",
-                    //         lastName: "Lê Minh"
-                    //     }
-                    // }
+                    
                 ],
                 CommentFake: {
                     commentId: uuid.v1(),

@@ -104,6 +104,10 @@
     padding-right: 16px;
 }
 
+.pd-r-12
+{
+    padding-right: 12px;
+}
 
 
 .cl-red
@@ -160,6 +164,11 @@
     width: 90% !important;
 }
 
+.w-96
+{
+    width: 96% !important;
+}
+
 .w-100
 {
     width: 100% !important;
@@ -198,6 +207,10 @@
 .mg-auto
 {
     margin: auto;
+}
+
+.mg-r-10{
+    margin-right: 10px;
 }
 
 .mg-t-10{
@@ -297,6 +310,10 @@
     padding: 8px;
 }
 
+.pd-16{
+    padding: 16px;
+}
+
 .pd-l-8
 {
     padding-left: 8px;
@@ -321,4 +338,31 @@
 
 .p-absolute{
     position: absolute;
+}
+
+/* date pick */
+.dp__menu_index
+{
+    z-index: 999999999999 !important;
+}
+
+div[role="dialog"]
+{
+    width: 100%;
+}
+
+.dp__calendar{
+    width: 100%;
+}
+
+.dp__calendar_header{
+    width: 100%;
+}
+
+.dp__calendar_header_item{
+    text-align: unset;
+}
+
+.cl-red{
+    color: red;
 }

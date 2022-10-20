@@ -367,3 +367,12 @@
     height: 24px;
     background-position: -740px -580px;
 }
+
+.big-white-filter-icon
+{
+    width: 24px;
+    height: 24px;
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -292px -132px;
+    background-color: white;
+}

@@ -22,7 +22,7 @@
                 </div>
                 <Task 
                     v-for="task in column.lstTask" 
-                    :key="task.id" 
+                    :key="task.taskId" 
                     @dblclick="showDetailTask(task.taskId)"
                     :data="task"
                 />
@@ -81,6 +81,12 @@ export default {
             });
         });
     },
+    watch: {
+        'lstColumnTask.lstTask': function(newValue)
+        {
+            
+        }
+    },
     props: {
         columnColor: {
             type: String, 
@@ -99,7 +105,6 @@ export default {
         showDetailTask(taskId)
         {
             let me = this;
-            debugger;
             me.$emit('showDetailTask', taskId);
         }
     },

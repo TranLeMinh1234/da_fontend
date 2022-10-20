@@ -1,9 +1,10 @@
 <template>
-    <div class="icon-dropdown">
+    <div class="item-dropdown">
         <div 
-            :class="['icon-component', 'file-icon', iconClass]" 
+            :class="['item-component']" 
             @click="executeShowDropDown()"
         >
+            <slot name="item"></slot>
         </div>
         <DropDown 
             :configDropDown="configDropDown"
@@ -11,7 +12,7 @@
             :elementUseDropDown="elementUseDropDown"
             @hideDropDown="hideDropDown()"
         >
-            <slot></slot>
+            <slot name="dropdown"></slot>
         </DropDown>
     </div>
 </template>
@@ -49,7 +50,7 @@ export default {
         findPositionIcon()
         {
             let me = this;
-            me.elementUseDropDown = me.$el.querySelector('.icon-component');
+            me.elementUseDropDown = me.$el.querySelector('.item-component');
             let postionIcon = me.elementUseDropDown.getBoundingClientRect();
             me.config.positionXShow = postionIcon.left + postionIcon.width/2;
             me.config.positionYShow = postionIcon.top + postionIcon.height/2;
@@ -101,5 +102,5 @@ export default {
 </script>
 
 <style scoped>
-
+@import url(../../assets/css/componentCommon/ItemDropDown.css);
 </style>

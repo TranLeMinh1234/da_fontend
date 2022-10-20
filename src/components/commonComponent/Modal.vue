@@ -42,9 +42,16 @@ export default {
     name: 'Modal',
     created(){
         let me = this;
-        me.zindex = typeof me.mainApp == "function"? 
-        me.mainApp().$zindexManage.getBiggestZindex() 
-        : this.$zindexManage.getBiggestZindex();
+        if(typeof me.mainApp == "function")
+        {
+            me.mainApp().$zindexManage.generateBiggestZindex();
+            me.zindex = me.mainApp().$zindexManage.getBiggestZindex();
+        }
+        else
+        {
+            me.$zindexManage.generateBiggestZindex();
+            me.zindex = me.$zindexManage.getBiggestZindex();
+        }
 
     },
     mounted(){
@@ -82,6 +89,8 @@ export default {
             }
             else
             {
+                typeof me.mainApp == "function"? me.mainApp().$zindexManage.generateBiggestZindex() 
+                : this.$zindexManage.generateBiggestZindex();
                 me.calculate();
             }
         }

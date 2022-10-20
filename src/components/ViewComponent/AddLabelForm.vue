@@ -97,7 +97,7 @@ export default {
                 let arrayLabelIdAdd = [];
                 me.lstAdd.forEach(labelAdd => {
                     let isStored = false;
-                    objectParent.dataEdit.lstLabel.forEach(label => {
+                    objectParent.dataEdit.listLabel.forEach(label => {
                         if(label.labelId == labelAdd.labelId)
                             isStored = true;
                     })
@@ -117,7 +117,7 @@ export default {
                 .then(res => {
                     if(res.data.success)
                     {
-                        objectParent.dataEdit.lstLabel = objectParent.dataEdit.lstLabel.concat(arrayPush);
+                        objectParent.dataEdit.listLabel = objectParent.dataEdit.listLabel.concat(arrayPush);
                     }
                     else
                     {
