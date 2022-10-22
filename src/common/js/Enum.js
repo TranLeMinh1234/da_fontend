@@ -24,4 +24,9 @@ var EnumModeUseControl = {
     Add: 1
 };
 
-export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl};
+var EnumTypeDeadline = {
+    Start: 0,
+    End: 1
+};
+
+export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline};

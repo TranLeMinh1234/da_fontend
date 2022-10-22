@@ -7,14 +7,15 @@
         </div>
         <div class="d-flex lst-label al-center fl-wrap w-100 mg-t-10">
             <div 
-                v-for="label in data.listLabel" :key="label.labelId"
+                v-for="label in data.listLabel" :key="label?.labelId"
+                v-show="label != null"
                 class="label"
                 :style="{
                     color: 'white',
-                    backgroundColor: label.color,
+                    backgroundColor: label?.color,
                 }"
             >
-                <div>{{label.nameLabel}}</div>
+                <div>{{label?.nameLabel}}</div>
             </div>
         </div>
     </div>
@@ -45,7 +46,6 @@ export default {
     watch:{
         'data.listLabel': function(newValue)
         {
-            debugger;
         }
     },
     methods: {

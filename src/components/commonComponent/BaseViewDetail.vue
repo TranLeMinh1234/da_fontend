@@ -28,6 +28,7 @@ export default {
             me.nameDetailComponent = '';
             me.configModal = undefined;
             me.props = undefined;
+            me.data = undefined;
             me.callbackOutsideComponent = undefined;
             if(callbackInsideComponent)
             {

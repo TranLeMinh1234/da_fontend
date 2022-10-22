@@ -31,10 +31,26 @@ var commonFunction = {
             return null;
         return new Date(Date.parse(time));
     },
+    parseDateJsToString(time)
+    {
+        if(!time)
+            return null;
+        
+        if(typeof time == 'string')
+        {
+            time = this.parseStringServerToDate(time);
+        }
+
+        return `${time.getDate() < 10? '0' + time.getDate() : time.getDate()}/${time.getMonth()+1 < 10? '0' + time.getMonth()+1 : time.getMonth()+1}/${time.getFullYear()}`;
+    },
     parseDateToStringDateServer(date)
     {
         if(!date)
             return null;
+        if(typeof date == 'string')
+        {
+            date = this.parseStringServerToDate(date);
+        }
         return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}T${date.getHours() < 10? '0'+date.getHours(): date.getHours()}:${date.getMinutes() < 10? '0'+date.getMinutes(): date.getMinutes()}:${date.getSeconds() < 10? '0'+date.getSeconds(): date.getSeconds()}`
     }
 };

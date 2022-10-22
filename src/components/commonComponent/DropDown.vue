@@ -11,7 +11,8 @@
             }"
         >
             <div 
-                :class="['arrow-droprown ','arrow-' + configDropDown?.directArrow]"
+                :class="['arrow-droprown ','arrow-' + configDropDown?.directArrow, 
+                isHaveArrow == false? 'd-none':'']"
                 :style="arrowPostion"
             ></div>
             <div class="content-dropdown" ref="rootDropDown">
@@ -31,9 +32,9 @@ export default {
 
         //init hide click outside dropdown
         document.addEventListener('click', (event)=>{
-            if((!me.$el.contains(event.target) && 
+            if((!me.$el?.contains(event.target) && 
                 !me.elementUseDropDown?.contains(event.target)) && 
-                !me.$refs.rootDropDown.contains(event.target) &&
+                !me.$refs.rootDropDown?.contains(event.target) &&
                 me.isShowDropDown == true)
             {
                 me.$emit('hideDropDown');
@@ -85,25 +86,25 @@ export default {
             let result = {};
             if(!me.configDropDown)
                 return result;
-            if(me.configDropDown.directArrow.includes('top'))
+            if(me.configDropDown.directArrow?.includes('top'))
             {
                 result = {
                     left: `calc(50% + ${me.configDropDown?.arrowPositionX}px)`,
-                    top: `calc(-14px + ${me.configDropDown?.arrowPositiony})`
+                    top: `calc(-14px + ${me.configDropDown?.arrowPositionY}px)`
                 }
             }
-            else if(me.configDropDown.directArrow.includes('bottom'))
+            else if(me.configDropDown.directArrow?.includes('bottom'))
             {
                 result = {
                     left: `calc(50% + ${me.configDropDown?.arrowPositionX}px)`,
-                    bottom: `calc(-48px + ${me.configDropDown?.arrowPositiony})`
+                    bottom: `calc(-48px + ${me.configDropDown?.arrowPositionY}px)`
                 }
             }
-            else if(me.configDropDown.directArrow.includes('left'))
+            else if(me.configDropDown.directArrow?.includes('left'))
             {
                 result = {
                     left: `calc(-14px + ${me.configDropDown?.arrowPositionX}px)`,
-                    top: `calc(50% + ${me.configDropDown?.arrowPositiony})`
+                    top: `calc(50% + ${me.configDropDown?.arrowPositionY}px)`
                 }
             }
             //right
@@ -111,7 +112,7 @@ export default {
             {
                 result = {
                     left: `calc(-48px + ${me.configDropDown?.arrowPositionX}px)`,
-                    top: `calc(50% + ${me.configDropDown?.arrowPositiony})`
+                    top: `calc(50% + ${me.configDropDown?.arrowPositionY}px)`
                 }
             }
 
@@ -124,15 +125,15 @@ export default {
             if(!me.configDropDown)
                 return result;
 
-            if(me.configDropDown.directArrow.includes('top'))
+            if(me.configDropDown.directArrow?.includes('top'))
             {
                 result = me.configDropDown.positionXShow - me.configDropDown.width/2 - me.configDropDown.arrowPositionX;
             }
-            else if(me.configDropDown.directArrow.includes('bottom'))
+            else if(me.configDropDown.directArrow?.includes('bottom'))
             {
                 result = me.configDropDown.positionXShow - me.configDropDown.width/2 - me.configDropDown.arrowPositionX;
             }
-            else if(me.configDropDown.directArrow.includes('left'))
+            else if(me.configDropDown.directArrow?.includes('left'))
             {
                 result = me.configDropDown.positionXShow + 40;
             }
@@ -149,15 +150,15 @@ export default {
             let result = 0;
             if(!me.configDropDown)
                 return result;
-            if(me.configDropDown.directArrow.includes('top'))
+            if(me.configDropDown.directArrow?.includes('top'))
             {
                 result = me.configDropDown.positionYShow + 28;
             }
-            else if(me.configDropDown.directArrow.includes('bottom'))
+            else if(me.configDropDown.directArrow?.includes('bottom'))
             {
                 result = me.configDropDown.positionYShow - me.configDropDown.height - 28;
             }
-            else if(me.configDropDown.directArrow.includes('left'))
+            else if(me.configDropDown.directArrow?.includes('left'))
             {
                 result = me.configDropDown.positionYShow - me.configDropDown.height/2 - me.configDropDown.arrowPositionY;
             }

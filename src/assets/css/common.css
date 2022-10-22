@@ -226,6 +226,11 @@
     margin-top: 2px;
 }
 
+.mg-t-auto
+{
+    margin: auto 0px auto 0px;
+}
+
 .mg-l-4
 {
     margin-left: 4px;
@@ -346,23 +351,28 @@
     z-index: 999999999999 !important;
 }
 
-div[role="dialog"]
+.date-picker div[role="dialog"]
 {
     width: 100%;
 }
 
-.dp__calendar{
+.date-picker .dp__calendar{
     width: 100%;
 }
 
-.dp__calendar_header{
+.date-picker .dp__calendar_header{
     width: 100%;
 }
 
-.dp__calendar_header_item{
+.date-picker .dp__calendar_header_item{
     text-align: unset;
 }
 
 .cl-red{
     color: red;
+}
+
+.pe-none
+{
+    pointer-events:none;
 }

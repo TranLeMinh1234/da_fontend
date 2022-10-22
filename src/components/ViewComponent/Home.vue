@@ -127,7 +127,7 @@
                             </div>
                         </div>
                         <div class="d-flex al-center j-end w-96">
-                            <button class="btn btn-white-silver">Hủy</button>
+                            <button class="btn btn-white-silver" @click="closeFilterDailyTask">Hủy</button>
                             <button class="btn btn-primary mg-l-10" @click="excuteFilterDailyTask">Lọc</button>
                         </div>
                     </IconDropDown>
@@ -195,10 +195,16 @@ export default {
         me.initHtmlCss();
     },
     methods: {
+        closeFilterDailyTask()
+        {
+            let me = this;
+            me.isShowFilterDailyTask = false;
+        },
         excuteFilterDailyTask()
         {
             let me = this;
             me.$refs.view.getDailyTask(me.filterDailyTask.startTime,me.filterDailyTask.endTime);
+            me.isShowFilterDailyTask = false;
         },
         StartDateFilterChange(value,whichDate)
         {

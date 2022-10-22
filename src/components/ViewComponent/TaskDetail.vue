@@ -54,7 +54,7 @@
                     <ItemDropDown
                         :config="{
                             width: 600,
-                            height: 450,
+                            height: 500,
                             directArrow: 'top'
                         }"
                         :isShowDropDown="isShowDeadlineDropDown"
@@ -65,21 +65,25 @@
                         <template #item>
                             <div class="w-100 h-100 d-flex al-center c-poiter">
                                 <div class="file-icon select-expire-time-icon mg-l-10"></div>
-                                <div class="info-assigned-user pd-l-16">
+                                <div class="info-assigned-user pd-l-16" v-if="dataEdit.endTime == null && dataEdit.startTime == null">
                                     Chọn hạn hoàn thành
+                                </div>
+                                <div class="pd-l-16">
+                                    <div class="mg-t-auto" v-if="dataEdit.startTime"><span>Từ ngày: </span><span class="fw-600">{{$commonFunction.parseDateJsToString(dataEdit.startTime)}}</span></div>
+                                    <div class="mg-t-auto" v-if="dataEdit.endTime"><span>Đến ngày: </span><span class="fw-600">{{$commonFunction.parseDateJsToString(dataEdit.endTime)}}</span></div>
                                 </div>
                             </div>
                         </template>
                         <template #dropdown>
                             <div class="d-flex header-deadline-dropdown">
                                 <div 
-                                    :class="['d-flex','tab-deadline',!isTabStartDeadline? 'tab-active':'','center-items']"
+                                    :class="['c-poiter','d-flex','tab-deadline',!isTabStartDeadline? 'tab-active':'','center-items']"
                                     @click="isTabStartDeadline = !isTabStartDeadline"
                                 >
                                     <div>Hạn hoàn thành</div>
                                 </div>
                                 <div 
-                                    :class="['d-flex','tab-deadline',isTabStartDeadline? 'tab-active':'','center-items']"
+                                    :class="['c-poiter','d-flex','tab-deadline',isTabStartDeadline? 'tab-active':'','center-items']"
                                     @click="isTabStartDeadline = !isTabStartDeadline"
                                 >
                                     <div>Thời gian bắt đầu</div>
@@ -91,15 +95,19 @@
                                 style="width: 100%"
                                 :format="formatDatePicker"
                                 selectText="Lưu"
-                                cancelText="Hủy bỏ"
+                                :value="dataEdit.endTime" @update:modelValue="commitEndTime"
                                 inline/>
                                 <Datepicker 
                                 v-show="isTabStartDeadline"
                                 style="width: 100%"
                                 :format="formatDatePicker"
                                 selectText="Lưu"
-                                cancelText="Hủy bỏ"
+                                :value="dataEdit.endTime" @update:modelValue="commitStartTime"
                                 inline/>
+                            </div>
+                            <div class="d-flex al-center fit-content mg-t-10 c-poiter" @click="deleteDeadlineTask">
+                                <div class="file-icon delete-line-icon"></div>
+                                <div class="cl-red">Xóa</div>
                             </div>
                         </template>
                     </ItemDropDown>
@@ -276,7 +284,7 @@
                 </div>
             </div>
             <div class="not-primary-content">
-                <div class="d-flex al-center remind-task extra-feature c-poiter">
+                <div class="d-flex al-center remind-task extra-feature c-poiter" @click="openSettingRemindTask">
                     <div class="file-icon remind-task-icon mg-l-10"></div>
                     <div class="pd-l-10">Nhắc việc</div>
                 </div>
@@ -302,12 +310,13 @@
 </template>
 
 <script>
-import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl} from '../../common/js/Enum.js';
+import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl, EnumTypeDeadline} from '../../common/js/Enum.js';
 import { uuid } from 'vue-uuid';
 import Modal from '../commonComponent/Modal.vue';
 import IconDropDown from '../commonComponent/IconDropDown.vue';
 import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import AddLabelForm from '../ViewComponent/AddLabelForm.vue';
+import SettingRemindTask from '../ViewComponent/SettingRemindTask.vue';
 import { mapGetters, mapMutations } from 'vuex';
 import FileAttach from '../commonComponent/FileAttach.vue';
 import Comment from '../commonComponent/Comment.vue';
@@ -327,7 +336,8 @@ export default {
         Comment,
         IconDropDown,
         ItemDropDown,
-        Datepicker
+        Datepicker,
+        SettingRemindTask
     },
     props:
     {
@@ -346,6 +356,8 @@ export default {
     },
     created(){
         let me = this;
+        me.deadLineHaveToLoad = 0;
+
         me.formatDatePicker = (date) => 
         {
             const day = date.getDate();
@@ -387,50 +399,260 @@ export default {
             return result;
         }
     },
+    watch:{
+    },
     methods: {
+        openSettingRemindTask()
+        {
+            let me = this;
+            if(me.dataEdit.startTime || me.dataEdit.endTime)
+            {
+                me.showDetail('SettingRemindTask',{
+                    width: '430px',
+                    height: 'auto',
+                    borderTop: true
+                }, {
+                    userDoTask: me.dataEdit.assignedFor,
+                    userAssigned: me.dataEdit.assignedBy
+                }, null);
+            }
+            else
+            {
+                me.showDialogNotification(
+                    {
+                        width: '430px',
+                        height: '200px',
+                        borderTop: true
+                    },
+                    {
+                        'title': 'Nhắc việc',
+                        'content': 'Vui lòng thiết lập lại thời gian bắt đầu hoặc thời gian kết thúc công việc để thực hiện tính năng này.'
+                    },
+                    () =>{
+                    }
+                );
+            }
+        },
+        commitEndTime(newValue)
+        {
+            let me = this;
+
+            let oldValue = me.dataEdit.endTime;
+
+            if(typeof me.dataEdit.startTime == 'string')
+            {
+                me.dataEdit.startTime = me.$commonFunction.parseStringServerToDate(me.dataEdit.startTime);
+            }
+
+            if(newValue != null && me.dataEdit.startTime != null && newValue.getTime() < me.dataEdit.startTime.getTime())
+            {
+                me.showDialogNotification(
+                    {
+                        width: '400px',
+                        height: '200px',
+                        borderTop: true
+                    },
+                    {
+                        'title': 'Cảnh báo',
+                        'content': 'Thời gian bắt đầu không được nhỏ hơn hạn hoàn thành.'
+                    },
+                    () =>{
+                    }
+                );
+                me.dataEdit.endTime = oldValue;
+                me.isShowDeadlineDropDown = false;
+            }
+            else
+            {
+                me.callApi('put',`api/task/deadline`,{
+                    "newDeadline" : me.$commonFunction.parseDateToStringDateServer(newValue),
+                    'taskId': me.option.taskId,
+                    'typeDeadline': EnumTypeDeadline.End
+                },null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        me.dataEdit.endTime = newValue;
+                        me.isShowDeadlineDropDown = false;
+                    }
+                });
+            }
+
+        },
+        commitStartTime(newValue)
+        {
+            let me = this;
+
+            let oldValue = me.dataEdit.startTime;
+
+            if(typeof me.dataEdit.endTime == 'string')
+            {   
+                me.dataEdit.endTime = me.$commonFunction.parseStringServerToDate(me.dataEdit.endTime);
+            }
+
+            if(newValue != null && me.dataEdit.endTime != null && newValue.getTime() > me.dataEdit.endTime.getTime())
+            {
+                me.showDialogNotification(
+                    {
+                        width: '400px',
+                        height: '200px',
+                        borderTop: true
+                    },
+                    {
+                        'title': 'Cảnh báo',
+                        'content': 'Thời gian bắt đầu không được nhỏ hơn hạn hoàn thành.'
+                    },
+                    () =>{
+                    }
+                );
+                me.dataEdit.startTime = oldValue;
+                me.isShowDeadlineDropDown = false;
+            }
+            else
+            {
+                me.callApi('put',`api/task/deadline`,{
+                    "newDeadline" : me.$commonFunction.parseDateToStringDateServer(newValue),
+                    'taskId': me.option.taskId,
+                    'typeDeadline': EnumTypeDeadline.Start
+                },null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        me.dataEdit.startTime = newValue;
+                        me.isShowDeadlineDropDown = false;
+                    }
+                });
+            }
+        },
+        endTimeChange(newValue)
+        {
+            let me = this;
+            let oldValue = me.dataEdit.endTime;
+
+            me.deadLineHaveToLoad--;
+
+            if(me.deadLineHaveToLoad > 0)
+                return;
+            
+            if(typeof me.dataEdit.startTime == 'string')
+            {
+                me.dataEdit.startTime = me.$commonFunction.parseStringServerToDate(me.dataEdit.startTime);
+            }
+
+            if(newValue != null && me.dataEdit.startTime != null && newValue.getTime() < me.dataEdit.startTime.getTime())
+            {
+                me.showDialogNotification(
+                    {
+                        width: '400px',
+                        height: '200px',
+                        borderTop: true
+                    },
+                    {
+                        'title': 'Cảnh báo',
+                        'content': 'Thời gian bắt đầu không được nhỏ hơn hạn hoàn thành.'
+                    },
+                    () =>{
+                    }
+                );
+                me.dataEdit.endTime = oldValue;
+            }
+            else
+            {
+                me.callApi('put',`api/task/deadline`,{
+                    "newDeadline" : me.$commonFunction.parseDateToStringDateServer(newValue),
+                    'taskId': me.option.taskId,
+                    'typeDeadline': EnumTypeDeadline.End
+                },null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                    }
+                });
+            }
+        },
+        deleteDeadlineTask()
+        {
+            let me = this;
+            me.callApi('put',`api/task/deadline`,{
+                    "newDeadline" : null,
+                    'taskId': me.option.taskId,
+                    'typeDeadline': me.isTabStartDeadline? EnumTypeDeadline.Start : EnumTypeDeadline.End
+                },null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        if(me.isTabStartDeadline)
+                        {
+                            me.dataEdit.startTime = null;
+                        }
+                        else
+                        {
+                            me.dataEdit.endTime = null;
+                        }
+
+                        me.isShowDeadlineDropDown = false;
+                    }
+                });
+        },
         showDeadLineTaskDetail()
         {
             let me = this;
+            me.$zindexManage.generateBiggestZindex();
             me.isShowDeadlineDropDown = true;
         },
         closeDeadLineTaskDetail()
         {
             let me = this;
+            me.$zindexManage.clearBiggestIndex();
             me.isShowDeadlineDropDown = false;
         },
         deleteTask()
         {
             let me = this;
-            let callbackAfterDeleteTask = function()
+            if(me.userInfo.email == me.dataEdit.createdBy.email)
             {
-                me.callApi('delete', `api/task/deleteCustom/${me.option.taskId}`,null)
-                .then(res => {
-                    if(res.data.success)
-                    {
-                        let data = res.data.data;
-                        let callBackDoInDailyTaskView = function(objecParent)
+                let callbackAfterDeleteTask = function()
+                {
+                    me.callApi('delete', `api/task/deleteCustom/${me.option.taskId}`,null)
+                    .then(res => {
+                        if(res.data.success)
                         {
-                            objecParent.lstColumnTask.forEach(column => {
-                                column.lstTask = column.lstTask && column.lstTask.length > 0 ? 
-                                    column.lstTask.filter(task => task.taskId != me.option.taskId) 
-                                    : [];
-                            })
+                            let data = res.data.data;
+                            let callBackDoInDailyTaskView = function(objecParent)
+                            {
+                                objecParent.lstColumnTask.forEach(column => {
+                                    column.lstTask = column.lstTask && column.lstTask.length > 0 ? 
+                                        column.lstTask.filter(task => task.taskId != me.option.taskId) 
+                                        : [];
+                                })
+                            }
+                            me.$emit('closePopup',
+                                    callBackDoInDailyTaskView,
+                                    "ViewComponent");
                         }
-                        me.$emit('closePopup',
-                                callBackDoInDailyTaskView,
-                                "ViewComponent");
-                    }
-                });
-            }
+                    });
+                }
 
-            me.showDialogConfirm({
-                width: "500px",
-                height: "260px",
-                borderTop: true
-            },{
-                'title': "Xóa công việc",
-                'content': "Sau khi thực hiện xóa công việc, tất cả các dữ liệu liên quan bao gồm: thông tin mô tả công việc, tài liệu đính kèm, các công việc con, bình luận, lịch sử hoạt động,... sẽ bị xóa khỏi hệ thống? Bạn có chắc chắn muốn thực hiện thao tác này không?"
-            }, callbackAfterDeleteTask);
+                me.showDialogConfirm({
+                    width: "500px",
+                    height: "260px",
+                    borderTop: true
+                },{
+                    'title': "Xóa công việc",
+                    'content': "Sau khi thực hiện xóa công việc, tất cả các dữ liệu liên quan bao gồm: thông tin mô tả công việc, tài liệu đính kèm, các công việc con, bình luận, lịch sử hoạt động,... sẽ bị xóa khỏi hệ thống? Bạn có chắc chắn muốn thực hiện thao tác này không?"
+                }, callbackAfterDeleteTask);
+            }
+            else
+            {
+                me.showDialogNotification({
+                    width: "400px",
+                    height: "160px",
+                    borderTop: true
+                },{
+                    'title': "Cảnh báo",
+                    'content': "Bạn không có quyền thực hiện chức năng này."
+                }, undefined);
+            }
         },
         showMoreFeatureTaskDetail()
         {
@@ -465,7 +687,6 @@ export default {
                     if(res.data.success)
                     {
                         let data = res.data.data;
-                        me.nameNewTask = '';
                         me.isAddingTask = false;
                         me.option.taskId = data.taskId;
                         me.dataEdit.taskId = data.taskId;
@@ -476,18 +697,18 @@ export default {
             }
             else
             {
-                me.showDialogNotification(
-                    {
-                        width: '400px',
-                        height: '180px',
-                        borderTop: true
-                    },
-                    {
-                        'title': 'Cảnh báo',
-                        'content': 'Tên công việc không được bỏ trống'
-                    }, 
-                    undefined
-                )
+                // me.showDialogNotification(
+                //     {
+                //         width: '400px',
+                //         height: '180px',
+                //         borderTop: true
+                //     },
+                //     {
+                //         'title': 'Cảnh báo',
+                //         'content': 'Tên công việc không được bỏ trống'
+                //     }, 
+                //     undefined
+                // )
             }
         },
         loadAllData()
@@ -526,6 +747,16 @@ export default {
                         me.dataEdit.assignedFor = data.assignedFor;
                         me.dataEdit.assignedBy = data.assignedBy;
                         me.dataEdit.createdBy = data.createdBy;
+
+                        if(data.startTime != null)
+                        {
+                            me.deadLineHaveToLoad++;
+                        }
+
+                        if(data.endTime != null)
+                        {
+                            me.deadLineHaveToLoad++;
+                        }
                     }
                 }
             );
@@ -827,7 +1058,7 @@ export default {
         closeSubPopup( callback )
         {
             let me = this;
-            if(callback)
+            if(typeof callback == 'function')
             {
                 callback(me);
             }
@@ -940,36 +1171,40 @@ export default {
             let me = this;
             let callbackWhenClosePopup = function(objecParent){
                 let isExistsTask = false;
-                debugger;
-                objecParent.lstColumnTask.forEach(column => {
-                    if(column.lstTask && column.lstTask.length > 0)
-                    {
-                        let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
-                        if(indexTaskExist > -1)
-                        {
-                            isExistsTask = true;
-                            column.lstTask[indexTaskExist] = me.dataEdit;
-                        }
-                    }
-                    // column.lstTask?.forEach(task => {
-                    //     if(task.taskId == me.dataEdit.taskId)
-                    //     {
-                    //         isExistsTask = true;
-                    //         task = me.dataEdit;
-                    //     }
-                    // });
-                })
-
-                if(!isExistsTask)
+                
+                if(me.nameNewTask)
                 {
-                    if(me.option.typeTask == EnumTypeTask.Personal && objecParent.lstColumnTask.length > 0)
-                    {
-                        if(!objecParent.lstColumnTask[0].lstTask)
+                    objecParent.lstColumnTask.forEach(column => {
+                        if(column.lstTask && column.lstTask.length > 0)
                         {
-                            objecParent.lstColumnTask[0].lstTask = [];
+                            let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
+                            if(indexTaskExist > -1)
+                            {
+                                isExistsTask = true;
+                                column.lstTask[indexTaskExist] = me.dataEdit;
+                            }
                         }
-                        objecParent.lstColumnTask[0].lstTask.push(me.dataEdit);
+                        // column.lstTask?.forEach(task => {
+                        //     if(task.taskId == me.dataEdit.taskId)
+                        //     {
+                        //         isExistsTask = true;
+                        //         task = me.dataEdit;
+                        //     }
+                        // });
+                    })
+
+                    if(!isExistsTask)
+                    {
+                        if(me.option.typeTask == EnumTypeTask.Personal && objecParent.lstColumnTask.length > 0)
+                        {
+                            if(!objecParent.lstColumnTask[0].lstTask)
+                            {
+                                objecParent.lstColumnTask[0].lstTask = [];
+                            }
+                            objecParent.lstColumnTask[0].lstTask.push(me.dataEdit);
+                        }
                     }
+                    me.nameNewTask = '';
                 }
             };
             me.$emit('closePopup',
@@ -980,6 +1215,7 @@ export default {
     data()
     {
         return{
+            
             isShowDeadlineDropDown: false,
             isTabStartDeadline: false,
 
@@ -995,6 +1231,7 @@ export default {
             //modal
             nameDetailComponent: '',
             props: undefined,
+            data: undefined,
             isShowDetail: false,
             configModal: undefined,
             callbackOutsideComponent: null,
@@ -1034,6 +1271,8 @@ export default {
             dataEdit: {
                 taskId: this.option.taskId,
                 taskName: '[In báo cáo/Báo cáo]Truy vấn lấy vé xuất lại',
+                startTime: null,
+                endTime: null,
                 createdBy: {
                     email: "tlminh40300@gmail.com",
                     fileAvatar: 'c304fbcb-7520-4ad9-b6d0-c020ee826330_rPL27_5f.jpg',

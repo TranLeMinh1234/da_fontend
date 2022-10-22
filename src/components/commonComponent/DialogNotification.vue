@@ -39,7 +39,10 @@ export default {
         close()
         {
             let me = this;
-            me.callBack();
+            if(typeof me.callBack == 'function')
+            {
+                me.callBack();
+            }
             me.isShow = false;
         }
     },

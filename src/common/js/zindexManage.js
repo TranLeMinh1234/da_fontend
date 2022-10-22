@@ -1,5 +1,5 @@
 var zindexManage = {
-    zindexComponent: [99],
+    zindexComponent: [99999],
     generateBiggestZindex: function()
     {
         var biggestNewZindex = this.zindexComponent[this.zindexComponent.length-1] + 1;

@@ -21,6 +21,8 @@
 .dropdown .content-dropdown{
     position: relative;
     z-index: 99999;
+    height: 100%;
+    overflow: auto;
 }
 
 .dropdown .arrow-top

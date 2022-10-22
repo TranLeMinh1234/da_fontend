@@ -376,3 +376,18 @@
     -webkit-mask-position: -292px -132px;
     background-color: white;
 }
+
+.checkbox-remind-icon
+{
+    background-color: #2196f3;  
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -584px -424px;
+    width: 16px;
+    height: 16px;
+}
+
+.black-down-arrow-icon{
+    width: 16px;
+    height: 16px;
+    background-position: -232px -104px
+}
