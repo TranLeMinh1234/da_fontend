@@ -413,7 +413,10 @@ export default {
                     borderTop: true
                 }, {
                     userDoTask: me.dataEdit.assignedFor,
-                    userAssigned: me.dataEdit.assignedBy
+                    userAssigned: me.dataEdit.assignedBy,
+                    taskId: me.option.taskId,
+                    startTime: me.dataEdit.startTime,
+                    endTime: me.dataEdit.endTime
                 }, null);
             }
             else
@@ -464,18 +467,32 @@ export default {
             }
             else
             {
-                me.callApi('put',`api/task/deadline`,{
-                    "newDeadline" : me.$commonFunction.parseDateToStringDateServer(newValue),
-                    'taskId': me.option.taskId,
-                    'typeDeadline': EnumTypeDeadline.End
-                },null)
-                .then(res => {
-                    if(res.data.success)
+                me.showDialogConfirm(
                     {
-                        me.dataEdit.endTime = newValue;
-                        me.isShowDeadlineDropDown = false;
+                        width: '600px',
+                        height: '200px',
+                        borderTop: true
+                    },
+                    {
+                        'title': 'Cảnh báo',
+                        'content': 'Thiết lập lời nhắc nhở của công việc sẽ bị xóa bỏ nếu bạn thay đổi mốc thời gian này. Bạn có chắc muốn thay đổi thời gian đến hạn công việc.'
+                    },
+                    () =>{
+                        me.callApi('put',`api/task/deadline`,{
+                            "newDeadline" : me.$commonFunction.parseDateToStringDateServer(newValue),
+                            'taskId': me.option.taskId,
+                            'typeDeadline': EnumTypeDeadline.End
+                        },null)
+                        .then(res => {
+                            if(res.data.success)
+                            {
+                                me.dataEdit.endTime = newValue;
+                                me.isShowDeadlineDropDown = false;
+                            }
+                        });
                     }
-                });
+                );
+                me.isShowDeadlineDropDown = false;
             }
 
         },
@@ -510,18 +527,32 @@ export default {
             }
             else
             {
-                me.callApi('put',`api/task/deadline`,{
-                    "newDeadline" : me.$commonFunction.parseDateToStringDateServer(newValue),
-                    'taskId': me.option.taskId,
-                    'typeDeadline': EnumTypeDeadline.Start
-                },null)
-                .then(res => {
-                    if(res.data.success)
+                me.showDialogConfirm(
                     {
-                        me.dataEdit.startTime = newValue;
-                        me.isShowDeadlineDropDown = false;
+                        width: '600px',
+                        height: '200px',
+                        borderTop: true
+                    },
+                    {
+                        'title': 'Cảnh báo',
+                        'content': 'Thiết lập lời nhắc nhở của công việc sẽ bị xóa bỏ nếu bạn thay đổi mốc thời gian này. Bạn có chắc muốn thay đổi thời gian bắt đầu công việc.'
+                    },
+                    () =>{
+                        me.callApi('put',`api/task/deadline`,{
+                            "newDeadline" : me.$commonFunction.parseDateToStringDateServer(newValue),
+                            'taskId': me.option.taskId,
+                            'typeDeadline': EnumTypeDeadline.Start
+                        },null)
+                        .then(res => {
+                            if(res.data.success)
+                            {
+                                me.dataEdit.startTime = newValue;
+                                me.isShowDeadlineDropDown = false;
+                            }
+                        });
                     }
-                });
+                );
+                me.isShowDeadlineDropDown = false;
             }
         },
         endTimeChange(newValue)
