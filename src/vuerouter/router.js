@@ -1,7 +1,8 @@
 import Home from '../components/ViewComponent/Home.vue';
 import Test from '../components/ViewComponent/Test.vue';
 import Login from '../components/ViewComponent/Login.vue';
-import DailyTask from '../components/ViewComponent/DailyTask.vue'
+import DailyTask from '../components/ViewComponent/DailyTask.vue';
+import Template from '../components/ViewComponent/Template.vue'
 import { createRouter,createWebHistory} from 'vue-router';
 
 var routes = [
@@ -12,11 +13,15 @@ var routes = [
             {
                 path: '/DailyTask',
                 component: DailyTask
+            },
+            {
+                path: '/Template',
+                component: Template
             }
         ]
     },
     { path: '/Test', component: Test },
-    { path: '/Login', component: Login }
+    { path: '/Login', component: Login },
 ];
   
 // 3. Create the router instance and pass the `routes` option

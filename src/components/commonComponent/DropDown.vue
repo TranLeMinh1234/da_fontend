@@ -90,7 +90,7 @@ export default {
             {
                 result = {
                     left: `calc(50% + ${me.configDropDown?.arrowPositionX}px)`,
-                    top: `calc(-14px + ${me.configDropDown?.arrowPositionY}px)`
+                    top: `calc(-14px - ${me.configDropDown?.arrowPositionY}px)`
                 }
             }
             else if(me.configDropDown.directArrow?.includes('bottom'))

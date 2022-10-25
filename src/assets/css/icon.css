@@ -31,6 +31,12 @@
     background-color: white;
 }
 
+.bell-black-icon{
+    background-position: -132px -132px;
+    width: 23px;
+    height: 25px;
+}
+
 .commnet-icon{
     background-position: -612px -100px;
     width: 23px;
@@ -75,12 +81,24 @@
     background-color: white;
 }
 
+.black-home-icon{
+    background-position: -36px -132px;
+    width: 24px;
+    height: 24px;
+}
+
 .big-white-search-icon{
     -webkit-mask-image: url('../icon/ICON.svg') !important;
     -webkit-mask-position: -164px -132px;
     width: 26px;
     height: 26px;
     background-color: white;
+}
+
+.big-black-search-icon{
+    background-position: -164px -132px;
+    width: 26px;
+    height: 26px;
 }
 
 .task-myself-icon{
@@ -169,6 +187,13 @@
     width: 24px;
     height: 24px;
     background-color: white;
+}
+
+.more-feature-black-icon
+{
+    background-position: -740px -292px;
+    width: 24px;
+    height: 24px;
 }
 
 .datepicker-icon
@@ -390,4 +415,26 @@
     width: 16px;
     height: 16px;
     background-position: -232px -104px
+}
+
+.add-template-icon{
+    width: 24px;
+    height: 24px;
+    background-position: -1252px -163px;
+}
+
+.green-tick-icon{
+    background-color: #21f344;  
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -584px -104px;
+    width: 16px;
+    height: 16px;
+}
+
+.transparent-icon{
+    background-color: transparent;  
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -584px -104px;
+    width: 16px;
+    height: 16px;
 }

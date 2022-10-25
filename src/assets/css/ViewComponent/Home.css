@@ -205,7 +205,6 @@
     width: 100%;
     height: 50px;
     background-color: transparent;
-    margin-top: 12px;
 }
 
 #primary-content .header .header-feature
@@ -228,7 +227,30 @@
 }
 
 
+.menu-add-home
+{
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
 
+.menu-add-home .menu-add-item{
+    width: 100%;
+    height: 50px;
+}
+
+.menu-add-home .menu-add-item:hover{
+    background-color: #f1f1f1;
+}
+
+#Home .white-header
+{
+    background-color: white;
+}
+
+#Home .header .blue-add-btn{
+    background-color: rgb(33, 147, 243);
+}
 
 
 

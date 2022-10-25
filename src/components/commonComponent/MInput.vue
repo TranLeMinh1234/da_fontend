@@ -1,5 +1,7 @@
 <template>
-    <div class="m-input">
+    <div class="m-input" :style="{
+        height: isValidate? '70px': '50px'
+    }">
         <div class="background-input">
             <div v-if="isHaveIcon" :class="['file-icon',icon]"></div>
             <input 
@@ -15,7 +17,9 @@
                 }"
             >
         </div>
-        <div class="cl-red txt-italic fz-12 pd-t-2 fit-content">{{messNotiError}}</div>
+        <div class="cl-red txt-italic fz-12 pd-t-2 fit-content" :style="{
+            display: isValidate? 'block': 'none'
+        }">{{messNotiError}}</div>
     </div>
 </template>
 
@@ -49,7 +53,11 @@ export default {
         title: {
             type: String,
             default: ''
-        }
+        },
+        isValidate: {
+            type: Boolean,
+            default: true
+        },
     },
     created()
     {

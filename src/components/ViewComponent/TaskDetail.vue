@@ -501,7 +501,7 @@ export default {
             let me = this;
 
             let oldValue = me.dataEdit.startTime;
-
+            
             if(typeof me.dataEdit.endTime == 'string')
             {   
                 me.dataEdit.endTime = me.$commonFunction.parseStringServerToDate(me.dataEdit.endTime);
@@ -557,19 +557,16 @@ export default {
         },
         endTimeChange(newValue)
         {
+            debugger
             let me = this;
             let oldValue = me.dataEdit.endTime;
 
-            me.deadLineHaveToLoad--;
-
-            if(me.deadLineHaveToLoad > 0)
-                return;
-            
             if(typeof me.dataEdit.startTime == 'string')
             {
                 me.dataEdit.startTime = me.$commonFunction.parseStringServerToDate(me.dataEdit.startTime);
             }
 
+            debugger;
             if(newValue != null && me.dataEdit.startTime != null && newValue.getTime() < me.dataEdit.startTime.getTime())
             {
                 me.showDialogNotification(

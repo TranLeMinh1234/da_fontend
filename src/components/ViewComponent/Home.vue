@@ -79,28 +79,69 @@
             </div>
         </div>
         <div id="primary-content">
-            <div class="welcome-info">
+            <div class="welcome-info" v-show="isShowClock">
                 <div class="hello-sentence">Xin chào Trần Lê Minh</div>
                 <div class="clock"></div>
             </div>
-            <div class="header d-flex al-center j-end">
+            <div :class="['header', 'd-flex', 'al-center', 'j-space-between', isDifferentDailyTask ? 'white-header': '']">
+                <div style="width: 100px">
+                    <div 
+                        class="file-icon black-home-icon c-poiter mg-l-32"
+                        v-show="isDifferentDailyTask"
+                        @click="changeDailyTaskView"
+                        ></div>
+                </div>
                 <div class="header-feature d-flex al-center j-spread-around pd-r-16">
                     <div class="btn-add-all">
-                        <button class="btn-icon btn-silver d-flex al-center c-poiter">
+                        <button 
+                            :class="['btn-icon', 'btn-silver', 
+                            'd-flex', 'al-center', 'c-poiter',
+                            isDifferentDailyTask ? 'blue-add-btn':'']"
+                        >
                             <div class="d-flex al-center" @click="openFormAddNewTask">
                                 <div class="file-icon plush-white-icon"></div>
                                 <div>Thêm công việc</div>
                             </div>
                             <div class="bulkhead mg-l-6"></div>
-                            <div class="file-icon down-arrow-icon mg-l-10"></div>
+                            <div class="mg-l-10">
+                                <IconDropDown
+                                    :config="{
+                                        width: 380,
+                                        height: 330,
+                                        arrowPositionX:100,
+                                        arrowPositionY:0,
+                                        directArrow: 'top',
+                                    }"
+                                    :isHaveArrow="true"
+                                    iconClass="down-arrow-icon"
+                                    :isShowDropDown="isShowAddOption"
+                                    @showDropDownEvent="showAddOptionEvent"
+                                    @closeDropDownEvent="closeAddOptionEvent"
+                                >
+                                    <div class="menu-add-home mg-t-10">
+                                        <div class="d-flex al-center menu-add-item c-poiter" @click="changeViewAddTemplate">
+                                            <div class="file-icon add-template-icon mg-l-10"></div>
+                                            <div class="pd-l-10">Thêm mẫu quá trình công việc</div>
+                                        </div>
+                                        <div class="d-flex al-center menu-add-item c-poiter">
+                                            <div class="file-icon add-template-icon mg-l-10"></div>
+                                            <div class="pd-l-10">Thêm mẫu quá trình công việc</div>
+                                        </div>
+                                        <div class="d-flex al-center menu-add-item c-poiter">
+                                            <div class="file-icon add-template-icon mg-l-10"></div>
+                                            <div class="pd-l-10">Thêm mẫu quá trình công việc</div>
+                                        </div>
+                                    </div>
+                                </IconDropDown>    
+                            </div>
                         </button>
                     </div>
                     <IconDropDown
+                        v-show="!isDifferentDailyTask"
                         :config="{
                             width: 650,
                             height: 100,
                             arrowPositionX:200,
-                            arrowPositionY:200,
                             directArrow: 'top',
                         }"
                         iconClass="big-white-filter-icon"
@@ -131,10 +172,10 @@
                             <button class="btn btn-primary mg-l-10" @click="excuteFilterDailyTask">Lọc</button>
                         </div>
                     </IconDropDown>
-                    <div class="file-icon big-white-search-icon c-poiter"></div>
-                    <div class="file-icon bell-white-icon c-poiter"></div>
-                    <div class="file-icon more-feature-white-icon c-poiter"></div>
-                    <div class="personal-setting bgr-image-cover"></div>
+                    <div :class="['file-icon',isDifferentDailyTask? 'big-black-search-icon':'big-white-search-icon','c-poiter']"></div>
+                    <div :class="['file-icon',isDifferentDailyTask? 'bell-black-icon':'bell-white-icon','c-poiter']"></div>
+                    <div :class="['file-icon',isDifferentDailyTask? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
+                    <div class="personal-setting bgr-image-cover c-poiter"></div>
                 </div>
             </div>
             <div class="body">
@@ -195,6 +236,33 @@ export default {
         me.initHtmlCss();
     },
     methods: {
+        changeDailyTaskView()
+        {
+            let me = this;
+            me.isShowMenu = true;
+            me.isShowClock = true;
+            me.isDifferentDailyTask = false;
+            me.$router.push({path: 'DailyTask'});
+        },
+        changeViewAddTemplate()
+        {
+            let me = this;
+            me.isShowMenu = false;
+            me.isShowClock = false;
+            me.isDifferentDailyTask = true;
+            me.isShowAddOption = false;
+            me.$router.push({path: '/template'});
+        },
+        showAddOptionEvent()
+        {
+            let me = this;
+            me.isShowAddOption = true;
+        },
+        closeAddOptionEvent()
+        {
+            let me = this;
+            me.isShowAddOption = false;
+        },
         closeFilterDailyTask()
         {
             let me = this;
@@ -246,7 +314,23 @@ export default {
                 clock.innerHTML = me.convertDatePMAM(me.timeNow);
                 me.timeNow.setSeconds(me.timeNow.getSeconds() + 1);
             },1000);
-            
+
+            if(me.$route.path.includes('template')){
+                me.isShowClock = false;
+                me.isShowMenu = false;
+            }
+            else
+            {
+                me.isShowClock = true;
+                me.isShowMenu = true;
+            }
+
+            if(me.$route.path.includes('DailyTask'))
+            {
+                me.isDifferentDailyTask = false;
+            }
+            else
+                me.isDifferentDailyTask = true;
         },
         closePopup(callbackInsideComponent, typeComponent)
         {
@@ -317,8 +401,11 @@ export default {
                 endTime: new Date(),
             },
             isShowFilterDailyTask: false,
+            isShowAddOption: false,
 
             isShowMenu: true,
+            isDifferentDailyTask: true,
+            isShowClock: true,
             isShowPersonalGroup: true,
             isShowCommunityGroup: true,
             lstGroupPersonalTask: [
