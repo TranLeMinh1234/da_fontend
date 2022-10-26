@@ -18,10 +18,13 @@
                 </div>
                 <div class="cl-black list">
                     <div
-                        v-for="(template,index) in listTemplate" :key="template.TemplateGroupTaskId"
+                        v-for="(template,index) in listTemplate" :key="template.templateGroupTaskId"
                         class="template-item"
                         @click="changeDetailTemplate(index)"
                     >
+                        <div class="delete-template-item d-flex center-items" @click="deleteTemplate(template.templateGroupTaskId)">
+                            <div class="file-icon exit-popup-icon"></div>
+                        </div>
                         <div class="txt-threedots">{{template.nameTemplateGroupTask}}</div>
                         <div class="d-flex mg-t-10">
                             <img :src="linkImg(template?.createdBy?.fileAvatarName)" alt="" class="user-avar">
@@ -34,8 +37,8 @@
                     </div>
                 </div>
             </div>
-            <div class="detail-template cl-black" v-if="!isAddingNewTemplate">
-                <div class="pd-16 fw-600 fs-24 txt-threedots name-template">{{listTemplate[indexTemplateEdit].nameTemplateGroupTask}}</div>
+            <div class="detail-template cl-black" v-if="!isAddingNewTemplate && listTemplate.length > 0">
+                <div class="pd-16 fw-600 fs-24 txt-threedots name-template">{{listTemplate[indexTemplateEdit]?.nameTemplateGroupTask}}</div>
                 <div class="grid-edit">
                     <table>
                         <thead>
@@ -97,12 +100,12 @@
                                 <td>
                                     <div class="p-relative">
                                         <div class="d-flex center-items d-none feature-line" v-if="process.isEditing">
-                                            <div class="file-icon delete-line-icon c-poiter"></div>
+                                            <div class="file-icon delete-line-icon c-poiter" @click=""></div>
                                             <div class="file-icon green-tick-icon c-poiter mg-l-6"></div>
                                         </div> 
                                         <div class="d-flex center-items d-none feature-line" v-if="!process.isEditing">
                                             <div class="file-icon exit-popup-icon c-poiter"></div>
-                                            <div class="file-icon edit-icon c-poiter mg-l-6"></div>
+                                            <div class="file-icon edit-icon c-poiter mg-l-6" @click="prepareEditProcess"></div>
                                         </div> 
                                     </div>
                                 </td>
@@ -189,6 +192,11 @@
                                     </div>
                                 </td>
                                 <td>
+                                    <div class="p-relative">
+                                        <div class="d-flex center-items d-none feature-line" v-if="process.isEditing">
+                                            <div class="file-icon exit-popup-icon c-poiter" @click="deleteFakeProcessWhenAddingNewTemplate(process)"></div>
+                                        </div> 
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -213,6 +221,7 @@ import BaseComponent from '../commonComponent/BaseComponent.vue';
 import MInput from '../commonComponent/MInput.vue';
 import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl, EnumTypeDeadline} from '../../common/js/Enum.js';
 import { uuid } from 'vue-uuid';
+import {baseCallApi} from '../../common/js/BaseCallApi.js';
 
 export default {
     name: "Template",
@@ -220,7 +229,85 @@ export default {
     components: {
         MInput
     },
+    created(){
+        let me = this;
+        me.loadAllData();
+    },
     methods:{
+        loadAllData()
+        {
+            let me = this;
+            me.getTemplate();
+        },
+        getTemplate()
+        {
+            let me = this;
+            me.callApi('get', 'api/template/getall/havepermission',null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    me.listTemplate = data;
+                    if(!me.listTemplate || (me.listTemplate && me.listTemplate.length == 0))
+                    {
+                        me.listTemplate = [];
+                        me.isAddingNewTemplate = true;
+                    }
+                    else
+                    {
+                        me.isAddingNewTemplate = false;
+                    }
+                    me.checkLoadDone();
+                }
+             });
+        },
+        prepareEditProcess()
+        {
+            
+        },
+        deleteFakeProcessWhenAddingNewTemplate(processFake){
+            let me = this;
+            debugger;
+            me.newTemplate.listProcess = me.newTemplate.listProcess.filter(process => process.proccessId != processFake.proccessId);
+            if(me.newTemplate.listProcess.length == 0)
+            {
+                me.addFakeProcess();
+            }
+        },
+        checkLoadDone()
+        {
+            let me = this;
+            if(!me.countLoadDone)
+            {
+                me.countLoadDone = 1;
+            }
+            else
+            {
+                me.countLoadDone++;
+            }
+
+            if(me.countLoadDone == 2)
+            {
+                me.isLoadingDataDone = true;
+            }
+        },
+        deleteTemplate(templateId){
+            let me = this;
+            me.callApi('delete',`api/template/deletecustom/${templateId}`, null).then(
+                res => {
+                    if(res.data.success)
+                    {
+                        let data = res.data.data;
+                        me.listTemplate = me.listTemplate.filter(template => template.templateGroupTaskId != templateId);
+                        if(!me.listTemplate || (me.listTemplate && me.listTemplate.length == 0))
+                        {
+                            me.listTemplate = [];
+                            me.addNewTemplate();
+                        }
+                    }
+                }
+            );
+        },        
         commitNewTemplate()
         {
             let me = this;
@@ -266,16 +353,21 @@ export default {
 
             if(isValid)
             {
+                for(let i = 1; i <= me.newTemplate.listProcess.length; i++)
+                {
+                    me.newTemplate.listProcess[i-1].sortOrder = i;
+                }
+
                 me.callApi('post','api/template/insertcustom', me.newTemplate ,null)
                 .then(res => {
                     if(res.data.success)
                     {
-
+                        me.toast.success('Thêm mẫu quá trình thành công');
+                        let data = res.data.data;
+                        me.listTemplate.push(data);
                     }
                 });
             }
-
-            
         },
         addNewTemplate()
         {
@@ -290,9 +382,9 @@ export default {
                         description: '',
                         columnSetting: {
                             columnSettingId: uuid.v1(),
-                            color: "#000000",
+                            color: "#00ffff",
                             colorText: '#000000',
-                            ColorHeader: '#000000'
+                            colorHeader: '#2196f3'
                         },
                         isNewProcess: true,
                         isEditing: true
@@ -316,9 +408,9 @@ export default {
                         description: '',
                         columnSetting: {
                             columnSettingId: uuid.v1(),
-                            color: "#000000",
+                            color: "#00ffff",
                             colorText: '#000000',
-                            ColorHeader: '#000000'
+                            colorHeader: '#2196f3'
                         },
                         sortOrder: me.newTemplate.listProcess.length,
                         isNewProcess: true,
@@ -336,9 +428,9 @@ export default {
                         sortOrder: null,
                         columnSetting: {
                             columnSettingId: uuid.v1(),
-                            color: "#000000",
+                            color: "#00ffff",
                             colorText: '#000000',
-                            ColorHeader: '#000000'
+                            colorHeader: '#2196f3'
                         },
                         isNewProcess: true,
                         isEditing: true
@@ -384,82 +476,98 @@ export default {
             searchTemplateValue: '',
             indexTemplateEdit: 0,
             isAddingNewTemplate: false,
-            listTemplate: [
-                {
-                    TemplateGroupTaskId: '1',
-                    nameTemplateGroupTask: 'Template 1 Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1',
-                    listProcess: [
-                        {
-                            proccessId: '1',
-                            processName: 'Quá trình 1,Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1',
-                            description: '',
-                            columnSetting: {
-                                columnSettingId: '2',
-                                color: "#000000",
-                                colorText: '#000000',
-                                ColorHeader: '#000000'
-                            }
-                        },
-                        {
-                            proccessId: '2',
-                            processName: 'Quá trình 2',
-                            description: '',
-                            columnSetting: {
-                                columnSettingId: '2',
-                                color: "#000000",
-                                colorText: '#000000',
-                                ColorHeader: '#000000'
-                            }
-                        },
-                        {
-                            proccessId: '3',
-                            processName: 'Quá trình 3',
-                            description: '',
-                            columnSetting: {
-                                columnSettingId: '3',
-                                color: "#000000",
-                                colorText: '#000000',
-                                ColorHeader: '#000000'
-                            }
-                        }
-                    ],
-                    createdBy: {
-                        email: 'tlminh10300@gmail.com',
-                        firstName: 'Trần',
-                        lastName: 'Lê Minh'
-                    },
-                    createdByEmail: '',
-                    createdTime: new Date()
-                },
-                {
-                    TemplateGroupTaskId: '2',
-                    nameTemplateGroupTask: 'Template 2',
-                    listProcess: [
-                        {
-                            processName: 'Quá trình 1',
-                            description: '',
-                            columnSetting: {
-                                columnSettingId: '1',
-                                color: "#000000",
-                                colorText: '#000000',
-                                ColorHeader: '#000000'
-                            }
-                        }
-                    ],
-                    createdByEmail: '',
-                    createdBy: {
-                        email: 'tlminh10300@gmail.com',
-                        firstName: 'Trần',
-                        lastName: 'Lê Minh'
-                    },
-                    createdTime: new Date()
-                }
-            ],
+            isLoadingDataDone: false,
+            listTemplate: [],
+                // {
+                //     TemplateGroupTaskId: '1',
+                //     nameTemplateGroupTask: 'Template 1 Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1',
+                //     listProcess: [
+                //         {
+                //             proccessId: '1',
+                //             processName: 'Quá trình 1,Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1',
+                //             description: '',
+                //             columnSetting: {
+                //                 columnSettingId: '2',
+                //                 color: "#000000",
+                //                 colorText: '#000000',
+                //                 ColorHeader: '#000000'
+                //             }
+                //         },
+                //         {
+                //             proccessId: '2',
+                //             processName: 'Quá trình 2',
+                //             description: '',
+                //             columnSetting: {
+                //                 columnSettingId: '2',
+                //                 color: "#000000",
+                //                 colorText: '#000000',
+                //                 ColorHeader: '#000000'
+                //             }
+                //         },
+                //         {
+                //             proccessId: '3',
+                //             processName: 'Quá trình 3',
+                //             description: '',
+                //             columnSetting: {
+                //                 columnSettingId: '3',
+                //                 color: "#000000",
+                //                 colorText: '#000000',
+                //                 ColorHeader: '#000000'
+                //             }
+                //         }
+                //     ],
+                //     createdBy: {
+                //         email: 'tlminh10300@gmail.com',
+                //         firstName: 'Trần',
+                //         lastName: 'Lê Minh'
+                //     },
+                //     createdByEmail: '',
+                //     createdTime: new Date()
+                // },
+                // {
+                //     TemplateGroupTaskId: '2',
+                //     nameTemplateGroupTask: 'Template 2',
+                //     listProcess: [
+                //         {
+                //             processName: 'Quá trình 1',
+                //             description: '',
+                //             columnSetting: {
+                //                 columnSettingId: '1',
+                //                 color: "#000000",
+                //                 colorText: '#000000',
+                //                 ColorHeader: '#000000'
+                //             }
+                //         }
+                //     ],
+                //     createdByEmail: '',
+                //     createdBy: {
+                //         email: 'tlminh10300@gmail.com',
+                //         firstName: 'Trần',
+                //         lastName: 'Lê Minh'
+                //     },
+                //     createdTime: new Date()
+                // }
+            //],
             listTempProcess: [],
             newTemplate: {
                 templateGroupTaskId: uuid.v1(),
                 nameTemplateGroupTask: '',
-                listProcess: [],
+                listProcess: [
+                    {
+                        proccessId: uuid.v1(),
+                        processName: '',
+                        description: '',
+                        columnSetting: {
+                            columnSettingId: uuid.v1(),
+                            color: "#00ffff",
+                            colorText: '#000000',
+                            colorHeader: '#2196f3'
+                        },
+                        sortOrder: 0,
+                        isNewProcess: true,
+                        isEditing: true
+                    }
+                ],
                 createdBy: {},
                 createdByEmail: '',
                 createdTime: null
