@@ -7,14 +7,14 @@
                         :isHaveIcon="true"
                         padding="10px 14px 10px 32px" 
                         icon="medium-search-icon"
-                        placeholder="Tìm mẫu quá trình"
+                        placeholder="Tìm mẫu quy trình công việc..."
                         @enterEvent="searchTemplate"
                         v-model="searchTemplateValue"
                     />
                 </div>
                 <div class="d-flex al-center j-space-between">
-                    <div class="cl-black fw-600 fs-18">Danh sách mẫu quá trình</div>
-                    <button class="btn btn-primary mg-r-16" @click="addNewTemplate">Thêm mẫu quá trình</button>
+                    <div class="cl-black fw-600 fs-18">Danh sách mẫu quy trình công việc</div>
+                    <button class="btn btn-primary mg-r-16" @click="addNewTemplate">Thêm mẫu quy trình</button>
                 </div>
                 <div class="cl-black list">
                     <div
@@ -44,7 +44,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%">STT</th>
-                                <th style="width: 15%">Tên quá trình</th>
+                                <th style="width: 15%">Tên bước quy trình</th>
                                 <th style="width: 25%">Mô tả</th>
                                 <th style="width: 10%">Màu cột</th>
                                 <th style="width: 10%">Màu chữ</th>
@@ -54,7 +54,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(process,index) in listTemplate[indexTemplateEdit].listProcess" :key="process.proccessId"
+                                v-for="(process,index) in listTemplate[indexTemplateEdit].listProcess" :key="process.processId"
                             >
                                 <td>
                                     <!-- <div v-if="index!=0" class="connect-step"></div> -->
@@ -100,12 +100,12 @@
                                 <td>
                                     <div class="p-relative">
                                         <div class="d-flex center-items d-none feature-line" v-if="process.isEditing">
-                                            <div class="file-icon delete-line-icon c-poiter" @click=""></div>
-                                            <div class="file-icon green-tick-icon c-poiter mg-l-6"></div>
+                                            <div class="file-icon delete-line-icon c-poiter" @click="commitOriginal(process)"></div>
+                                            <div class="file-icon green-tick-icon c-poiter mg-l-6" @click="commitEditProcess(process)"></div>
                                         </div> 
                                         <div class="d-flex center-items d-none feature-line" v-if="!process.isEditing">
-                                            <div class="file-icon exit-popup-icon c-poiter"></div>
-                                            <div class="file-icon edit-icon c-poiter mg-l-6" @click="prepareEditProcess"></div>
+                                            <div class="file-icon exit-popup-icon c-poiter" @click="deleteProcess(process)"></div>
+                                            <div class="file-icon edit-icon c-poiter mg-l-6" @click="prepareEditProcess(process)"></div>
                                         </div> 
                                     </div>
                                 </td>
@@ -138,7 +138,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%">STT</th>
-                                <th style="width: 20%">Tên quá trình</th>
+                                <th style="width: 20%">Tên bước quy trình</th>
                                 <th style="width: 30%">Mô tả</th>
                                 <th style="width: 10%">Màu cột</th>
                                 <th style="width: 10%">Màu chữ</th>
@@ -148,7 +148,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(process,index) in newTemplate.listProcess" :key="process.proccessId"
+                                v-for="(process,index) in newTemplate.listProcess" :key="process.processId"
                             >
                                 <td>
                                     <!-- <div v-if="index!=0" class="connect-step"></div> -->
@@ -261,14 +261,113 @@ export default {
                 }
              });
         },
-        prepareEditProcess()
+        commitEditProcess(processEdit)
         {
-            
+            let me = this;
+            if(processEdit.isNewProcess)
+            {
+                me.callApi('post', `api/template/insertprocess`, processEdit ,null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        let data = res.data.data;
+                        for(var propertyName in data)
+                        {
+                            processEdit[propertyName] = data[propertyName];
+                        }
+                        processEdit.isEditing = false;
+                    }
+                });
+            }
+            else
+            {
+                me.callApi('put', `api/template/process`, processEdit ,null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        debugger;
+                        me.listTempProcess = me.listTempProcess.filter(process => process.processId != processEdit.processId);
+                        processEdit.isEditing = false;
+                    }
+                });
+            }
+        },
+        deleteProcess(processDelete)
+        {
+            let me = this;
+            me.callApi('delete', `api/template/process/${processDelete.processId}/${processDelete.columnSetting.columnSettingId}`)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.listTemplate[me.indexTemplateEdit].listProcess = 
+                        me.listTemplate[me.indexTemplateEdit].listProcess.filter(process => process.processId != processDelete.processId);
+                }
+                else
+                {
+                    errorCode = res.data.errorCode[0];
+                    switch(errorCode)
+                    {
+                        case 'ExistsTaskInProcess':
+                            me.showDialogNotification({
+                                    width: '430px',
+                                    height: '180px',
+                                    borderTop: true
+                                },
+                                {
+                                    'title': 'Cảnh báo',
+                                    'content': 'Tồn tại công việc phát sinh. Bạn không được phép xóa bước quy trình này.'
+                                },
+                                undefined);
+                            break;
+                        default: 
+                            break;
+                    }
+                }
+            });
+        },
+        commitOriginal(processEditing)
+        {
+            let me = this;
+            if(processEditing.isNewProcess)
+            {
+                me.listTemplate[me.indexTemplateEdit].listProcess = 
+                    me.listTemplate[me.indexTemplateEdit].listProcess.filter(process => process.processId != processEditing.processId);
+            }
+            else
+            {
+                let processOriginal = me.listTempProcess.find(processTemp => processTemp.processId == processEditing.processId);
+                if(processOriginal)
+                {
+                    for(var propertyName in processOriginal)
+                    {
+                        debugger;
+                        processEditing[propertyName] = processOriginal[propertyName];
+                    }
+                }
+
+                me.listTempProcess = me.listTempProcess.filter(process => process.processId != processEditing.processId);
+            }
+        },
+        prepareEditProcess(processEditing)
+        {
+            let me = this;
+            let indexProcess = me.listTempProcess.findIndex(processTemp => processTemp.processId == processEditing.processId)
+            if(indexProcess == -1)
+            {
+                let cloneProcess = {};
+                let cloneColumnSetting = {};
+                Object.assign(cloneProcess,processEditing);
+                Object.assign(cloneColumnSetting,processEditing.columnSetting);
+                cloneProcess.columnSetting = cloneColumnSetting;
+                cloneProcess.isEditing = false;
+                me.listTempProcess.push(cloneProcess);
+            }
+
+            processEditing.isEditing = true;
         },
         deleteFakeProcessWhenAddingNewTemplate(processFake){
             let me = this;
-            debugger;
-            me.newTemplate.listProcess = me.newTemplate.listProcess.filter(process => process.proccessId != processFake.proccessId);
+            me.newTemplate.listProcess = me.newTemplate.listProcess.filter(process => process.processId != processFake.processId);
             if(me.newTemplate.listProcess.length == 0)
             {
                 me.addFakeProcess();
@@ -362,7 +461,7 @@ export default {
                 .then(res => {
                     if(res.data.success)
                     {
-                        me.toast.success('Thêm mẫu quá trình thành công');
+                        me.toast.success('Thêm mẫu quy trình công việc thành công');
                         let data = res.data.data;
                         me.listTemplate.push(data);
                     }
@@ -377,7 +476,7 @@ export default {
                 nameTemplateGroupTask: '',
                 listProcess: [
                     {
-                        proccessId: uuid.v1(),
+                        processId: uuid.v1(),
                         processName: '',
                         description: '',
                         columnSetting: {
@@ -403,7 +502,7 @@ export default {
             {
                 me.newTemplate.listProcess.push(
                     {
-                        proccessId: uuid.v1(),
+                        processId: uuid.v1(),
                         processName: '',
                         description: '',
                         columnSetting: {
@@ -422,9 +521,10 @@ export default {
             {
                 me.listTemplate[me.indexTemplateEdit].listProcess.push(
                     {
-                        proccessId: uuid.v1(),
+                        processId: uuid.v1(),
                         processName: '',
                         description: '',
+                        templateGroupTaskReferenceId: me.listTemplate[me.indexTemplateEdit].templateGroupTaskId,
                         sortOrder: null,
                         columnSetting: {
                             columnSettingId: uuid.v1(),
@@ -443,7 +543,7 @@ export default {
             let me = this;
             me.listTemplate[me.indexTemplateEdit].listProcess.forEach(process => {
                 me.listTempProcess.forEach(processTemp => {
-                    if(processTemp.proccessId == process.proccessId)
+                    if(processTemp.processId == process.processId)
                     {
                         process = processTemp;
                     }
@@ -484,7 +584,7 @@ export default {
                 //     listProcess: [
                 //         {
                 //             proccessId: '1',
-                //             processName: 'Quá trình 1,Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1Quá trình 1',
+                //             processName: 'Quá',
                 //             description: '',
                 //             columnSetting: {
                 //                 columnSettingId: '2',
@@ -554,7 +654,7 @@ export default {
                 nameTemplateGroupTask: '',
                 listProcess: [
                     {
-                        proccessId: uuid.v1(),
+                        processId: uuid.v1(),
                         processName: '',
                         description: '',
                         columnSetting: {
