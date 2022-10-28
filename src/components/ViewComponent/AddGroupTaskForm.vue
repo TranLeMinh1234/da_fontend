@@ -22,6 +22,19 @@
                 :data="dataTypeGroupTask"
                 v-model="newGroupTask.typeGroupTask"
             />
+            <div class="fs-18 pd-t-16 fw-500">Mẫu quy trìn công việc</div>
+            <LocalCombobox 
+                :configField="{
+                    displayField: 'nameTemplateGroupTask',
+                    valueField: 'templateGroupTaskId'
+                }"
+                :configDropDown="{
+                    height: 140
+                }"
+                v-if="isDoneLoadData"
+                :data="listTemplateGroupTask"
+                v-model="newGroupTask.templateReferenceId"
+            />
             <div class="fs-18 pd-t-16 fw-500">Mô tả</div>
             <MTextarea 
                 v-model="newGroupTask.Description" 
@@ -63,8 +76,12 @@
                                     v-model="user.role.roleId"
                                 />
                             </div>
-                            <div class="file-icon lock-icon" v-if="user.email == userInfo.email"></div>
-                            <div class="file-icon exit-popup-icon" v-if="user.email != userInfo.email"></div>
+                            <div class="file-icon lock-icon mg-r-10" v-if="user.email == userInfo.email"></div>
+                            <div 
+                                class="file-icon exit-popup-icon mg-r-10" 
+                                v-if="user.email != userInfo.email"
+                                @click="deleteUserJoined(user)"
+                            ></div>
                         </div>
                     </div>
                 </div>
@@ -127,6 +144,11 @@ export default {
         me.loaddAllData();
     },
     methods:{
+        deleteUserJoined(userDelete)
+        {
+            let me = this;
+            me.listUser = me.listUser.filter(user => user.email != userDelete.email);
+        },
         closeSubPopup(callback)
         {
             let me = this;
@@ -143,7 +165,9 @@ export default {
                     width: '630px',
                     height: 'auto',
                     borderTop: true
-                }, {}, null);
+                }, {
+                    listRole: me.listRole
+                }, null);
         },
         closePopup(callback)
         {
@@ -236,7 +260,8 @@ export default {
         return {
             newGroupTask: {
                 nameGroupTask: '',
-                typeGroupTask: 1
+                typeGroupTask: 1,
+                templateReferenceId: null
             },
             listRole: [],
             listUser: [],

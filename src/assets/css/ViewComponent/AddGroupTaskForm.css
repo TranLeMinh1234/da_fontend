@@ -25,16 +25,17 @@
 }
 
 .add-grouptask-form .list-user .user-info{
-    width: 50%;
+    width: 55%;
 }
 
 .add-grouptask-form .list-user .user-avar{
     width: 32px;
     height: 32px;
-    border-radius: 16px;
+    border-radius: 20px;
+    object-fit: cover;
 }
 
 .add-grouptask-form .list-user .role-user
 {
-    width: 36%;
+    width: 40%;
 }

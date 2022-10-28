@@ -61,3 +61,15 @@
 
 .add-user-joined-form .choose-role{
 }
+
+.add-user-joined-form .choose-role table thead tr{
+    border-bottom: 1px solid silver;
+}
+
+.add-user-joined-form .explain-role
+{
+    border: 1px solid rgb(62, 134, 243);
+    border-radius: 8px;
+    background-color: #e4f7ff;
+    margin: 10px 0px 16px 10px;
+}

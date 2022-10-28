@@ -152,7 +152,7 @@
 
 .fw-500
 {
-    font-weight: 500;
+    font-weight: 500 !important;
 }
 
 .fw-600
@@ -207,6 +207,11 @@
 .w-24
 {
     width: 24% !important;
+}
+
+.w-20
+{
+    width: 20% !important;
 }
 
 .w-70
@@ -370,7 +375,16 @@
     padding: 16px;
 }
 
+.pd-10{
+    padding: 10px;
+}
+
 .pd-l-8
+{
+    padding-left: 8px;
+}
+
+.pd-l-10
 {
     padding-left: 8px;
 }

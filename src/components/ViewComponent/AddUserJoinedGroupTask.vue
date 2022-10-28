@@ -72,29 +72,58 @@
                 <table style="width: 100%">
                     <thead>
                         <tr>
-                            <td>Họ và tên</td>
-                            <td>Email</td>
-                            <td></td>
+                            <td style="width: 35%">Họ và tên</td>
+                            <td style="width: 60%">Email</td>
+                            <td style="width: 5%"></td>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             v-for="user in listUserChosen" :key="user.email"
                         >
-                            <td></td>
-                            <td></td>
-                            <td class="p-relative">
-                                <div class="file-icon delete-line-icon"></div>
+                            <td  class="txt-al-center txt-threedots" style="width: 35%">{{user.firstName}} {{user.lastName}}</td>
+                            <td class="txt-al-center txt-threedots" style="width: 60%">{{user.email}}</td>
+                            <td class="p-relative" style="width: 5%">
+                                <div class="file-icon delete-line-icon mg-auto c-poiter" @click="deleteChosenUser(user)"></div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+                <div class="pd-10 fs-18 fw-500">Vai trò</div>
+                <div class="d-flex al-center j-space-between w-80 pd-l-10">
+                    <div 
+                        v-for="role in option.listRole" :key="role.roleId"
+                        class="d-flex al-center"
+                        @click="chooseRole(role)"
+                    >
+                        <div
+                            :class="[role.roleId == roleIdChoose? 'bg-radio-active':'bg-radio']"
+                        >
+                            <div v-if="role.roleId == roleIdChoose" class="active-circle" ></div>
+                        </div>
+                        <div class="pd-l-12">{{role.nameRole}}</div>
+                    </div>
+                </div>
+                <div class="explain-role pd-10">
+                    <div  
+                        v-for="role in option.listRole" :key="role.roleId"
+                        v-show="role.roleId == roleIdChoose"
+                    >
+                        {{role.description}}
+                    </div>
+                </div>
             </div>
         </div>
         <div class="footer d-flex al-center j-end pd-16">
             <button class="btn btn-white-silver mg-r-12" @click="closePopup">Hủy</button>
-            <button :class="['btn', 'btn-primary', haveSelectedUser? '': 'pe-none']" @click="changeNextStep">Tiếp tục</button>
-            <button class="btn btn-primary" v-if="false">Đồng ý</button>
+            <button 
+                :class="['btn', 'btn-primary', haveSelectedUser? '': 'pe-none']" 
+                @click="changeNextStep"
+                v-if="step == 1"
+            >
+                Tiếp tục
+            </button>
+            <button class="btn btn-primary" v-if="step == 2" @click="commitListUserJoin">Đồng ý</button>
         </div>
     </div>
 </template>
@@ -146,17 +175,51 @@ export default {
         }
     },
     methods: {
+        commitListUserJoin()
+        {
+            let me = this;
+            me.listUserChosen.forEach(user => {
+                user.role = me.option.listRole.find(role => role.roleId == me.roleIdChoose);
+            });
+
+            me.$emit('closePopup', (objectParent)=>{
+                me.listUserChosen.forEach(userChosen => {
+                    let indexFind = objectParent.listUser.findIndex(user => user.email == userChosen.email);
+                    if(indexFind == -1)
+                    {
+                        objectParent.listUser.push(userChosen);
+                    }
+                })
+            })
+        },
+        deleteChosenUser(user)
+        {
+            let me = this;
+            me.listUserChosen = me.listUserChosen.filter(userChosen => userChosen.email != user.email);
+            if(me.listUserChosen.length == 0)
+            {
+                me.step = 1;
+            }
+        },
+        chooseRole(roleChosen)
+        {
+            let me = this;
+            me.roleIdChoose = roleChosen.roleId;
+        },
         changeNextStep()
         {
             let me = this;
             me.step = 2;
             me.listUserChoose.forEach(userSelected => {
-                let indexFind = me.listUserChosen.findIndex(userSettingRole => userSettingRole.email == userSelected.email);
-                if(indexFind == -1)
+                if(userSelected.isSelected)
                 {
-                    let userClone = {};
-                    Object.assign(userClone,me.listUserChoose[indexFind]);
-                    me.listUserChosen.push(userClone);
+                    let indexFind = me.listUserChosen.findIndex(userSettingRole => userSettingRole.email == userSelected.email);
+                    if(indexFind == -1)
+                    {
+                        let userClone = {};
+                        Object.assign(userClone,userSelected);
+                        me.listUserChosen.push(userClone);
+                    }
                 }
             });
         },
@@ -248,15 +311,27 @@ export default {
             me.$emit('closePopup', ()=>{});
         }
     },
+    props: {
+        option: {
+            typeof: Object,
+            default: function(rawProps)
+            {
+                return rawProps.option? rawProps.option : {
+                    listRole: []
+                };
+            }
+        }
+    },
     data()
     {
         return {
             indexPaging: 1,
             listUserChoose: [],
             listUserChosen: [],
+            roleIdChoose: this.option.listRole[2].roleId,
             numberOfRecords: 0,
             searchUser: '',
-            step: 2,
+            step: 1,
             isDoneLoadData: false
         };
     }

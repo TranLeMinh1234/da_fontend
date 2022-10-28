@@ -2,6 +2,7 @@
 @import url('./icon.css');
 @import url('./common.css');
 @import url('./button/buttonCommon.css');
+@import url('./radio/radioCustom.css');
 
 *{
     box-sizing: border-box;
