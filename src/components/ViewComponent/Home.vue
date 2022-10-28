@@ -123,9 +123,9 @@
                                             <div class="file-icon add-template-icon mg-l-10"></div>
                                             <div class="pd-l-10">Thêm mẫu quá trình công việc</div>
                                         </div>
-                                        <div class="d-flex al-center menu-add-item c-poiter">
-                                            <div class="file-icon add-template-icon mg-l-10"></div>
-                                            <div class="pd-l-10">Thêm mẫu quá trình công việc</div>
+                                        <div class="d-flex al-center menu-add-item c-poiter" @click="openFormAddGroupTask">
+                                            <div class="file-icon add-group-task-icon mg-l-10"></div>
+                                            <div class="pd-l-10">Thêm nhóm công việc</div>
                                         </div>
                                         <div class="d-flex al-center menu-add-item c-poiter">
                                             <div class="file-icon add-template-icon mg-l-10"></div>
@@ -197,6 +197,7 @@ import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
 import TaskDetail from './TaskDetail.vue';
 import IconDropDown from '../commonComponent/IconDropDown.vue';
 import Datepicker from '@vuepic/vue-datepicker';
+import AddGroupTaskForm from './AddGroupTaskForm.vue';;
 import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
@@ -206,7 +207,8 @@ export default {
         Modal,
         TaskDetail,
         IconDropDown,
-        Datepicker
+        Datepicker,
+        AddGroupTaskForm
     },
     created(){
         let me = this;
@@ -236,6 +238,18 @@ export default {
         me.initHtmlCss();
     },
     methods: {
+        openFormAddGroupTask()
+        {
+            let me = this;
+            me.showDetail('AddGroupTaskForm',{
+                width: '500px',
+                height: 'auto',
+                borderTop: true
+            },{
+                
+            },null);
+            me.isShowAddOption = false;
+        },
         changeDailyTaskView()
         {
             let me = this;
@@ -354,6 +368,7 @@ export default {
             me.showDetail('TaskDetail',{
                 width: '900px',
                 height: 'auto',
+                borderTop: true
             },{
                 taskId: null,
                 typeTask: EnumTypeTask.Personal,

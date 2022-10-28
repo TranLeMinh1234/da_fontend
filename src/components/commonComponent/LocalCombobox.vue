@@ -2,7 +2,8 @@
     <div class="local-combobox">
         <div 
             :class="['display-value-box','d-flex',
-            'al-center', disabled? 'pe-none disabled-input':'']" 
+            'al-center', disabled? 'pe-none disabled-input':'',
+            haveBorder? 'custom-border-box': '']" 
             @click="showDropDown"
         >
             <div class="txt-threedots">{{data[indexItemSelected][configField.displayField]}}</div>
@@ -41,7 +42,7 @@ export default {
     {
         let me = this;
         let indexItemBinding = me.data.findIndex(item => item[me.configField.valueField] == me.modelValue);
-        if(indexItemBinding == -1)
+        if(indexItemBinding == -1 && me.data && me.data.length > 0)
         {
             me.indexItemSelected = 0;
             me.$emit('update:modelValue', me.data[0][me.configField.valueField]);
@@ -94,6 +95,10 @@ export default {
                     directArrow: 'top',
                 };
             }
+        },
+        haveBorder: {
+            type: Boolean,
+            default: true
         },
         data: 
         {

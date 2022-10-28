@@ -1,13 +1,13 @@
 <template>
-    <div class="m-input" :style="{
+    <div class="m-textarea" :style="{
         height: isValidate? '70px': '50px'
     }">
-        <div class="background-input">
+        <div class="background-textarea">
             <div v-if="isHaveIcon" :class="['file-icon',icon]"></div>
-            <input 
+            <textarea 
                 :type="type" 
                 v-on="listeners" 
-                ref="mInputElement" 
+                ref="mTextareaElement" 
                 v-model="valueValidate"
                 :placeholder="placeholder"
                 :title="title"
@@ -16,6 +16,7 @@
                     padding: padding
                 }"
             >
+            </textarea>
         </div>
         <div class="cl-red txt-italic fz-12 pd-t-2 fit-content" :style="{
             display: isValidate? 'block': 'none'
@@ -26,7 +27,6 @@
 <script>
 import BaseDataControl from './BaseDataControl.vue';
 import {validateRule} from '../../common/js/validateRule.js';
-
 export default {
     name: "MInput",
     extends: BaseDataControl,
@@ -95,7 +95,7 @@ export default {
         {
             let me = this;
             return {
-                element: me.$refs.mInputElement,
+                element: me.$refs.mTextareaElement,
                 isValid: me.isValid,
                 valueValidate: me.valueValidate,
                 nameField: me.nameField,
@@ -117,5 +117,5 @@ export default {
 </script>
 
 <style scoped>
-@import url('../../assets/css/componentCommon/MInput.css');
+@import url('../../assets/css/componentCommon/MTextarea.css');
 </style>

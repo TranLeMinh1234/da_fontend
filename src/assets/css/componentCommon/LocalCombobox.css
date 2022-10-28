@@ -8,14 +8,22 @@
     width: 100%;
     height: 40px;
     border-radius: 8px;
-    border: 1px solid silver;
     position: relative;
 }
 
 .local-combobox .display-value-box:hover{
+    cursor: pointer;
+}
+
+.local-combobox .custom-border-box
+{
+    border: 1px solid silver;
+}
+
+.local-combobox .custom-border-box:hover
+{
     border: 1px solid #2196f3;
     box-shadow: 0px 0px 2px rgb(102, 102, 102);
-    cursor: pointer;
 }
 
 .local-combobox .border-blue

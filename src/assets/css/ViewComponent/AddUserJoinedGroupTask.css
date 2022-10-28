@@ -1,0 +1,63 @@
+.add-user-joined-form{
+    width: 100%;
+    height: auto;
+}
+
+.add-user-joined-form .body-content{
+    width: 100%;
+    height: auto;
+}
+
+.add-user-joined-form .check-select-table
+{
+    width: 16px;
+    height: 16px;
+    border: 1px solid silver;
+    border-radius: 4px;
+}
+
+.add-user-joined-form table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.add-user-joined-form  table thead {
+    width: calc( 100% - 10px);
+}
+
+.add-user-joined-form thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;/* even columns width , fix width of table too*/
+}
+
+.add-user-joined-form tbody{
+    display: block;
+    height: 200px;
+    overflow: auto;
+}
+
+.add-user-joined-form table tbody td{
+    height: 40px; 
+    text-align: center;   
+}
+
+.add-user-joined-form table thead td{
+    text-align: center;   
+}
+
+.add-user-joined-form table td:nth-child{
+    text-align: center;   
+}
+
+.add-user-joined-form table tbody tr:nth-child(even){
+    background-color: rgb(245, 245, 245);
+}
+
+
+.add-user-joined-form table tbody tr:hover{
+    background-color: #e4f7ff!important;
+}
+
+.add-user-joined-form .choose-role{
+}

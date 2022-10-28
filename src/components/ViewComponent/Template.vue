@@ -285,7 +285,6 @@ export default {
                 .then(res => {
                     if(res.data.success)
                     {
-                        debugger;
                         me.listTempProcess = me.listTempProcess.filter(process => process.processId != processEdit.processId);
                         processEdit.isEditing = false;
                     }
@@ -340,7 +339,6 @@ export default {
                 {
                     for(var propertyName in processOriginal)
                     {
-                        debugger;
                         processEditing[propertyName] = processOriginal[propertyName];
                     }
                 }

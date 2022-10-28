@@ -8,12 +8,15 @@ class BaseCallApi{
 
     Get(routeApi, data, option)
     {
-        let buildQueryData = "?";
-        for(var property in data)
+        let buildQueryData = data? "?":"";
+        if(data)
         {
-            buildQueryData+=`${property}=${data[property]}&`;
+            for(var property in data)
+            {
+                buildQueryData+=`${property}=${data[property]}&`;
+            }
+            buildQueryData = buildQueryData.slice(0,buildQueryData.length-1)
         }
-        buildQueryData = buildQueryData.slice(buildQueryData.length-1,1);
         return axios.get(this.doMain + '/' + routeApi + buildQueryData, option);
     }
 

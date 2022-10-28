@@ -20,7 +20,7 @@ export default {
         ...mapGetters('userManage', ['userInfo','isExistsUserInfo'])
     },
     methods: {
-        ...mapMutations('userManage',['setUserInfo','clearUserInfo']),
+        ...mapMutations('userManage',['setUserInfo','clearUserInfo','setRoleForUser']),
         checkLogin()
         {
             let me = this;

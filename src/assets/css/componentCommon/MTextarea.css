@@ -1,0 +1,38 @@
+.m-textarea{
+    width: 100%;
+}
+
+.m-textarea .background-textarea
+{
+    position: relative;
+}
+
+.m-textarea textarea
+{
+    border: 1px solid silver;
+    border-radius: 8px;
+    font-size: 12px;
+    width: 100%;
+    outline: none;
+    resize: none;
+}
+
+.m-textarea textarea:focus
+{
+    border: 1px solid #2196f3;
+    box-shadow: 0px 0px 2px rgb(102, 102, 102);
+}
+
+.error
+{
+    border: 1px solid red !important;
+    box-shadow: 0px 0px 2px rgb(102, 102, 102);
+}
+
+.m-textarea .background-textarea .file-icon
+{
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translate(-50%,-50%);
+}

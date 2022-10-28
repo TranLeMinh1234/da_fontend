@@ -168,7 +168,7 @@
 {
     background-position: -200px -136px;
     width: 26px;
-    height: 26px;
+    height: 16px;
 }
 
 .plush-white-icon
@@ -438,3 +438,43 @@
     width: 16px;
     height: 16px;
 }
+
+.add-group-task-icon{
+    background-position: -420px -36px;
+    width: 24px;
+    height: 24px;
+}
+
+.lock-icon{
+    background-position: -648px -164px;
+    width: 24px;
+    height: 24px;
+}
+
+.checkbox-blue-icon
+{
+    background-color: #2196f3;  
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -584px -424px;
+    width: 16px;
+    height: 16px;
+}
+
+.left-arrow-icon
+{
+    background-position: -484px -324px;
+    width: 24px;
+    height: 24px;
+    transform: rotate(180deg);
+}
+
+
+.right-arrow-icon
+{
+    background-position: -484px -324px;
+    width: 24px;
+    height: 24px;
+    margin: -3px 5px 0;
+}
+
+

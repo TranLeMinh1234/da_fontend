@@ -150,6 +150,11 @@
     width: fit-content;
 }
 
+.fw-500
+{
+    font-weight: 500;
+}
+
 .fw-600
 {
     font-weight: 600;
@@ -227,8 +232,20 @@
     margin-right: 16px;
 }
 
+.mg-r-12{
+    margin-right: 12px;
+}
+
 .mg-t-10{
     margin-top: 10px;
+}
+
+.mg-t-16{
+    margin-top: 16px;
+}
+
+.mg-t-26{
+    margin-top: 26px;
 }
 
 .mg-t-60{
@@ -428,5 +445,5 @@
 }
 
 .fs-24{
-    font-size: 18px;
+    font-size: 24px;
 }

@@ -29,4 +29,9 @@ var EnumTypeDeadline = {
     End: 1
 };
 
-export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline};
+var EnumTypeGroupTask = {
+    Personal: 1,
+    Group: 2
+};
+
+export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask};

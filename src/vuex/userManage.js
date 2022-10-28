@@ -20,6 +20,10 @@ const userManage = {
         {
             state.userInfo = userInfo;
         },
+        setRoleForUser(state, role)
+        {
+            state.userInfo.role = role;
+        },
         clearUserInfo(state){
             state.userInfo = null;
         }

@@ -557,7 +557,6 @@ export default {
         },
         endTimeChange(newValue)
         {
-            debugger
             let me = this;
             let oldValue = me.dataEdit.endTime;
 
@@ -566,7 +565,6 @@ export default {
                 me.dataEdit.startTime = me.$commonFunction.parseStringServerToDate(me.dataEdit.startTime);
             }
 
-            debugger;
             if(newValue != null && me.dataEdit.startTime != null && newValue.getTime() < me.dataEdit.startTime.getTime())
             {
                 me.showDialogNotification(
