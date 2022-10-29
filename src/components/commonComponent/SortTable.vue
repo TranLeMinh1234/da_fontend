@@ -1,9 +1,9 @@
 <template>
     <div class="sort-table d-flex">
-        <div v-for="column in lstColumnTask" :key="column.proccessId"
+        <div v-for="(column,index) in lstColumnTask" :key="column.proccessId"
             class="column-task"
             :style="{
-                backgroundColor: column.columnSetting.color
+                backgroundColor: columnColorResult(index)
             }"
             >
                 <div 
@@ -16,14 +16,19 @@
                         backgroundColor: column.columnSetting.colorHeader
                     }"
                 >
-                        <div class="name-column txt-threedots txt-al-center">
-                            {{column.name}}
+                        <div 
+                            class="name-column txt-threedots txt-al-center fw-500 fs-20"
+                            :style="{
+                                color: column.columnSetting.colorText
+                            }"
+                        >
+                            {{column.processName}}
                         </div>
                 </div>
                 <Task 
                     v-for="task in column.lstTask" 
                     :key="task.taskId" 
-                    @dblclick="showDetailTask(task.taskId)"
+                    @dblclick="showDetailTask(task)"
                     :data="task"
                 />
         </div>
@@ -82,15 +87,15 @@ export default {
         });
     },
     watch: {
-        'lstColumnTask.lstTask': function(newValue)
-        {
-            
-        }
+        
+    },
+    computed: {
+        
     },
     props: {
         columnColor: {
             type: String, 
-            default: 'hsla(0,0%,100%,.05)'
+            default: ''
         },
         isHaveHeader: {
             type: Boolean,
@@ -102,10 +107,18 @@ export default {
         }
     },
     methods: {
-        showDetailTask(taskId)
+         columnColorResult: function(index)
         {
             let me = this;
-            me.$emit('showDetailTask', taskId);
+            if(me.columnColor)
+                return me.columnColor;
+            else
+                return index%2==0? 'transparent' : 'hsla(0,0%,100%,.05)';
+        },
+        showDetailTask(task)
+        {
+            let me = this;
+            me.$emit('showDetailTask', task);
         }
     },
     data(){

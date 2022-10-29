@@ -3,6 +3,7 @@ import Test from '../components/ViewComponent/Test.vue';
 import Login from '../components/ViewComponent/Login.vue';
 import DailyTask from '../components/ViewComponent/DailyTask.vue';
 import Template from '../components/ViewComponent/Template.vue'
+import DetailGroupTask from '../components/ViewComponent/DetailGroupTask.vue'
 import { createRouter,createWebHistory} from 'vue-router';
 
 var routes = [
@@ -11,12 +12,19 @@ var routes = [
         component: Home,
         children: [
             {
+                name: 'DailyTask',
                 path: '/DailyTask',
                 component: DailyTask
             },
             {
+                name: 'Template',
                 path: '/Template',
                 component: Template
+            },
+            {
+                name: 'DetailGroupTask',
+                path: '/DetailGroupTask/:grouptaskid/:templateReferenceId/:typegrouptask/:taskdetailid',
+                component: DetailGroupTask
             }
         ]
     },

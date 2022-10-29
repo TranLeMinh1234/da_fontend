@@ -44,12 +44,13 @@
                         <div class="lst-group-title">Cá nhân</div>
                     </div>
                     <div class="lst-group" v-show="isShowPersonalGroup">
-                        <div v-for="(groupPersonal, index) in lstGroupPersonalTask" :key="index" 
+                        <div v-for="groupPersonal in lstGroupPersonalTask" :key="groupPersonal.groupTaskId" 
                             class="item-lst d-flex al-center"
-                            :title="groupPersonal.nameGroup"
+                            :title="groupPersonal.nameGroupTask"
+                            @click="goDetailGroupTask(groupPersonal)"
                         >
                             <div class="file-icon personal-group-icon"></div>
-                            <div class="name-group txt-threedots">{{groupPersonal.nameGroup}}</div>
+                            <div class="name-group txt-threedots">{{groupPersonal.nameGroupTask}}</div>
                         </div>
                     </div>
                     <div class="d-flex type-group">
@@ -61,12 +62,13 @@
                         <div class="lst-group-title">Hội nhóm</div>
                     </div>
                     <div class="lst-group" v-show="isShowCommunityGroup">
-                        <div v-for="(groupCommunity, index) in lstGroupCommunityTask" :key="index" 
+                        <div v-for="groupCommunity in lstGroupCommunityTask" :key="groupCommunity.groupTaskId" 
                             class="item-lst d-flex al-center"
-                            :title="groupCommunity.nameGroup"
+                            :title="groupCommunity.nameGroupTask"
+                            @click="goDetailGroupTask(groupCommunity)"
                         >
                             <div class="file-icon personal-group-icon"></div>
-                            <div class="name-group txt-threedots">{{groupCommunity.nameGroup}}</div>
+                            <div class="name-group txt-threedots">{{groupCommunity.nameGroupTask}}</div>
                         </div>
                     </div>
                 </div>
@@ -193,11 +195,12 @@
 <script>
 import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import Modal from '../commonComponent/Modal.vue';
-import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
+import {EnumEditMode,EnumTypeTask,EnumTypeGroupTask } from '../../common/js/Enum.js';
 import TaskDetail from './TaskDetail.vue';
 import IconDropDown from '../commonComponent/IconDropDown.vue';
 import Datepicker from '@vuepic/vue-datepicker';
-import AddGroupTaskForm from './AddGroupTaskForm.vue';;
+import AddGroupTaskForm from './AddGroupTaskForm.vue';
+import DetailGroupTask from './DetailGroupTask.vue';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
@@ -208,7 +211,8 @@ export default {
         TaskDetail,
         IconDropDown,
         Datepicker,
-        AddGroupTaskForm
+        AddGroupTaskForm,
+        DetailGroupTask
     },
     created(){
         let me = this;
@@ -220,7 +224,9 @@ export default {
             const year = date.getFullYear();
 
             return `${day}/${month}/${year}`;
-        }
+        };
+
+        me.loadAllData();
     },
     computed:
     {
@@ -238,6 +244,54 @@ export default {
         me.initHtmlCss();
     },
     methods: {
+        goDetailGroupTask(groupTask)
+        {
+            let me = this;
+            me.isDifferentDailyTask = true;
+            me.isShowClock = false;
+            me.isShowMenu = false;
+            me.$router.push({name: 'DetailGroupTask', params: {
+                grouptaskid: groupTask.groupTaskId,
+                typegrouptask: groupTask.typeGroupTask,
+                taskdetailid: 'all',
+                templateReferenceId: groupTask.templateReferenceId,
+            }});
+        },
+        loadAllData()
+        {
+            let me = this;
+            me.getAllGroup();
+        },
+        getAllGroup(){
+            let me = this;
+            me.callApi('get', 'api/grouptask/havejoined',null)
+            .then(res=> {
+                if( res.data.success )
+                {
+                    let data = res.data.data;
+                    me.lstGroupCommunityTask = data.lstGroupCommunityTask;
+                    me.lstGroupPersonalTask = data.lstGroupPersonalTask;
+                    me.checkDoneLoadData();
+                }
+            });
+        },
+        checkDoneLoadData()
+        {
+            let me = this;
+            if(!me.countDoneLoadData)
+            {
+                me.countDoneLoadData = 1;
+            }
+            else
+            {
+                me.countDoneLoadData++;
+            }
+
+            if(me.countDoneLoadData == 1)
+            {
+                me.isDoneLoadData = true;
+            }
+        },
         openFormAddGroupTask()
         {
             let me = this;
@@ -256,7 +310,7 @@ export default {
             me.isShowMenu = true;
             me.isShowClock = true;
             me.isDifferentDailyTask = false;
-            me.$router.push({path: 'DailyTask'});
+            me.$router.push({name: 'DailyTask'});
         },
         changeViewAddTemplate()
         {
@@ -265,7 +319,7 @@ export default {
             me.isShowClock = false;
             me.isDifferentDailyTask = true;
             me.isShowAddOption = false;
-            me.$router.push({path: '/template'});
+            me.$router.push({name: 'Template'});
         },
         showAddOptionEvent()
         {
@@ -329,22 +383,18 @@ export default {
                 me.timeNow.setSeconds(me.timeNow.getSeconds() + 1);
             },1000);
 
-            if(me.$route.path.includes('template')){
-                me.isShowClock = false;
-                me.isShowMenu = false;
-            }
-            else
-            {
-                me.isShowClock = true;
-                me.isShowMenu = true;
-            }
-
             if(me.$route.path.includes('DailyTask'))
             {
                 me.isDifferentDailyTask = false;
+                me.isShowClock = true;
+                me.isShowMenu = true;
             }
             else
+            {
+                me.isShowClock = false;
+                me.isShowMenu = false;
                 me.isDifferentDailyTask = true;
+            }
         },
         closePopup(callbackInsideComponent, typeComponent)
         {
@@ -365,15 +415,42 @@ export default {
         openFormAddNewTask()
         {
             let me = this;
-            me.showDetail('TaskDetail',{
-                width: '900px',
-                height: 'auto',
-                borderTop: true
-            },{
-                taskId: null,
-                typeTask: EnumTypeTask.Personal,
-                editMode: EnumEditMode.Add
-            },null);
+            
+            switch(me.$route.name)
+            {
+                case "DetailGroupTask":
+                    me.paramRouter = {
+                        groupTaskId: me.$route.params.grouptaskid,
+                        typeGroupTask: parseInt(me.$route.params.typegrouptask),
+                        taskDetailId: me.$route.params.taskdetailid,
+                        templateReferenceId: me.$route.params.templateReferenceId
+                    };
+
+                    me.showDetail('TaskDetail',{
+                        width: '900px',
+                        height: 'auto',
+                        borderTop: true
+                    },{
+                        taskId: null,
+                        groupTaskId: me.paramRouter.groupTaskId,
+                        typeGroupTask: me.paramRouter.typeGroupTask,
+                        typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
+                        processId: me.$refs.view.templateGroupTask.listProcess[0].processId,
+                        editMode: EnumEditMode.Add
+                    },null);
+                    break;
+                default:
+                    me.showDetail('TaskDetail',{
+                            width: '900px',
+                            height: 'auto',
+                            borderTop: true
+                        },{
+                            taskId: null,
+                            typeTask: EnumTypeTask.Personal,
+                            editMode: EnumEditMode.Add
+                        },null);
+                    break;
+            }
         },
         showHideMenu()
         {
@@ -423,6 +500,7 @@ export default {
             isShowClock: true,
             isShowPersonalGroup: true,
             isShowCommunityGroup: true,
+            isDoneLoadData: false,
             lstGroupPersonalTask: [
                 {
                     nameGroup: 'Công việc cá nhân'

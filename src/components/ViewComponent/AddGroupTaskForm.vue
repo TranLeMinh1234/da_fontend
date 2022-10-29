@@ -4,13 +4,13 @@
             Thêm nhóm công việc
         </div>
         <div class="body-content pd-16">
-            <div class="fs-18">Tên nhóm công việc</div>
+            <div class="fs-18">Tên nhóm công việc*:</div>
             <MInput 
                 placeholder="Nhập tên nhóm công việc..."
                 v-model="newGroupTask.nameGroupTask"
                 :isValidate="false"
             />
-            <div class="fs-18 pd-t-16 fw-500">Loại nhóm công việc</div>
+            <div class="fs-18 pd-t-16 fw-500">Loại nhóm công việc:</div>
             <LocalCombobox 
                 :configField="{
                     displayField: 'nameTypeGroupTask',
@@ -22,7 +22,7 @@
                 :data="dataTypeGroupTask"
                 v-model="newGroupTask.typeGroupTask"
             />
-            <div class="fs-18 pd-t-16 fw-500">Mẫu quy trìn công việc</div>
+            <div class="fs-18 pd-t-16 fw-500">Mẫu quy trìn công việc:</div>
             <LocalCombobox 
                 :configField="{
                     displayField: 'nameTemplateGroupTask',
@@ -35,9 +35,9 @@
                 :data="listTemplateGroupTask"
                 v-model="newGroupTask.templateReferenceId"
             />
-            <div class="fs-18 pd-t-16 fw-500">Mô tả</div>
+            <div class="fs-18 pd-t-16 fw-500">Mô tả:</div>
             <MTextarea 
-                v-model="newGroupTask.Description" 
+                v-model="newGroupTask.description" 
                 placeholder="Nhập mô tả..."
                 :isValidate="false"
             />
@@ -89,7 +89,7 @@
         </div>
         <div class="footer d-flex al-center j-end pd-16">
             <button class="btn btn-white-silver" @click="closePopup">Hủy bỏ</button>
-            <button class="btn btn-primary mg-r-16">Lưu</button>
+            <button class="btn btn-primary mg-r-16" @click="commitNewGroupTask">Lưu</button>
         </div>
     </div>
     <Modal :isShow="isShowDetail" :configModal="configModal" ref="modal">
@@ -144,6 +144,56 @@ export default {
         me.loaddAllData();
     },
     methods:{
+        commitNewGroupTask()
+        {
+            let me = this;
+            let isValid = true;
+
+            if(!me.newGroupTask.nameGroupTask)
+            {
+                me.showDialogNotification({
+                    width: '430px',
+                    height: '200px',
+                    borderTop: true
+                },
+                {
+                    'title': 'Cảnh báo',
+                    'content': 'Tên nhóm công việc không được bỏ trống.'
+                },
+                undefined);
+                isValid = false;
+            }
+
+            if(isValid)
+            {
+                me.loader = me.$loading.show();
+
+                me.callApi('post','api/grouptask/insertcustom', {
+                    groupTask: me.newGroupTask,
+                    listUser: me.listUser
+                }, null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        let data = res.data.data;
+                        me.toast.success('Thêm nhóm công việc thành công.');
+                        me.loader.hide();
+                        me.$emit('closePopup', ()=>{});
+                    }
+                    else
+                    {
+                        let errorCode = res.data.errorCode[0];
+                        switch(errorCode)
+                        {
+                            case '':
+                                break;
+                            default: 
+                                break;
+                        }
+                    }
+                });
+            }
+        },
         deleteUserJoined(userDelete)
         {
             let me = this;
@@ -236,7 +286,7 @@ export default {
                 me.isDoneLoadData = true;
             }
         },
-        closeSusPopup(callback)
+        closeSubPopup(callback)
         {
             let me = this;
             if(typeof callback == 'function')
@@ -259,9 +309,11 @@ export default {
     {
         return {
             newGroupTask: {
+                groupTaskId: null,
                 nameGroupTask: '',
                 typeGroupTask: 1,
-                templateReferenceId: null
+                templateReferenceId: null,
+                description: ''
             },
             listRole: [],
             listUser: [],

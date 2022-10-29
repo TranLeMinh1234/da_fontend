@@ -103,6 +103,7 @@ table tr td
 #template-bg .detail-template .grid-edit
 table tr
 {
+    display: table-row !important;
 }
 
 #template-bg .detail-template .grid-edit

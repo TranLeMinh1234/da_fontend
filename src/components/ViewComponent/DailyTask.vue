@@ -91,14 +91,14 @@ export default {
                 editMode: EnumEditMode.Add
             },null);
         },
-        showDetailTask(taskId)
+        showDetailTask(task)
         {
             let me = this;
             me.showDetail('TaskDetail',{
                 width: '900px',
                 height: 'auto',
             },{
-                taskId: taskId,
+                taskId: task.taskId,
                 typeTask: EnumTypeTask.Personal,
                 editMode: EnumEditMode.Edit
             },null);

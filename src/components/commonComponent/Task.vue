@@ -46,6 +46,7 @@ export default {
     watch:{
         'data.listLabel': function(newValue)
         {
+            debugger;
         }
     },
     methods: {

@@ -310,7 +310,7 @@
 </template>
 
 <script>
-import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl, EnumTypeDeadline} from '../../common/js/Enum.js';
+import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl, EnumTypeDeadline, EnumTypeGroupTask} from '../../common/js/Enum.js';
 import { uuid } from 'vue-uuid';
 import Modal from '../commonComponent/Modal.vue';
 import IconDropDown from '../commonComponent/IconDropDown.vue';
@@ -349,7 +349,7 @@ export default {
                 return rawProps.option? rawProps.option: {
                     taskId: uuid.v1(),
                     typeTask: EnumTypeTask.Personal,
-                    editMode: EnumEditMode.Watch
+                    editMode: EnumEditMode.Watch,
                 };
             }
         }
@@ -644,14 +644,30 @@ export default {
                         if(res.data.success)
                         {
                             let data = res.data.data;
-                            let callBackDoInDailyTaskView = function(objecParent)
+                            let callBackDoInDailyTaskView = function(){};
+                            if(me.option.typeTask == EnumTypeTask.Personal)
                             {
-                                objecParent.lstColumnTask.forEach(column => {
-                                    column.lstTask = column.lstTask && column.lstTask.length > 0 ? 
-                                        column.lstTask.filter(task => task.taskId != me.option.taskId) 
-                                        : [];
-                                })
+                                callBackDoInDailyTaskView = function(objecParent)
+                                {
+                                    objecParent.lstColumnTask.forEach(column => {
+                                        column.lstTask = column.lstTask && column.lstTask.length > 0 ? 
+                                            column.lstTask.filter(task => task.taskId != me.option.taskId) 
+                                            : [];
+                                    })
+                                }
                             }
+                            else
+                            {
+                                callBackDoInDailyTaskView = function(objecParent)
+                                {
+                                    objecParent.templateGroupTask.listProcess.forEach(process => {
+                                        if(process.processId == me.option.processId)
+                                        {
+                                            process.lstTask = process.lstTask.filter(task => task.taskId != me.option.taskId);
+                                        }
+                                    });
+                                }
+                            }                            
                             me.$emit('closePopup',
                                     callBackDoInDailyTaskView,
                                     "ViewComponent");
@@ -699,6 +715,12 @@ export default {
                     taskId: null,
                     taskName: me.nameNewTask,
                     typeTask: me.option.typeTask,
+                    processId: (me.option.typeTask == EnumTypeTask.GroupPersonal) ||
+                        (me.option.typeTask == EnumTypeTask.Group)  ? 
+                        me.option.processId : null,
+                    groupTaskId: (me.option.typeTask == EnumTypeTask.GroupPersonal) ||
+                        (me.option.typeTask == EnumTypeTask.Group)  ? 
+                        me.option.groupTaskId : null,
                     description: null,
                     AssignedByEmail: null,
                     CreatedByEmail: null,
@@ -717,6 +739,7 @@ export default {
                         me.option.taskId = data.taskId;
                         me.dataEdit.taskId = data.taskId;
                         me.dataEdit.taskName = data.taskName;
+                        me.dataEdit.processId = data.processId;
                         me.loadAllData();
                     }
                 });
@@ -769,6 +792,7 @@ export default {
                         me.dataEdit.groupTask = data.groupTask;
                         me.dataEdit.startTime = data.startTime;
                         me.dataEdit.endTime = data.endTime;
+                        me.dataEdit.processId = data.processId;
                         me.dataEdit.assignForEmail = data.assignForEmail;
                         me.dataEdit.assignedFor = data.assignedFor;
                         me.dataEdit.assignedBy = data.assignedBy;
@@ -1195,44 +1219,90 @@ export default {
         closeTaskDetailPopup()
         {
             let me = this;
-            let callbackWhenClosePopup = function(objecParent){
-                let isExistsTask = false;
-                
-                if(me.nameNewTask)
-                {
-                    objecParent.lstColumnTask.forEach(column => {
-                        if(column.lstTask && column.lstTask.length > 0)
-                        {
-                            let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
-                            if(indexTaskExist > -1)
-                            {
-                                isExistsTask = true;
-                                column.lstTask[indexTaskExist] = me.dataEdit;
-                            }
-                        }
-                        // column.lstTask?.forEach(task => {
-                        //     if(task.taskId == me.dataEdit.taskId)
-                        //     {
-                        //         isExistsTask = true;
-                        //         task = me.dataEdit;
-                        //     }
-                        // });
-                    })
-
-                    if(!isExistsTask)
+            let callbackWhenClosePopup = function(){};
+            
+            if(me.option.typeTask == EnumTypeTask.Personal)
+            {
+                callbackWhenClosePopup = function(objecParent){
+                    let isExistsTask = false;
+                    
+                    if(me.option.editMode == EnumEditMode.Add && me.nameNewTask)
                     {
-                        if(me.option.typeTask == EnumTypeTask.Personal && objecParent.lstColumnTask.length > 0)
-                        {
-                            if(!objecParent.lstColumnTask[0].lstTask)
+                        objecParent.lstColumnTask.forEach(column => {
+                            if(column.lstTask && column.lstTask.length > 0)
                             {
-                                objecParent.lstColumnTask[0].lstTask = [];
+                                let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
+                                if(indexTaskExist > -1)
+                                {
+                                    isExistsTask = true;
+                                    column.lstTask[indexTaskExist] = me.dataEdit;
+                                }
                             }
-                            objecParent.lstColumnTask[0].lstTask.push(me.dataEdit);
+                        })
+
+                        if(!isExistsTask)
+                        {
+                            if(me.option.typeTask == EnumTypeTask.Personal && objecParent.lstColumnTask.length > 0)
+                            {
+                                if(!objecParent.lstColumnTask[0].lstTask)
+                                {
+                                    objecParent.lstColumnTask[0].lstTask = [];
+                                }
+                                objecParent.lstColumnTask[0].lstTask.push(me.dataEdit);
+                            }
                         }
+                        me.nameNewTask = '';
                     }
-                    me.nameNewTask = '';
-                }
-            };
+                    else if(me.option.editMode == EnumEditMode.Edit)
+                    {
+                        objecParent.lstColumnTask.forEach(column => {
+                            if(column.lstTask && column.lstTask.length > 0)
+                            {
+                                let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
+                                if(indexTaskExist > -1)
+                                {
+                                    column.lstTask[indexTaskExist] = me.dataEdit;
+                                }
+                            }
+                        })
+                    }
+                };
+            }
+            else
+            {
+                callbackWhenClosePopup = function(objecParent){
+                    if(me.option.editMode == EnumEditMode.Add && me.nameNewTask)
+                    {
+                        objecParent.templateGroupTask.listProcess.forEach(process => {
+                            if(process.processId == me.dataEdit.processId)
+                            {
+                                let indexFind = process.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
+                                if(indexFind != -1)
+                                {
+                                    process.lstTask[indexFind] = me.dataEdit;
+                                    isExistsTask = true;
+                                }
+                                else
+                                {
+                                    process.lstTask.push(me.dataEdit);
+                                }
+                            }
+                        });
+                        
+                        me.nameNewTask = '';
+                    }
+                    else if(me.option.editMode == EnumEditMode.Edit)
+                    {
+                        objecParent.templateGroupTask.listProcess.forEach(process => {
+                            if(process.processId == me.dataEdit.processId)
+                            {
+                                let indexFind = process.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
+                                process.lstTask[indexFind] = me.dataEdit;
+                            }
+                        });
+                    }
+                };
+            }
             me.$emit('closePopup',
                 callbackWhenClosePopup,
                 "ViewComponent");
