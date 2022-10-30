@@ -654,6 +654,8 @@ export default {
                                             column.lstTask.filter(task => task.taskId != me.option.taskId) 
                                             : [];
                                     })
+
+                                    objecParent.toast.success('Xóa công việc thành công.');
                                 }
                             }
                             else
@@ -666,6 +668,7 @@ export default {
                                             process.lstTask = process.lstTask.filter(task => task.taskId != me.option.taskId);
                                         }
                                     });
+                                    objecParent.toast.success('Xóa công việc thành công.');
                                 }
                             }                            
                             me.$emit('closePopup',

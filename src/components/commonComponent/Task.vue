@@ -1,5 +1,5 @@
 <template>
-    <div class="task c-poiter">
+    <div class="task c-poiter" :sortOrder="data.sortOrder" :taskId="data.taskId">
         <div class="name-task">{{data.taskName}}</div>
         <div class="fast-feature d-flex">
             <img :src="linkImg(data.assignedFor?.fileAvatarName)" alt="" class="assigned-user">

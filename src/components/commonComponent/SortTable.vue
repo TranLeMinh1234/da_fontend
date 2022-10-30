@@ -2,6 +2,7 @@
     <div class="sort-table d-flex">
         <div v-for="(column,index) in lstColumnTask" :key="column.proccessId"
             class="column-task"
+            :processId="column.processId"
             :style="{
                 backgroundColor: columnColorResult(index)
             }"
@@ -39,9 +40,11 @@
 import Sortable from 'sortablejs';
 import Task from './Task.vue';
 import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
+import BaseViewDetail from './BaseViewDetail.vue';
 
 export default {
     name: "SortTable",
+    extends: BaseViewDetail,
     components: {
         Task
     },
@@ -83,16 +86,29 @@ export default {
                 // ghostClass: "sortable-ghost",  // class làm mờ khi đang bị kéo
                 // chosenClass: "chosen", // class áp dụng cho ele được chọn để kéo
                 swapThreshold: 1,
+
+                onEnd: function(event)
+                {
+                    me.updateDroppedTask(event);
+                },
             });
         });
     },
     watch: {
-        
+        'lstColumnTask': function(newValue,oldValue)
+        {
+            debugger;
+        }
     },
     computed: {
         
     },
     props: {
+        isUpdateSortableOnServer:
+        {
+            type: Boolean,
+            default: false
+        },
         columnColor: {
             type: String, 
             default: ''
@@ -107,6 +123,32 @@ export default {
         }
     },
     methods: {
+        updateDroppedTask(event)
+        {
+            let me = this;
+            if(me.isUpdateSortableOnServer)
+            {
+                let taskId = event.item.getAttribute('taskId'),
+                    toProcessId = event.to.getAttribute('processId'),
+                    fromProcessId = event.from.getAttribute('processId'),
+                    newIndex = event.newIndex,
+                    oldIndex = event.oldIndex;
+
+                // me.callApi('put',`api/task/dropped/${taskId}/${toProcessId}/${newSortOrder}`)
+                // .then(res => {
+                //     if(res.data.success)
+                //     {
+                me.$emit('updateDroppedTask', {
+                    taskId: taskId,
+                    toProcessId: toProcessId,
+                    fromProcessId: fromProcessId,
+                    newIndex: newIndex,
+                    oldIndex: oldIndex
+                })
+                //     }
+                // });
+            }
+        },
          columnColorResult: function(index)
         {
             let me = this;

@@ -5,6 +5,8 @@
             @showDetailTask="showDetailTask"
             :lstColumnTask="templateGroupTask.listProcess"
             ref="sorttable"
+            :isUpdateSortableOnServer="true"
+            @updateDroppedTask="updateDroppedTask"
             v-if="isDoneLoadData"
         />
     </div>
@@ -38,11 +40,122 @@ export default {
             taskDetailId: me.$route.params.taskdetailid,
             templateReferenceId: me.$route.params.templateReferenceId
         };
-        
+
         me.loader = me.$loading.show();
         me.loadAllData();
     },
     methods:{
+        updateDroppedTask(taskInfo)
+        {
+            let me = this;
+            let taskInfoUpdate = [];
+            debugger;
+            if(taskInfo.toProcessId == taskInfo.fromProcessId)
+            {
+                if(taskInfo.newIndex != taskInfo.oldIndex)
+                {
+                    me.templateGroupTask.listProcess.forEach(process => {
+                        if(process.processId == taskInfo.toProcessId)
+                        {
+                            let taskDropped = process.lstTask.find(task => task.taskId == taskInfo.taskId);
+                            let taskMoved = process.lstTask.find(task => task.sortOrder == taskInfo.newIndex);
+                            taskDropped.sortOrder = taskInfo.newIndex;
+                            taskMoved.sortOrder = taskInfo.oldIndex;
+
+                            taskInfoUpdate.push(
+                                {
+                                    taskId: taskDropped.taskId,
+                                    processId: taskInfo.toProcessId,
+                                    sortOrder: taskDropped.sortOrder
+                                }
+                            );
+
+                            taskInfoUpdate.push(
+                                {
+                                    taskId: taskMoved.taskId,
+                                    processId: taskInfo.toProcessId,
+                                    sortOrder: taskMoved.sortOrder
+                                }
+                            );
+                        }
+                    });
+                }
+            }
+            else if(taskInfo.toProcessId != taskInfo.fromProcessId)
+            {
+                let taskDropped = {};
+                me.templateGroupTask.listProcess.forEach(process => {
+                    if(process.processId == taskInfo.fromProcessId)
+                    {
+                        taskDropped = process.lstTask.find(task => task.taskId == taskInfo.taskId);
+                        process.lstTask.forEach(task => {
+                            if(task.sortOrder > taskDropped.sortOrder)
+                            {
+                                task.sortOrder = task.sortOrder--;
+                                taskInfoUpdate.push(
+                                    {
+                                        taskId: task.taskId,
+                                        processId: taskInfo.fromProcessId,
+                                        sortOrder: task.sortOrder
+                                    }
+                                );
+                            }
+                        });
+                        process.lstTask = process.lstTask.filter(task => task.taskId != taskInfo.taskId);
+
+                        process.lstTask.sort((taskLeft,taskRight) => {
+                            return taskLeft.sortOrder - taskRight.sortOrder;
+                        });
+                    }
+                });
+
+                me.templateGroupTask.listProcess.forEach(process => {
+                    if(process.processId == taskInfo.toProcessId)
+                    {
+                        taskDropped.sortOrder = taskInfo.newIndex;
+                        process.lstTask.forEach(task => {
+                            if(task.sortOrder >= taskInfo.newIndex)
+                            {
+                                task.sortOrder++;   
+                                taskInfoUpdate.push(
+                                    {
+                                        taskId: task.taskId,
+                                        processId: taskInfo.toProcessId,
+                                        sortOrder: task.sortOrder
+                                    }
+                                );
+                            }
+                        });
+                        taskDropped.sortOrder = taskInfo.newIndex;
+                        process.lstTask.push(taskDropped);
+                        process.lstTask.sort((taskLeft,taskRight) => {
+                            return taskLeft.sortOrder - taskRight.sortOrder;
+                        });
+
+                        taskInfoUpdate.push(
+                            {
+                                taskId: taskDropped.taskId,
+                                processId: taskInfo.toProcessId,
+                                sortOrder: taskDropped.sortOrder
+                            }
+                        );
+                    }
+                })
+            }
+
+            if(taskInfoUpdate.length > 0)
+            {
+                me.loader = me.$loading.show();
+                me.callApi('put', 'api/task/processbatch', taskInfoUpdate,null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        me.loader.hide();
+                    }
+                });
+            }
+        
+        },
         loadAllData()
         {
             let me = this;
@@ -57,6 +170,7 @@ export default {
                 if(res.data.success)
                 {
                     let data = res.data.data;
+                    me.listUser = data;
                     me.checkDoneLoadData();
                 }
             });
@@ -105,20 +219,21 @@ export default {
 
                 me.listTask.forEach(task => {
                     me.templateGroupTask.listProcess.forEach(process => {
+                        if(!process.lstTask)
+                        {
+                            process.lstTask = [];
+                        }
+
                         if(process.processId == task.processId)
                         {
-                            if(!process.lstTask)
-                            {
-                                process.lstTask = [];
-                                process.lstTask.push(task);
-                            }
-                            else
-                            {
-                                process.lstTask.push(task);
-                            }
+                            process.lstTask.push(task);
                         }
+
                     });
                 })
+
+                let currentUser = me.listUser.find(user => user.email == me.userInfo.email);
+                me.setRoleForUser(currentUser.role);
             }
         },
         showDetailTask(task)
