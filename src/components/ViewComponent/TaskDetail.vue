@@ -662,13 +662,42 @@ export default {
                             {
                                 callBackDoInDailyTaskView = function(objecParent)
                                 {
+                                    let tasksAffectedSortOrder = [];
                                     objecParent.templateGroupTask.listProcess.forEach(process => {
                                         if(process.processId == me.option.processId)
                                         {
+                                            process.lstTask.forEach(task => {
+                                                if(task.sortOrder > me.dataEdit.sortOrder)
+                                                {
+                                                    task.sortOrder = task.sortOrder-1;
+                                                    tasksAffectedSortOrder.push(
+                                                        {
+                                                            taskId: task.taskId,
+                                                            processId: process.processId,
+                                                            sortOrder: task.sortOrder
+                                                        }
+                                                    );
+                                                }
+                                            });
                                             process.lstTask = process.lstTask.filter(task => task.taskId != me.option.taskId);
+                                            process.lstTask.sort((taskLeft,taskRight) => {
+                                                return taskLeft.sortOrder - taskRight.sortOrder;
+                                            });
                                         }
                                     });
-                                    objecParent.toast.success('Xóa công việc thành công.');
+
+                                    if(tasksAffectedSortOrder.length > 0)
+                                    {
+                                        objecParent.loader = objecParent.$loading.show();
+                                        me.callApi('put', 'api/task/processbatch', tasksAffectedSortOrder, null)
+                                        .then(res => {
+                                            if(res.data.success)
+                                            {
+                                                objecParent.loader.hide();
+                                                objecParent.toast.success('Xóa công việc thành công.');
+                                            }
+                                        });
+                                    }
                                 }
                             }                            
                             me.$emit('closePopup',
@@ -1226,12 +1255,12 @@ export default {
             
             if(me.option.typeTask == EnumTypeTask.Personal)
             {
-                callbackWhenClosePopup = function(objecParent){
+                callbackWhenClosePopup = function(objectParent){
                     let isExistsTask = false;
                     
                     if(me.option.editMode == EnumEditMode.Add && me.nameNewTask)
                     {
-                        objecParent.lstColumnTask.forEach(column => {
+                        objectParent.lstColumnTask.forEach(column => {
                             if(column.lstTask && column.lstTask.length > 0)
                             {
                                 let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
@@ -1245,20 +1274,22 @@ export default {
 
                         if(!isExistsTask)
                         {
-                            if(me.option.typeTask == EnumTypeTask.Personal && objecParent.lstColumnTask.length > 0)
+                            if(me.option.typeTask == EnumTypeTask.Personal && objectParent.lstColumnTask.length > 0)
                             {
-                                if(!objecParent.lstColumnTask[0].lstTask)
+                                if(!objectParent.lstColumnTask[0].lstTask)
                                 {
-                                    objecParent.lstColumnTask[0].lstTask = [];
+                                    objectParent.lstColumnTask[0].lstTask = [];
                                 }
-                                objecParent.lstColumnTask[0].lstTask.push(me.dataEdit);
+                                objectParent.lstColumnTask[0].lstTask.push(me.dataEdit);
                             }
                         }
+
+                        objectParent.toast.success('Thêm công việc thành công.');
                         me.nameNewTask = '';
                     }
                     else if(me.option.editMode == EnumEditMode.Edit)
                     {
-                        objecParent.lstColumnTask.forEach(column => {
+                        objectParent.lstColumnTask.forEach(column => {
                             if(column.lstTask && column.lstTask.length > 0)
                             {
                                 let indexTaskExist = column.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
@@ -1268,15 +1299,17 @@ export default {
                                 }
                             }
                         })
+
+                        objectParent.toast.success('Cập nhật công việc thành công.');
                     }
                 };
             }
             else
             {
-                callbackWhenClosePopup = function(objecParent){
+                callbackWhenClosePopup = function(objectParent){
                     if(me.option.editMode == EnumEditMode.Add && me.nameNewTask)
                     {
-                        objecParent.templateGroupTask.listProcess.forEach(process => {
+                        objectParent.templateGroupTask.listProcess.forEach(process => {
                             if(process.processId == me.dataEdit.processId)
                             {
                                 let indexFind = process.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
@@ -1291,18 +1324,22 @@ export default {
                                 }
                             }
                         });
+
+                        objectParent.toast.success('Thêm công việc thành công.');
                         
                         me.nameNewTask = '';
                     }
                     else if(me.option.editMode == EnumEditMode.Edit)
                     {
-                        objecParent.templateGroupTask.listProcess.forEach(process => {
+                        objectParent.templateGroupTask.listProcess.forEach(process => {
                             if(process.processId == me.dataEdit.processId)
                             {
                                 let indexFind = process.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
                                 process.lstTask[indexFind] = me.dataEdit;
                             }
                         });
+
+                        objectParent.toast.success('Cập nhật công việc thành công.');
                     }
                 };
             }

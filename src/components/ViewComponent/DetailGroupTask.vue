@@ -4,9 +4,13 @@
             :isHaveHeader="true"
             @showDetailTask="showDetailTask"
             :lstColumnTask="templateGroupTask.listProcess"
+            :isAddTaskOnColumn="true"
             ref="sorttable"
+            :groupTaskInfo="groupTaskInfo"
             :isUpdateSortableOnServer="true"
             @updateDroppedTask="updateDroppedTask"
+            @updateDroppedProcess="updateDroppedProcess"
+            @addNewTaskInProcess="addNewTaskInProcess"
             v-if="isDoneLoadData"
         />
     </div>
@@ -41,15 +45,95 @@ export default {
             templateReferenceId: me.$route.params.templateReferenceId
         };
 
+        me.groupTaskInfo = me.paramRouter;
         me.loader = me.$loading.show();
         me.loadAllData();
     },
     methods:{
+        addNewTaskInProcess(process)
+        {
+            let me = this;
+
+            me.showDetail('TaskDetail',{
+                width: '900px',
+                height: 'auto',
+                borderTop: true
+            },{
+                taskId: null,
+                groupTaskId: me.paramRouter.groupTaskId,
+                typeGroupTask: me.paramRouter.typeGroupTask,
+                typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
+                processId: process.processId,
+                editMode: EnumEditMode.Add
+            },null);
+        },
+        updateDroppedProcess(processInfo)
+        {
+            let me = this;
+            if(processInfo.newIndex != processInfo.oldIndex)
+            {
+                let processesAffected = [];
+                let processDroped = me.templateGroupTask.listProcess.find(process => process.processId == processInfo.processId);
+                processesAffected.push(
+                    {
+                        processId: processInfo.processId,
+                        sortOrder: processInfo.newIndex
+                    }
+                );
+
+                me.templateGroupTask.listProcess.forEach(process => {
+                    let maxIndexChange = Math.max(processInfo.newIndex,processInfo.oldIndex),
+                        minIndexChange = Math.min(processInfo.newIndex,processInfo.oldIndex);
+                    if(
+                        process.processId != processInfo.processId &&
+                        processInfo.newIndex < processInfo.oldIndex &&
+                        process.sortOrder >=  minIndexChange &&
+                        process.sortOrder <  maxIndexChange
+                    )
+                    {
+                        process.sortOrder = process.sortOrder + 1;
+                        processesAffected.push(
+                            {
+                                processId: process.processId,
+                                sortOrder: process.sortOrder
+                            }
+                        );
+                    }
+                    else if(
+                        process.processId != processInfo.processId &&
+                        processInfo.newIndex > processInfo.oldIndex &&
+                        process.sortOrder <=  maxIndexChange &&
+                        process.sortOrder >  minIndexChange
+                    )
+                    {
+                        process.sortOrder = process.sortOrder - 1;
+                        processesAffected.push(
+                            {
+                                processId: process.processId,
+                                sortOrder: process.sortOrder
+                            }
+                        );
+                    }
+                });
+                
+                processDroped.sortOrder = processInfo.newIndex;
+
+                if(processesAffected.length > 0)
+                {
+                    me.callApi('put', 'api/template/process/sortorder', processesAffected, null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+
+                        }
+                    });
+                }
+            }
+        },
         updateDroppedTask(taskInfo)
         {
             let me = this;
             let taskInfoUpdate = [];
-            debugger;
             if(taskInfo.toProcessId == taskInfo.fromProcessId)
             {
                 if(taskInfo.newIndex != taskInfo.oldIndex)
@@ -89,9 +173,10 @@ export default {
                     {
                         taskDropped = process.lstTask.find(task => task.taskId == taskInfo.taskId);
                         process.lstTask.forEach(task => {
-                            if(task.sortOrder > taskDropped.sortOrder)
+                            debugger;
+                            if(task.sortOrder > taskDropped.sortOrder && task.taskId != taskDropped.taskId)
                             {
-                                task.sortOrder = task.sortOrder--;
+                                task.sortOrder = task.sortOrder - 1;
                                 taskInfoUpdate.push(
                                     {
                                         taskId: task.taskId,
@@ -112,11 +197,10 @@ export default {
                 me.templateGroupTask.listProcess.forEach(process => {
                     if(process.processId == taskInfo.toProcessId)
                     {
-                        taskDropped.sortOrder = taskInfo.newIndex;
                         process.lstTask.forEach(task => {
-                            if(task.sortOrder >= taskInfo.newIndex)
+                            if(task.sortOrder >= taskInfo.newIndex && task.taskId != taskDropped.taskId)
                             {
-                                task.sortOrder++;   
+                                task.sortOrder = task.sortOrder + 1;   
                                 taskInfoUpdate.push(
                                     {
                                         taskId: task.taskId,
@@ -259,6 +343,8 @@ export default {
             templateGroupTask: {
                 listProcess: []
             },
+
+            groupTaskInfo: {},
 
             listTask: [],
 

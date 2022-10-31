@@ -109,7 +109,7 @@
                                 <IconDropDown
                                     :config="{
                                         width: 380,
-                                        height: 330,
+                                        height: 130,
                                         arrowPositionX:100,
                                         arrowPositionY:0,
                                         directArrow: 'top',
@@ -128,10 +128,6 @@
                                         <div class="d-flex al-center menu-add-item c-poiter" @click="openFormAddGroupTask">
                                             <div class="file-icon add-group-task-icon mg-l-10"></div>
                                             <div class="pd-l-10">Thêm nhóm công việc</div>
-                                        </div>
-                                        <div class="d-flex al-center menu-add-item c-poiter">
-                                            <div class="file-icon add-template-icon mg-l-10"></div>
-                                            <div class="pd-l-10">Thêm mẫu quá trình công việc</div>
                                         </div>
                                     </div>
                                 </IconDropDown>    

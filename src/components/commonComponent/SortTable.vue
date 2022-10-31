@@ -14,7 +14,7 @@
                             isHaveHeader? '': 'd-none',
                         ]"
                     :style="{
-                        backgroundColor: column.columnSetting.colorHeader
+                        backgroundColor: column.columnSetting.colorHeader,
                     }"
                 >
                         <div 
@@ -26,27 +26,47 @@
                             {{column.processName}}
                         </div>
                 </div>
-                <Task 
-                    v-for="task in column.lstTask" 
-                    :key="task.taskId" 
-                    @dblclick="showDetailTask(task)"
-                    :data="task"
-                />
+                <div class="task-container">
+                    <div 
+                        class="item-container"
+                        :processId="column.processId"
+                    >
+                        <Task 
+                            v-for="task in column.lstTask" 
+                            :key="task.taskId" 
+                            @dblclick="showDetailTask(task)"
+                            :data="task"
+                        />
+                    </div>
+                    <div class="d-flex center-items mg-t-10">
+                        <div class="d-flex center-items add-task-column-button c-poiter" @click="addNewTaskInProcess(column)">
+                            <div class="add-task-column-icon file-icon"></div>
+                        </div>
+                    </div>
+                </div>
         </div>
+        <Modal :isShow="isShowDetail" :configModal="configModal">
+            <component :is="nameDetailComponent" :option="props" @closePopup="closePopup"></component>
+        </Modal>
     </div>
 </template>
 
 <script>
 import Sortable from 'sortablejs';
 import Task from './Task.vue';
-import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
+import Modal from './Modal.vue';
+import {EnumEditMode,EnumTypeTask,EnumTypeGroupTask} from '../../common/js/Enum.js';
 import BaseViewDetail from './BaseViewDetail.vue';
+import TaskDetail from '../ViewComponent/TaskDetail.vue'; 
 
 export default {
     name: "SortTable",
     extends: BaseViewDetail,
+    emits: ['addNewTaskInProcess','updateDroppedTask'],
     components: {
-        Task
+        Task,
+        Modal,
+        TaskDetail
     },
     created(){
 
@@ -54,7 +74,7 @@ export default {
     mounted(){
         let me = this;
         var elSortTable = me.$el;
-        var lstColumnTask = me.$el.querySelectorAll('.column-task');
+        var lstColumnTask = me.$el.querySelectorAll('.item-container');
         var sortTable = new Sortable(elSortTable, {
             group: "column-task",
             sort: true,
@@ -68,19 +88,27 @@ export default {
             // ghostClass: "sortable-ghost",  // class làm mờ khi đang bị kéo
             // chosenClass: "chosen", // class áp dụng cho ele được chọn để kéo
             swapThreshold: 1,
+            onEnd: function(event)
+            {
+                debugger;
+                me.updateDroppedProcess(event);
+            }
         });
 
         lstColumnTask.forEach(column => {
             var columnSortTable = new Sortable(column, {
-                group: "task",
+                group: {
+                    name: "task",
+                    put: 'task',
+                    pull: 'task',   
+                },
                 sort: true,
                 animation: 300,
+                emptyInsertThreshold: 100,
                 delay: 0,
-                touchStartThreshold: 20, // bao nhiều px thì thực hiện sort, 
+                touchStartThreshold: 1, // bao nhiều px thì thực hiện sort, 
                 handle: ".task",// phần tử click kéo đi để sort - phần tử chấp nhận tương tác   
                 preventOnFilter: true,
-                put: '.column-task',
-                pull: '.column-task',
                 // handle: '.header-column',
                 draggable: ".task", // cấu hình những ele có thể tham gia sort (khuyen khich class) - không có trong này thì không sort dc
                 // ghostClass: "sortable-ghost",  // class làm mờ khi đang bị kéo
@@ -97,13 +125,18 @@ export default {
     watch: {
         'lstColumnTask': function(newValue,oldValue)
         {
-            debugger;
         }
     },
     computed: {
         
     },
     props: {
+        groupTaskInfo: {
+            type: Object,
+            default: function(rawProps){
+                return rawProps.groupTaskInfo? rawProps.groupTaskInfo: {};
+            }
+        },
         isUpdateSortableOnServer:
         {
             type: Boolean,
@@ -120,9 +153,36 @@ export default {
         lstColumnTask: {
             type: Array,
             default: []
-        }
+        },
+        isAddTaskOnColumn: {
+            type: Boolean,
+            default: false
+        },
+        
     },
     methods: {
+        addNewTaskInProcess(process)
+        {
+            let me = this;
+
+            me.$emit('addNewTaskInProcess', process);
+        },
+        updateDroppedProcess(event)
+        {
+            let me = this;
+            if(me.isUpdateSortableOnServer)
+            {
+                let processId = event.item.getAttribute('processId'),
+                    newIndex = event.newIndex,
+                    oldIndex = event.oldIndex;
+
+                me.$emit('updateDroppedProcess', {
+                    processId: processId,
+                    newIndex: newIndex+1,
+                    oldIndex: oldIndex+1
+                })
+            }
+        },
         updateDroppedTask(event)
         {
             let me = this;
@@ -133,20 +193,14 @@ export default {
                     fromProcessId = event.from.getAttribute('processId'),
                     newIndex = event.newIndex,
                     oldIndex = event.oldIndex;
-
-                // me.callApi('put',`api/task/dropped/${taskId}/${toProcessId}/${newSortOrder}`)
-                // .then(res => {
-                //     if(res.data.success)
-                //     {
+                debugger;
                 me.$emit('updateDroppedTask', {
                     taskId: taskId,
                     toProcessId: toProcessId,
                     fromProcessId: fromProcessId,
-                    newIndex: newIndex,
-                    oldIndex: oldIndex
+                    newIndex: newIndex+1,
+                    oldIndex: oldIndex+1
                 })
-                //     }
-                // });
             }
         },
          columnColorResult: function(index)
@@ -165,7 +219,13 @@ export default {
     },
     data(){
         return {
-            
+
+
+            nameDetailComponent: '',
+            props: null,
+            isShowDetail: false,
+            configModal: null,
+            callbackOutsideComponent: null,
         }
     }
 }

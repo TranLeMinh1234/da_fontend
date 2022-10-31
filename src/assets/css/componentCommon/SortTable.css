@@ -1,23 +1,39 @@
 .sort-table{
     width: 100%;
     height: 100%;
-    overflow: auto;
 }
 
 .sort-table .column-task
 {
     height: 98%;
     width: 322px;
+    position: relative;
 }
 
 .sort-table .column-task .header-column
 {
     width: 100%;
     height: 60px;
-    background-color: red;
+    position: absolute;
+    top: 0px;
 }
 
 .sort-table .column-task .name-column
 {
     width: 60%;
+}
+
+.sort-table .task-container{
+    width: 100%;
+    height: 94%;
+    margin-top: 60px;
+    overflow: auto;
+}
+
+.sort-table .column-task .add-task-column-button
+{
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    border-radius: 12px;
 }

@@ -477,4 +477,12 @@
     margin: -3px 5px 0;
 }
 
+.add-task-column-icon
+{
+    background-color: #2196f3;  
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -164px -100px;
+    width: 24px;
+    height: 24px;
+}
 
