@@ -486,3 +486,19 @@
     height: 24px;
 }
 
+.white-refresh-icon{
+    background-color: white;  
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -515px -452px;
+    width: 24px;
+    height: 24px;
+}
+
+.normal-white-filter-icon
+{
+    background-color: white;  
+    -webkit-mask-image: url('../icon/ICON.svg') !important;
+    -webkit-mask-position: -292px -132px;
+    width: 24px;
+    height: 24px;
+}

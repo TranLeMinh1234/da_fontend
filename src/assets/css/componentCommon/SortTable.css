@@ -1,12 +1,13 @@
 .sort-table{
     width: 100%;
     height: 100%;
+    overflow-x: scroll;
 }
 
 .sort-table .column-task
 {
     height: 98%;
-    width: 322px;
+    flex: 0 0 322px;
     position: relative;
 }
 
@@ -30,10 +31,31 @@
     overflow: auto;
 }
 
+.sort-table .task-container .item-container
+{
+
+}
+
 .sort-table .column-task .add-task-column-button
 {
     width: 24px;
     height: 24px;
     background-color: white;
     border-radius: 12px;
+}
+
+.sort-table .column-add-new-process
+{
+    height: 98%;
+    flex: 0 0 322px;
+    position: relative;
+}
+
+.sort-table .column-add-new-process .header-column
+{
+    background-color: white;
+    width: 100%;
+    height: 60px;
+    position: absolute;
+    top: 0px;
 }

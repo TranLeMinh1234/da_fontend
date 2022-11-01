@@ -3,3 +3,49 @@
     width: 100%;
     height: 100%;
 }
+
+#detail-group-task .filter-bar{
+    position: fixed;
+    top: 50px;
+    width: 65px;
+    height: calc(100vw - 50px);
+    right: 0px;
+    background-color: rgba(0,0,0,.7);
+}
+
+#detail-group-task .filter-item
+{
+    width: 100%;
+    height: 50px;
+}
+
+#detail-group-task .list-user-joined
+{
+    width: 100%;
+    height: calc(100vh - 150px);
+    overflow-y: overlay;
+}
+
+#detail-group-task .list-user-joined .filter-active
+{
+    background-color: hsla(0,0%,100%,.2) !important;
+}
+
+#detail-group-task .list-user-joined .user-joined
+{
+    width: 55px;
+    height: 50px;
+    border-radius: 6px;
+    margin: 8px auto;
+}
+
+#detail-group-task .list-user-joined .user-joined:hover{
+    background-color: hsla(0,0%,100%,.2);
+}
+
+#detail-group-task .list-user-joined .user-joined img{
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    object-fit: cover;
+}

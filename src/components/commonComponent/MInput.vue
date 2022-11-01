@@ -86,6 +86,10 @@ export default {
                         default:
                             break;
                     }
+                },
+                blur: function(event)
+                {
+                    me.$emit('blur',me.valueValidate);
                 }
             }
         }

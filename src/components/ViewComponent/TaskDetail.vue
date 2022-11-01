@@ -38,19 +38,38 @@
                 <div class="user-assigned" v-if="!isAddingTask">Người giao việc: <span>{{dataEdit.assignedBy?.firstName}} {{dataEdit.assignedBy?.lastName}}</span></div>
                 <div class="user-assigned" v-if="isAddingTask">Người giao việc:</div>
                 <div class="one-edit-task d-flex w-100 pd-t-16 j-spread-around">
-                    <div class="one-edit-item assigned-user w-48 d-flex al-center">
+                    <div class="one-edit-item assigned-user w-48 d-flex al-center" v-if="!isGroupTypeTask">
                         <img :src="linkImg(dataEdit.assignedFor?.fileAvatarName)" alt="" class="avatar mg-l-10">
                         <div class="info-assigned-user pd-l-16">
                             <div>Người thực hiện</div>
                             <div class="fw-600">Trần Lê Minh</div>
                         </div>
                     </div>
-                    <!-- <div class="one-edit-item w-48 d-flex al-center">
-                        <div class="file-icon select-expire-time-icon mg-l-10"></div>
-                        <div class="info-assigned-user pd-l-16">
-                            Chọn hạn hoàn thành
-                        </div>
-                    </div> -->
+                    <ItemDropDown
+                        :config="{
+                            width: 600,
+                            height: 500,
+                            directArrow: 'top'
+                        }"
+                        v-if="isGroupTypeTask"
+                        :isShowDropDown="isShowChooseUserDropDown"
+                        @showDropDownEvent="showChooseUserDropDown"
+                        @closeDropDownEvent="closeChooseUserDropDown"
+                        class="one-edit-item assigned-user w-48 d-flex al-center"
+                    >
+                        <template #item>
+                            <div class="w-100 h-100 d-flex al-center c-poiter">
+                                <img :src="linkImg(dataEdit.assignedFor?.fileAvatarName)" alt="" class="avatar mg-l-10">
+                                <div class="info-assigned-user pd-l-16">
+                                    <div>Người thực hiện</div>
+                                    <div class="fw-600">Trần Lê Minh</div>
+                                </div>
+                            </div>
+                        </template>
+                        <template #dropdown>
+                            asdasd
+                        </template>
+                    </ItemDropDown>
                     <ItemDropDown
                         :config="{
                             width: 600,
@@ -382,6 +401,11 @@ export default {
     computed:
     {
         ...mapGetters('userManage', ['userInfo','isExistsUserInfo']),
+        isGroupTypeTask: function()
+        {
+            let me = this;
+            return me.option.typeTask == EnumTypeTask.Group;
+        },
         isCheckAll: function()
         {
             let me = this;
@@ -631,6 +655,18 @@ export default {
             let me = this;
             me.$zindexManage.clearBiggestIndex();
             me.isShowDeadlineDropDown = false;
+        },
+        showChooseUserDropDown()
+        {
+            let me = this;
+            me.$zindexManage.generateBiggestZindex();
+            me.isShowChooseUserDropDown = true;
+        },
+        closeChooseUserDropDown()
+        {
+            let me = this;
+            me.$zindexManage.clearBiggestIndex();
+            me.isShowChooseUserDropDown = false;
         },
         deleteTask()
         {
@@ -1351,7 +1387,7 @@ export default {
     data()
     {
         return{
-            
+            isShowChooseUserDropDown: false,
             isShowDeadlineDropDown: false,
             isTabStartDeadline: false,
 
