@@ -44,7 +44,10 @@
             <div class="mg-t-26">
                 <div class="d-flex al-center j-space-between">
                     <div class="fw-500 fw-18">Thành viên {{listUser.length > 0 ? `(${listUser.length})` : ''}}</div>
-                    <div class="fw-600 color-blue-taskdetail c-poiter" @click="openAddUserForm">Thêm thành viên</div>
+                    <div 
+                        class="fw-600 color-blue-taskdetail c-poiter" 
+                        @click="openAddUserForm"
+                        v-if="isGroupGroupTask">Thêm thành viên</div>
                 </div>
                 <div class="list-user">
                    <div 
@@ -142,6 +145,13 @@ export default {
 
         me.listUser.push(me.userInfo);
         me.loaddAllData();
+    },
+    computed:{
+        isGroupGroupTask: function()
+        {
+            let me = this;
+            return me.newGroupTask.typeGroupTask == EnumTypeGroupTask.Group;
+        }
     },
     methods:{
         commitNewGroupTask()

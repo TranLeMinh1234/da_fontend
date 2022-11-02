@@ -27,6 +27,7 @@
     width: 24px;
     height: 24px;
     border-radius: 12px;
+    object-fit: cover;
 }
 
 .fast-feature .assigned-user + .datepicker-icon

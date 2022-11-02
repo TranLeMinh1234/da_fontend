@@ -42,13 +42,13 @@
                         <img :src="linkImg(dataEdit.assignedFor?.fileAvatarName)" alt="" class="avatar mg-l-10">
                         <div class="info-assigned-user pd-l-16">
                             <div>Người thực hiện</div>
-                            <div class="fw-600">Trần Lê Minh</div>
+                            <div class="fw-600">{{dataEdit.assignedFor?.firstName}} {{dataEdit.assignedFor?.lastName}}</div>
                         </div>
                     </div>
                     <ItemDropDown
                         :config="{
-                            width: 600,
-                            height: 500,
+                            width: 300,
+                            height: 340,
                             directArrow: 'top'
                         }"
                         v-if="isGroupTypeTask"
@@ -62,12 +62,38 @@
                                 <img :src="linkImg(dataEdit.assignedFor?.fileAvatarName)" alt="" class="avatar mg-l-10">
                                 <div class="info-assigned-user pd-l-16">
                                     <div>Người thực hiện</div>
-                                    <div class="fw-600">Trần Lê Minh</div>
+                                    <div class="fw-600">{{dataEdit.assignedFor?.firstName}} {{dataEdit.assignedFor?.lastName}}</div>
                                 </div>
                             </div>
                         </template>
                         <template #dropdown>
-                            asdasd
+                            <div class="w-100 h-100">
+                                <div class="pd-10 fw-600">Chọn người thực hiện</div>
+                                <div class="pd-10">
+                                    <MInput 
+                                        :isHaveIcon="true"
+                                        padding="10px 14px 10px 32px" 
+                                        icon="medium-search-icon"
+                                        placeholder="Tìm thàng viên..."
+                                        @enterEvent="searchAssignedUserEvent"
+                                        v-model="searchAssignedUser"
+                                        :isValidate="false"
+                                    />
+                                </div>
+                                <div class="list-assigned-user">
+                                    <div
+                                        v-for="user in listFilterAssignedUser" :key="user.email"
+                                        :class="['option-assigned-user', 'd-flex', 'al-center', 'c-poiter', 'pd-10']"
+                                        @click="selectAssignedUser(user)"
+                                    >
+                                        <img :src="linkImg(user.fileAvatarName)" alt="">
+                                        <div class="pd-l-12">
+                                            <div class="fw-600">{{user.firstName}} {{user.lastName}}</div>
+                                            <div>{{user.email}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </template>
                     </ItemDropDown>
                     <ItemDropDown
@@ -343,6 +369,7 @@ import {baseCallApi} from '../../common/js/BaseCallApi.js';
 import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
 import ItemDropDown from '../commonComponent/ItemDropDown.vue';
 import Datepicker from '@vuepic/vue-datepicker';
+import MInput from '../commonComponent/MInput.vue';
 
 export default {
     name: "TaskDetail",
@@ -356,7 +383,8 @@ export default {
         IconDropDown,
         ItemDropDown,
         Datepicker,
-        SettingRemindTask
+        SettingRemindTask,
+        MInput
     },
     props:
     {
@@ -426,6 +454,27 @@ export default {
     watch:{
     },
     methods: {
+        selectAssignedUser(userSelected)
+        {
+            let me = this;
+            me.callApi('put',`api/task/assignforuser/${me.option.groupTaskId}/${me.dataEdit.taskId}/${userSelected.email}`,null,null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.assignedFor = userSelected;
+                    me.dataEdit.assignForEmail = userSelected.email;
+                    me.isShowChooseUserDropDown = false;
+                }
+            });
+        },
+        searchAssignedUserEvent()
+        {
+            let me = this;
+            me.listFilterAssignedUser = me.option.listAssignedUser.filter(user => {
+                let name = `${user.firstName} ${user.lastName}`;
+                return name.includes(me.searchAssignedUser);
+            });
+        },
         openSettingRemindTask()
         {
             let me = this;
@@ -1387,6 +1436,8 @@ export default {
     data()
     {
         return{
+            listFilterAssignedUser: this.option.listAssignedUser,
+            searchAssignedUser: '',
             isShowChooseUserDropDown: false,
             isShowDeadlineDropDown: false,
             isTabStartDeadline: false,

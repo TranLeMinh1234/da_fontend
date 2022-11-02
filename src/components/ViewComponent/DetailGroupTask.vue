@@ -92,7 +92,8 @@ export default {
                 typeGroupTask: me.paramRouter.typeGroupTask,
                 typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
                 processId: process.processId,
-                editMode: EnumEditMode.Add
+                editMode: EnumEditMode.Add,
+                listAssignedUser: me.listUser
             },null);
         },
         updateDroppedProcess(processInfo)
@@ -416,7 +417,8 @@ export default {
                 typeGroupTask: me.paramRouter.typeGroupTask,
                 typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
                 processId: task.processId,
-                editMode: EnumEditMode.Edit
+                editMode: EnumEditMode.Edit,
+                listAssignedUser: me.listUser
             },null);
         }
     },

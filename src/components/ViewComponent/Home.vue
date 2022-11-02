@@ -171,7 +171,9 @@
                         </div>
                     </IconDropDown>
                     <div :class="['file-icon',isDifferentDailyTask? 'big-black-search-icon':'big-white-search-icon','c-poiter']"></div>
-                    <div :class="['file-icon',isDifferentDailyTask? 'bell-black-icon':'bell-white-icon','c-poiter']"></div>
+                    <Notification 
+                        :icon="isDifferentDailyTask? 'bell-black-icon':'bell-white-icon'"
+                    />
                     <div :class="['file-icon',isDifferentDailyTask? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
                     <div class="personal-setting bgr-image-cover c-poiter"></div>
                 </div>
@@ -197,6 +199,7 @@ import IconDropDown from '../commonComponent/IconDropDown.vue';
 import Datepicker from '@vuepic/vue-datepicker';
 import AddGroupTaskForm from './AddGroupTaskForm.vue';
 import DetailGroupTask from './DetailGroupTask.vue';
+import Notification from '../commonComponent/Notification.vue';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
@@ -208,7 +211,8 @@ export default {
         IconDropDown,
         Datepicker,
         AddGroupTaskForm,
-        DetailGroupTask
+        DetailGroupTask,
+        Notification
     },
     created(){
         let me = this;
