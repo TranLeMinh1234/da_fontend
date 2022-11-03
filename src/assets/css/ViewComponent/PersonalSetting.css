@@ -1,0 +1,73 @@
+.avatar-userinfo
+{
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    object-fit: cover;
+}
+
+.personal-info-setting
+{
+    width: 100%;
+    height: 100%;
+    padding: 16px 0px 0px 0px;
+    position: relative;
+}
+
+.personal-info-setting .avatar{
+    width: 100%;
+    height: 25%;
+}
+
+.personal-info-setting .avatar img{
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    object-fit: cover;
+}
+
+.personal-info-setting .setting-feature-item{
+    cursor: pointer;   
+    padding: 0px 10px 0px 10px;
+}
+
+.personal-info-setting .setting-feature-item:hover{
+    background-color: #f1f1f1;
+}
+.personal-info-setting .change-password
+{
+    background-image: url('../../changPassWord.svg');
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    background-position: 8px center !important;
+}
+
+.personal-info-setting .account-setting
+{
+    background-image: url('../../AccountSetting.svg');
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    background-position: 8px center !important;
+}
+
+.personal-info-setting .logout
+{
+    border-radius: 0px 0px 8px 8px;
+    background-color: #f1f1f1;
+    padding: 10px 0px 10px 0px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    cursor: pointer;
+}
+
+.personal-info-setting .logout .logout-icon
+{
+    background-image: url('../../LogOut.svg');
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 40px;
+    background-position: 8px center !important;
+}

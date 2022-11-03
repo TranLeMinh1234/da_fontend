@@ -1,0 +1,36 @@
+.list-notification
+{
+    max-height: 800px;
+    width: 100%;
+    overflow: auto;
+    margin: 10px 0px 10px 0px;
+}
+
+.list-notification .notification{
+    width: 100%;
+    cursor: pointer;
+}
+
+.list-notification .notification:hover{
+    background-color: #f1f1f1;
+}
+
+.list-notification .notification img{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+
+.list-notification .notification .time-notification
+{
+    color: #616161;
+    padding-top: 10px;
+}
+
+.list-notification .loadding-notification .img-loading
+{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}

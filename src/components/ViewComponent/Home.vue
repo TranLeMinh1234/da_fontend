@@ -175,7 +175,7 @@
                         :icon="isDifferentDailyTask? 'bell-black-icon':'bell-white-icon'"
                     />
                     <div :class="['file-icon',isDifferentDailyTask? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
-                    <div class="personal-setting bgr-image-cover c-poiter"></div>
+                    <PersonalSetting />
                 </div>
             </div>
             <div class="body">
@@ -200,6 +200,7 @@ import Datepicker from '@vuepic/vue-datepicker';
 import AddGroupTaskForm from './AddGroupTaskForm.vue';
 import DetailGroupTask from './DetailGroupTask.vue';
 import Notification from '../commonComponent/Notification.vue';
+import PersonalSetting from './PersonalSetting.vue';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 export default {
@@ -212,7 +213,8 @@ export default {
         Datepicker,
         AddGroupTaskForm,
         DetailGroupTask,
-        Notification
+        Notification,
+        PersonalSetting
     },
     created(){
         let me = this;

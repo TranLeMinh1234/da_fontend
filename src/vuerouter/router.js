@@ -29,7 +29,11 @@ var routes = [
         ]
     },
     { path: '/Test', component: Test },
-    { path: '/Login', component: Login },
+    { 
+        name: 'Login',
+        path: '/Login', 
+        component: Login 
+    },
 ];
   
 // 3. Create the router instance and pass the `routes` option

@@ -5,7 +5,7 @@
             :class="['dropdown', isShowDropDown? '': 'd-none']"
             :style="{
                 width: configDropDown?.width + 'px',
-                height: configDropDown?.height + 'px',
+                height: configDropDown?.height ? configDropDown?.height + 'px': 'auto',
                 top: displayY,
                 left: displayX,
             }"
