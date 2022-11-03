@@ -720,7 +720,7 @@ export default {
         deleteTask()
         {
             let me = this;
-            if(me.userInfo.email == me.dataEdit.createdBy.email)
+            if(me.userInfo.email == me.dataEdit.createdBy.email || me.userInfo.role.listPermissionCode.includes("AllPermission"))
             {
                 let callbackAfterDeleteTask = function()
                 {
@@ -804,8 +804,8 @@ export default {
             else
             {
                 me.showDialogNotification({
-                    width: "400px",
-                    height: "160px",
+                    width: "420px",
+                    height: "180px",
                     borderTop: true
                 },{
                     'title': "Cảnh báo",

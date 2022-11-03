@@ -21,10 +21,10 @@
                 <div
                     :class="['info-notification','pd-l-16']"
                 >
-                    <div class="info" v-html="getInfoNotification">
+                    <div class="info" v-html="getInfoNotification(notification)">
                     </div>
                     <div class="time-notification">
-                        {{$commonFunction.parseDateJsToString(notification.createdTime)}}
+                        {{$commonFunction.parseDateTimeJsToString(notification.createdTime)}}
                     </div>
                 </div>
             </div>
@@ -37,6 +37,27 @@
                     <div class="loadding-skeleton w-20 mg-t-10 h-32px" style="height: 20px;border-radius: 12px"></div>
                 </div>
             </div>
+            <div class="loadding-notification d-flex pd-16" v-if="isLoading">
+                <div>
+                    <div class="img-loading loadding-skeleton"></div>
+                </div>
+                <div class="pd-l-12 w-100">
+                    <div class="loadding-skeleton w-100 h-32px" style="height: 30px;border-radius: 12px"></div>
+                    <div class="loadding-skeleton w-20 mg-t-10 h-32px" style="height: 20px;border-radius: 12px"></div>
+                </div>
+            </div>
+            <div class="loadding-notification d-flex pd-16" v-if="isLoading">
+                <div>
+                    <div class="img-loading loadding-skeleton"></div>
+                </div>
+                <div class="pd-l-12 w-100">
+                    <div class="loadding-skeleton w-100 h-32px" style="height: 30px;border-radius: 12px"></div>
+                    <div class="loadding-skeleton w-20 mg-t-10 h-32px" style="height: 20px;border-radius: 12px"></div>
+                </div>
+            </div>
+            <div class="empty-container d-flex pd-16 center-items" v-if="!isLoading && listNotification?.length == 0">
+                <div style="color: silver"><i>Bạn Không có thông báo.</i></div>
+            </div>
         </div>
     </IconDropDown>
 </template>
@@ -45,12 +66,26 @@
 import IconDropDown from './IconDropDown.vue';
 import BaseComponent from './BaseComponent.vue';
 import {baseCallApi} from '../../common/js/BaseCallApi.js';
+import {EnumTypeNotification} from '../../common/js/Enum.js';
 
 export default {
     name: 'Notification',
     extends: BaseComponent,
     components: {
         IconDropDown
+    },
+    mounted()
+    {
+        let me = this;
+        me.boxNotificationElement = document.querySelector('.list-notification');
+        me.boxNotificationElement.onscroll = function(event)
+        {
+            let notificationContainer = event.target;
+            if(notificationContainer.offsetHeight + notificationContainer.scrollTop>= notificationContainer.scrollHeight)
+            {
+                me.loadData('scroll');
+            }
+        }
     },
     props: {
         icon: {
@@ -62,22 +97,38 @@ export default {
 
     },
     computed: {
-        getInfoNotification: function()
+    },
+    methods: {
+        getInfoNotification: function(notification)
         {
             let me = this;
             let stringInfo = '<b>Hoàng Thu Hằng</b> đã mời bạn vào dự án/nhóm <b>Phát hành R55</b> với vai trò <b>Thành viên</b>';
-            switch('1')
+            switch(notification.typeNoti)
             {
-                case '1':
+                case EnumTypeNotification.AddUserGroupTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã mời bạn vào dự nhóm công việc <b>${notification.groupTask.nameGroupTask}</b> với vai trò <b>${notification.role.nameRole}</b>.`;
+                    break;
+                case EnumTypeNotification.DeleteUserFromGroupTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa bạn khỏi nhóm công việc <b>${notification.groupTask.nameGroupTask}</b>.`;
+                    break;
+                case EnumTypeNotification.AssignedTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã phân công công việc <b>${notification.task?.taskName ? notification.task.taskName : notification.taskName}</b> cho bạn.`;
+                    break;
+                case EnumTypeNotification.DeletedTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa công việc <b>${notification.taskName}</b>.`;
+                    break;
+                case EnumTypeNotification.RemindTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa công việc <b>${notification.task.taskName}</b>.`;
+                    break;
+                case EnumTypeNotification.CommentedTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã bình luận công việc <b>${notification.task.taskName}</b>.`;
                     break;
                 default: 
                     break;
             }
 
             return stringInfo;
-        }
-    },
-    methods: {
+        },
         linkImg(fileName)
         {
             let me = this;
@@ -98,7 +149,6 @@ export default {
 
         {
             let me = this;
-            this.isLoading = true;
             let startIndexPaging = me.listNotification.length,
                 numberOfRecordTake = 0;
 
@@ -123,24 +173,25 @@ export default {
 
             if(numberOfRecordTake > 0)
             {
+                this.isLoading = true;
                 setTimeout(()=>{
                     me.callApi('get',`api/notification/${me.userInfo.email}/${startIndexPaging}/${numberOfRecordTake}`,null)
                     .then(res => {
                         if(res.data.success)
                         {
                             let data = res.data.data;
-
                             if(typeLoading == 'show')
                             {
                                 if(me.numberOfNewNotification > 0)
                                 {
                                     me.listNotification = me.listNotification.forEach(notification => {
-                                        let indexFind = data.find(notificationNew => notificationNew.notificationId == notification.notificationId);
+                                        let indexFind = data.findIndex(notificationNew => notificationNew.notificationId == notification.notificationId);
                                         if(indexFind == -1)
                                         {
                                             data.push(notification);
                                         }
                                     });
+                                    
                                     me.listNotification = data;
                                     me.numberOfNewNotification = 0;
                                 }
@@ -151,16 +202,22 @@ export default {
 
                                 me.isLoadFirstTime = false;
                             }
-                            if(typeLoading == 'scroll')
+                            else if(typeLoading == 'scroll')
                             {
-                                me.listNotification = me.listNotification.forEach(notification => {
-                                    let indexFind = data.find(notificationNew => notificationNew.notificationId == notification.notificationId);
-                                    if(indexFind == -1)
-                                    {
-                                        data.push(notification);
-                                    }
-                                });
-                                me.listNotification = data;
+                                if(data.length > 0)
+                                {
+                                    data.forEach(notificationNew => {
+                                        let indexFind = me.listNotification.findIndex(notification => notificationNew.notificationId == notification.notificationId);
+                                        if(indexFind == -1)
+                                        {
+                                            me.listNotification.push(notificationNew);
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    me.boxNotificationElement.scrollTo(0,me.boxNotificationElement.offsetHeight - 160 > 0 ? me.boxNotificationElement.offsetHeight - 160 : 0);
+                                }
                             }
 
                             me.isLoading = false;

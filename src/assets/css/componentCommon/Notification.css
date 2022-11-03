@@ -34,3 +34,8 @@
     height: 40px;
     border-radius: 20px;
 }
+
+.list-notification .empty-container
+{
+    height: 100px;
+}

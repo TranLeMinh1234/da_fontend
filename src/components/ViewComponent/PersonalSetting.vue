@@ -53,7 +53,6 @@ export default {
         logOut()
         {
             let me = this;
-            debugger;
             me.clearToken();
             me.clearUserInfo();
             me.$router.push({name: 'Login'});

@@ -34,4 +34,13 @@ var EnumTypeGroupTask = {
     Group: 2
 };
 
-export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask};
+var EnumTypeNotification = { 
+    AddUserGroupTask: 1,
+    DeleteUserFromGroupTask: 2,
+    AssignedTask: 3,
+    DeletedTask: 4,
+    CommentedTask: 5,
+    RemindTask: 6
+}
+
+export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask, EnumTypeNotification};
