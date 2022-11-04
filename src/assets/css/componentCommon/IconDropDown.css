@@ -1,0 +1,17 @@
+.icon-dropdown
+{
+    position: relative;
+}
+
+.icon-dropdown .number-notifications
+{
+    background-color: red;
+    color: white;
+    border-radius: 8px;
+    position: absolute;
+    z-index: 9999;
+    top: -8px;
+    right: -4px;
+    padding: 2px 5px 2px 5px;
+    font-size: 12px;
+}

@@ -7,6 +7,8 @@
         }"
         :iconClass="icon"
         :isShowDropDown="isShowListNotification"
+        :isShowNumberNotification="true"
+        :numberOfNotification="numberOfNewNotification"
         @showDropDownEvent="showListNotification"
         @closeDropDownEvent="closeListNotification"
     >
@@ -100,6 +102,11 @@ export default {
     computed: {
     },
     methods: {
+        increaseNumberOfNewNotification()
+        {
+            let me = this;
+            me.numberOfNewNotification++;
+        },
         goViewRelate(notification)
         {
             let me = this;
@@ -189,23 +196,22 @@ export default {
             me.loadData('show');
         },
         loadData(typeLoading)
-
         {
             let me = this;
             let startIndexPaging = me.listNotification.length,
                 numberOfRecordTake = 0;
-
+            debugger;
             if(typeLoading == 'show')
             {
-                if(me.numberOfNewNotification > 0)
-                {
-                    startIndexPaging = 0;
-                    numberOfRecordTake = me.numberOfNewNotification;
-                }
-                else if(me.isLoadFirstTime)
+                if(me.isLoadFirstTime)
                 {
                     startIndexPaging = 0;
                     numberOfRecordTake = 10;
+                }
+                else if(me.numberOfNewNotification > 0)
+                {
+                    startIndexPaging = 0;
+                    numberOfRecordTake = me.numberOfNewNotification;
                 }
             }
             else if(typeLoading == 'scroll')
@@ -225,7 +231,11 @@ export default {
                             let data = res.data.data;
                             if(typeLoading == 'show')
                             {
-                                if(me.numberOfNewNotification > 0)
+                                if(me.isLoadFirstTime)
+                                {
+                                    me.listNotification = data;
+                                }
+                                else if(me.numberOfNewNotification > 0)
                                 {
                                     me.listNotification = me.listNotification.forEach(notification => {
                                         let indexFind = data.findIndex(notificationNew => notificationNew.notificationId == notification.notificationId);
@@ -237,10 +247,6 @@ export default {
                                     
                                     me.listNotification = data;
                                     me.numberOfNewNotification = 0;
-                                }
-                                else if(me.isLoadFirstTime)
-                                {
-                                    me.listNotification = data;
                                 }
 
                                 me.isLoadFirstTime = false;

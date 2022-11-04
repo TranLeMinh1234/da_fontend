@@ -20,7 +20,7 @@ var webSocketManage = {
         };
     },
     eventOnMessage: function(event){
-        debugger;
+        
     },
     eventOnOpen: function(event){
 

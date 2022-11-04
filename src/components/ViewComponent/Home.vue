@@ -172,6 +172,7 @@
                     </IconDropDown>
                     <div :class="['file-icon',isDifferentDailyTask? 'big-black-search-icon':'big-white-search-icon','c-poiter']"></div>
                     <Notification 
+                        ref="notification"
                         :icon="isDifferentDailyTask? 'bell-black-icon':'bell-white-icon'"
                     />
                     <div :class="['file-icon',isDifferentDailyTask? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
@@ -193,7 +194,7 @@
 <script>
 import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import Modal from '../commonComponent/Modal.vue';
-import {EnumEditMode,EnumTypeTask,EnumTypeGroupTask } from '../../common/js/Enum.js';
+import {EnumEditMode,EnumTypeTask,EnumTypeGroupTask,EnumTypeNotification} from '../../common/js/Enum.js';
 import TaskDetail from './TaskDetail.vue';
 import IconDropDown from '../commonComponent/IconDropDown.vue';
 import Datepicker from '@vuepic/vue-datepicker';
@@ -231,7 +232,6 @@ export default {
         //init socket 
         me.$webSocketManage.startConnect(me.tokenCallApi);
 
-
         me.loadAllData();
     },
     computed:
@@ -256,6 +256,41 @@ export default {
     {
         let me = this;
         me.initHtmlCss();
+
+        me.$webSocketManage.eventOnMessage = function(event)
+        {
+            let data = JSON.parse(event.data);
+            debugger;
+            switch(data.TypeNoti)
+            {
+                case EnumTypeNotification.AddUserGroupTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info('Bạn đã được thêm vào nhóm công việc mới.');
+                    break;
+                case EnumTypeNotification.DeleteUserFromGroupTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info(`Bạn đã bị xóa khỏi nhóm công việc ${data.GroupTask.NameGroupTask}`);
+                    break;
+                case EnumTypeNotification.AssignedTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info(`Công việc "${data.Task.TaskName}" đã được phân công cho bạn.`);
+                    break;
+                case EnumTypeNotification.DeletedTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info(`Công việc "${data.Task.TaskName}" đã bị xóa.`);
+                    break;
+                case EnumTypeNotification.CommentedTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info(`${data.CreatedBy.FirstName} ${data.CreatedBy.LastName} đã bình luận công việc "${data.Task.TaskName}".`);
+                    break;
+                case EnumTypeNotification.RemindTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info('Bạn có hạn hoàn thành công việc');
+                    break;
+                default:
+                    break;
+            }
+        };
     },
     methods: {
         goDetailGroupTask(groupTask)

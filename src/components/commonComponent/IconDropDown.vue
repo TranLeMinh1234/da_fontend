@@ -5,6 +5,9 @@
             @click="executeShowDropDown()"
         >
         </div>
+        <div class="number-notifications" v-if="isShowNumberNotification && numberOfNotification > 0">
+            {{numberOfNotification}}
+        </div>
         <DropDown 
             :configDropDown="configDropDown"
             :isShowDropDown="isShowDropDown"
@@ -81,6 +84,14 @@ export default {
                 };
             }
         },
+        isShowNumberNotification: {
+            type: Boolean,
+            default: false
+        },
+        numberOfNotification: {
+            type: Number,
+            default: 0
+        },
         iconClass:{
             type: String,
             default: ""
@@ -101,5 +112,5 @@ export default {
 </script>
 
 <style scoped>
-
+@import url('../../assets/css/componentCommon/IconDropDown.css');
 </style>
