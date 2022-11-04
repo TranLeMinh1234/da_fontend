@@ -4,6 +4,7 @@ import App from './App.vue'
 import { storeState } from './vuex/store.js'
 import { commonFunction } from './common/js/commFunction.js';
 import { zindexManage } from './common/js/zindexManage.js';
+import { webSocketManage } from './common/js/websocket.js';
 import { router } from './vuerouter/router.js';
 
 //datepicker
@@ -80,6 +81,7 @@ app.use(router);
 
 app.config.globalProperties.$commonFunction = commonFunction;
 app.config.globalProperties.$zindexManage = zindexManage;
+app.config.globalProperties.$webSocketManage = webSocketManage;
 
 app.use(VueAxios, axios);
 

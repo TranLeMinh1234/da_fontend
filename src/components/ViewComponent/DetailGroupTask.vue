@@ -60,6 +60,7 @@ export default {
     extends: BaseViewDetail,
     created(){
         let me = this;
+
         me.paramRouter = {
             groupTaskId: me.$route.params.grouptaskid,
             typeGroupTask: parseInt(me.$route.params.typegrouptask),
@@ -385,7 +386,7 @@ export default {
             {
                 me.isDoneLoadData = true;
                 me.loader.hide();
-
+                let taskOpen = null;
                 me.listTask.forEach(task => {
                     me.templateGroupTask.listProcess.forEach(process => {
                         if(!process.lstTask)
@@ -398,11 +399,33 @@ export default {
                             process.lstTask.push(task);
                         }
 
+                        if(task.taskId == me.paramRouter.taskDetailId)
+                        {
+                            taskOpen = task;
+                        }
+
                     });
                 })
 
                 let currentUser = me.listUser.find(user => user.email == me.userInfo.email);
                 me.setRoleForUser(currentUser.role);
+
+                if(me.paramRouter.taskDetailId != 'all')
+                {
+                    let me = this;
+                    me.showDetail('TaskDetail',{
+                        width: '900px',
+                        height: 'auto',
+                    },{ 
+                        taskId: me.paramRouter.taskDetailId,
+                        groupTaskId: me.paramRouter.groupTaskId,
+                        typeGroupTask: me.paramRouter.typeGroupTask,
+                        typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
+                        processId: taskOpen.processId,
+                        editMode: EnumEditMode.Edit,
+                        listAssignedUser: me.listUser
+                    },null);
+                }
             }
         },
         showDetailTask(task)

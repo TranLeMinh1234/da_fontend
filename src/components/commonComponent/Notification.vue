@@ -14,6 +14,7 @@
             <div 
                 :class="['notification','d-flex','al-self-start','pd-16']"
                 v-for="notification in listNotification" :key="notification.notificationId"
+                @click="goViewRelate(notification)"
             >
                 <div>
                     <img :src="linkImg(notification?.createdBy?.fileAvatarName)" alt="">
@@ -99,6 +100,48 @@ export default {
     computed: {
     },
     methods: {
+        goViewRelate(notification)
+        {
+            let me = this;
+
+            switch(notification.typeNoti)
+            {
+                case EnumTypeNotification.AddUserGroupTask:
+                    me.$router.push({name: 'DetailGroupTask', params: {
+                        grouptaskid: notification.groupTask.groupTaskId,
+                        typegrouptask: notification.groupTask.typeGroupTask,
+                        taskdetailid: 'all',
+                        templateReferenceId: notification.groupTask.templateReferenceId,
+                    }});
+                    break;
+                case EnumTypeNotification.DeleteUserFromGroupTask:
+                    break;
+                case EnumTypeNotification.AssignedTask:
+                    me.$router.push({name: 'DetailGroupTask', params: {
+                        grouptaskid: notification.groupTask.groupTaskId,
+                        typegrouptask: notification.groupTask.typeGroupTask,
+                        taskdetailid: notification.taskRelateId,
+                        templateReferenceId: notification.groupTask.templateReferenceId,
+                    }});
+                    break;
+                case EnumTypeNotification.DeletedTask:
+                    break;
+                case EnumTypeNotification.RemindTask:
+                    break;
+                case EnumTypeNotification.CommentedTask:
+                    me.$router.push({name: 'DetailGroupTask', params: {
+                        grouptaskid: notification.groupTask.groupTaskId,
+                        typegrouptask: notification.groupTask.typeGroupTask,
+                        taskdetailid: notification.taskRelateId,
+                        templateReferenceId: notification.groupTask.templateReferenceId,
+                    }});
+                    break;
+                default: 
+                    break;
+            }
+
+            me.isShowListNotification = false;
+        },
         getInfoNotification: function(notification)
         {
             let me = this;
@@ -106,7 +149,7 @@ export default {
             switch(notification.typeNoti)
             {
                 case EnumTypeNotification.AddUserGroupTask:
-                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã mời bạn vào dự nhóm công việc <b>${notification.groupTask.nameGroupTask}</b> với vai trò <b>${notification.role.nameRole}</b>.`;
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã mời bạn vào nhóm công việc <b>${notification.groupTask.nameGroupTask}</b> với vai trò <b>${notification.role.nameRole}</b>.`;
                     break;
                 case EnumTypeNotification.DeleteUserFromGroupTask:
                     stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa bạn khỏi nhóm công việc <b>${notification.groupTask.nameGroupTask}</b>.`;

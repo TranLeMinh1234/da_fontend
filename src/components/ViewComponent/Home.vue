@@ -227,6 +227,10 @@ export default {
 
             return `${day}/${month}/${year}`;
         };
+        
+        //init socket 
+        me.$webSocketManage.startConnect(me.tokenCallApi);
+
 
         me.loadAllData();
     },
@@ -238,7 +242,15 @@ export default {
         }
     },
     watch: {
-        
+        '$route.path': function(newValue){
+            let me = this;
+            if(newValue.includes('DetailGroupTask'))
+            {
+                me.isDifferentDailyTask = true;
+                me.isShowClock = false;
+                me.isShowMenu = false;
+            }
+        }
     },
     mounted()
     {
