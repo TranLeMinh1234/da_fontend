@@ -7,6 +7,10 @@ import { zindexManage } from './common/js/zindexManage.js';
 import { webSocketManage } from './common/js/websocket.js';
 import { router } from './vuerouter/router.js';
 
+//lodash
+import VueLodash from 'vue-lodash';
+import lodash from 'lodash';
+ 
 //datepicker
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -82,6 +86,7 @@ app.use(router);
 app.config.globalProperties.$commonFunction = commonFunction;
 app.config.globalProperties.$zindexManage = zindexManage;
 app.config.globalProperties.$webSocketManage = webSocketManage;
+app.config.globalProperties.lodash = lodash;
 
 app.use(VueAxios, axios);
 

@@ -13,6 +13,24 @@
         @closeDropDownEvent="closeListNotification"
     >
         <div class="list-notification">
+            <div class="loadding-notification d-flex pd-16" v-if="isLoading && numberOfNewNotification > 0">
+                <div>
+                    <div class="img-loading loadding-skeleton"></div>
+                </div>
+                <div class="pd-l-12 w-100">
+                    <div class="loadding-skeleton w-100 h-32px" style="height: 30px;border-radius: 12px"></div>
+                    <div class="loadding-skeleton w-20 mg-t-10 h-32px" style="height: 20px;border-radius: 12px"></div>
+                </div>
+            </div>
+            <div class="loadding-notification d-flex pd-16" v-if="isLoading && numberOfNewNotification > 0">
+                <div>
+                    <div class="img-loading loadding-skeleton"></div>
+                </div>
+                <div class="pd-l-12 w-100">
+                    <div class="loadding-skeleton w-100 h-32px" style="height: 30px;border-radius: 12px"></div>
+                    <div class="loadding-skeleton w-20 mg-t-10 h-32px" style="height: 20px;border-radius: 12px"></div>
+                </div>
+            </div>
             <div 
                 :class="['notification','d-flex','al-self-start','pd-16']"
                 v-for="notification in listNotification" :key="notification.notificationId"
@@ -31,7 +49,7 @@
                     </div>
                 </div>
             </div>
-            <div class="loadding-notification d-flex pd-16" v-if="isLoading">
+            <div class="loadding-notification d-flex pd-16" v-if="isLoading && numberOfNewNotification == 0">
                 <div>
                     <div class="img-loading loadding-skeleton"></div>
                 </div>
@@ -40,7 +58,7 @@
                     <div class="loadding-skeleton w-20 mg-t-10 h-32px" style="height: 20px;border-radius: 12px"></div>
                 </div>
             </div>
-            <div class="loadding-notification d-flex pd-16" v-if="isLoading">
+            <div class="loadding-notification d-flex pd-16" v-if="isLoading && numberOfNewNotification == 0">
                 <div>
                     <div class="img-loading loadding-skeleton"></div>
                 </div>
@@ -49,7 +67,7 @@
                     <div class="loadding-skeleton w-20 mg-t-10 h-32px" style="height: 20px;border-radius: 12px"></div>
                 </div>
             </div>
-            <div class="loadding-notification d-flex pd-16" v-if="isLoading">
+            <div class="loadding-notification d-flex pd-16" v-if="isLoading && numberOfNewNotification == 0">
                 <div>
                     <div class="img-loading loadding-skeleton"></div>
                 </div>
@@ -165,13 +183,13 @@ export default {
                     stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã phân công công việc <b>${notification.task?.taskName ? notification.task.taskName : notification.taskName}</b> cho bạn.`;
                     break;
                 case EnumTypeNotification.DeletedTask:
-                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa công việc <b>${notification.taskName}</b>.`;
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa công việc <b>${notification.task?.taskName ? notification.task.taskName : notification.taskName}</b>.`;
                     break;
                 case EnumTypeNotification.RemindTask:
-                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa công việc <b>${notification.task.taskName}</b>.`;
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa công việc <b>${notification?.task?.taskName}</b>.`;
                     break;
                 case EnumTypeNotification.CommentedTask:
-                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã bình luận công việc <b>${notification.task.taskName}</b>.`;
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã bình luận công việc <b>${notification.task?.taskName ? notification.task.taskName : notification.taskName}</b>.`;
                     break;
                 default: 
                     break;

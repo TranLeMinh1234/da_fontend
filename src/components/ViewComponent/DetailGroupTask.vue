@@ -413,18 +413,28 @@ export default {
                 if(me.paramRouter.taskDetailId != 'all')
                 {
                     let me = this;
-                    me.showDetail('TaskDetail',{
-                        width: '900px',
-                        height: 'auto',
-                    },{ 
-                        taskId: me.paramRouter.taskDetailId,
-                        groupTaskId: me.paramRouter.groupTaskId,
-                        typeGroupTask: me.paramRouter.typeGroupTask,
-                        typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
-                        processId: taskOpen.processId,
-                        editMode: EnumEditMode.Edit,
-                        listAssignedUser: me.listUser
-                    },null);
+                    me.callApi('get',`api/task/checkexists/${me.paramRouter.taskDetailId}`,null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+                            let data = res.data.data;
+                            if(data)
+                            {
+                                me.showDetail('TaskDetail',{
+                                    width: '900px',
+                                    height: 'auto',
+                                },{ 
+                                    taskId: me.paramRouter.taskDetailId,
+                                    groupTaskId: me.paramRouter.groupTaskId,
+                                    typeGroupTask: me.paramRouter.typeGroupTask,
+                                    typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
+                                    processId: taskOpen.processId,
+                                    editMode: EnumEditMode.Edit,
+                                    listAssignedUser: me.listUser
+                                },null);
+                            }
+                        }
+                    });
                 }
             }
         },

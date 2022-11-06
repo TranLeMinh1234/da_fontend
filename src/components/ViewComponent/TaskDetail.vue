@@ -23,7 +23,7 @@
                     @closeDropDownEvent="closeMoreFeatureTaskDetail"
                 >
                     <div class="more-feature-taskdetail pd-8">
-                        <div class="d-flex pd-16 al-center feature-taskdetail-item c-poiter" @click="deleteTask">
+                        <div class="d-flex pd-16 al-center feature-taskdetail-item c-poiter" @click="deleteTask()">
                             <div class="file-icon delete-line-icon pd-r-12"></div>
                             <div class="cl-red">Xóa</div>
                         </div>
@@ -262,8 +262,9 @@
                             <div class="d-flex al-center feature-line d-none">
                                 <div 
                                     class="file-icon hole-trash-icon c-poiter" 
-                                    @click="deleteChildTask(childTask.taskId)"
-                                    v-show="childTask.createdByEmail == userInfo.email"></div>
+                                    @click="deleteChildTask(childTask)"
+                                    v-show="checkPermissionDeleteChildTask(childTask)"
+                                    ></div>
                             </div>
                         </div>
                     </div>
@@ -454,6 +455,13 @@ export default {
     watch:{
     },
     methods: {
+        checkPermissionDeleteChildTask(childTask)
+        {
+            let me = this;
+            return childTask.createdByEmail == me.userInfo.email ||
+                    me.userInfo.role.listPermissionCode.includes("AllPermission") ||
+                    me.userInfo.role.listPermissionCode.includes("ManageTaskGroup");
+        },
         selectAssignedUser(userSelected)
         {
             let me = this;
@@ -717,14 +725,16 @@ export default {
             me.$zindexManage.clearBiggestIndex();
             me.isShowChooseUserDropDown = false;
         },
-        deleteTask()
+        deleteTask(taskId)
         {
             let me = this;
-            if(me.userInfo.email == me.dataEdit.createdBy.email || me.userInfo.role.listPermissionCode.includes("AllPermission"))
+            let taskIdDelete = taskId? taskId : me.option.taskId;
+            if(me.userInfo.email == me.dataEdit.createdBy.email || me.userInfo.role.listPermissionCode.includes("AllPermission")
+                || me.userInfo.role.listPermissionCode.includes("ManageTaskGroup"))
             {
                 let callbackAfterDeleteTask = function()
                 {
-                    me.callApi('delete', `api/task/deleteCustom/${me.option.taskId}`,null)
+                    me.callApi('delete', `api/task/deleteCustom/${taskIdDelete}`,null)
                     .then(res => {
                         if(res.data.success)
                         {
@@ -736,7 +746,7 @@ export default {
                                 {
                                     objecParent.lstColumnTask.forEach(column => {
                                         column.lstTask = column.lstTask && column.lstTask.length > 0 ? 
-                                            column.lstTask.filter(task => task.taskId != me.option.taskId) 
+                                            column.lstTask.filter(task => task.taskId != taskIdDelete) 
                                             : [];
                                     })
 
@@ -764,7 +774,7 @@ export default {
                                                     );
                                                 }
                                             });
-                                            process.lstTask = process.lstTask.filter(task => task.taskId != me.option.taskId);
+                                            process.lstTask = process.lstTask.filter(task => task.taskId != taskIdDelete);
                                             process.lstTask.sort((taskLeft,taskRight) => {
                                                 return taskLeft.sortOrder - taskRight.sortOrder;
                                             });
@@ -1119,10 +1129,71 @@ export default {
                 }
             );
         },
-        deleteChildTask(taskId)
+        deleteChildTask(task)
         {
             let me = this;
-            me.dataEdit.lstChildTask = me.dataEdit.lstChildTask.filter(item => item.taskId != taskId);
+
+            let callbackAfterDeleteTask = function()
+            {
+                me.loader = me.$loading.show();
+                me.callApi('delete', `api/task/deleteCustom/${task.taskId}`,null)
+                .then(res => {
+                    if(res.data.success)
+                    {
+                        let data = res.data.data;
+                        let listSortOrderUpdate = [];
+                        me.listChildTaskDelete.push(task);
+                        me.dataEdit.lstChildTask = me.dataEdit.lstChildTask.filter(item => item.taskId != task.taskId);
+                        if(me.option.typeTask != EnumTypeTask.Personal)
+                        {
+                            me.dataEdit.lstChildTask.forEach(childTask => {
+                                if(childTask.sortOrder >= task.sortOrder)
+                                {
+                                    listSortOrderUpdate.push({
+                                        taskId: childTask.taskId,
+                                        processId: childTask.processId,
+                                        sortOrder: childTask.sortOrder - 1
+                                    });
+                                }
+                            });
+
+                            if(listSortOrderUpdate.length > 0)
+                            {
+                                me.callApi('put','api/task/processbatch',listSortOrderUpdate,null)
+                                .then(res => {
+                                    if(res.data.success)
+                                    {
+                                        me.dataEdit.lstChildTask.forEach(childTask => {
+                                            if(childTask.sortOrder >= task.sortOrder)
+                                            {
+                                                childTask.sortOrder = childTask.sortOrder - 1;
+                                            }
+                                        });
+
+                                        me.dataEdit.lstChildTask.sort((left,right) => {
+                                            return left.sortOrder - right.sortOrder;
+                                        });
+                                        me.loader.hide();
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                me.loader.hide();
+                            }
+                        }
+                        }
+                });
+            };
+            
+            me.showDialogConfirm({
+                width: "500px",
+                height: "260px",
+                borderTop: true
+            },{
+                'title': "Xóa công việc",
+                'content': "Sau khi thực hiện xóa công việc, tất cả các dữ liệu liên quan bao gồm: thông tin mô tả công việc, tài liệu đính kèm, các công việc con, bình luận, lịch sử hoạt động,... sẽ bị xóa khỏi hệ thống? Bạn có chắc chắn muốn thực hiện thao tác này không?"
+            }, callbackAfterDeleteTask);
         },
         checkFinishLoadData()
         {
@@ -1159,7 +1230,6 @@ export default {
                     let data = res.data.data;
                     if(data && data.length > 0)
                     {
-                        // me.dataRoot.lstCheckTask = data;
                         me.dataEdit.lstCheckTask = data;
                     }
                     me.checkFinishLoadData();
@@ -1190,22 +1260,31 @@ export default {
                     taskName: me.fakeNameChildTask,
                     typeTask: me.option.typeTask,
                     PathTreeTask: (me.dataEdit.PathTreeTask? me.dataEdit.PathTreeTask : '') + "/" + me.option.taskId,
-                    createdByEmail: me.userInfo.email
+                    createdByEmail: me.userInfo.email,
+                    processId: (me.option.typeTask == EnumTypeTask.GroupPersonal) ||
+                        (me.option.typeTask == EnumTypeTask.Group)  ? 
+                        me.option.processId : null,
+                    groupTaskId: (me.option.typeTask == EnumTypeTask.GroupPersonal) ||
+                        (me.option.typeTask == EnumTypeTask.Group)  ? 
+                        me.option.groupTaskId : null,
+                    assignedByEmail: me.userInfo.email,
+                    AssignForEmail: me.dataEdit.assignedByEmail
                 };
                 me.callApi('post', 'api/task/insertChildTask', dataSave, null)
                 .then(res => {
                     if(res.data.success)
                     {
                         let data = res.data.data;
+                        data.isNewChildTask = true;
                         me.dataEdit.lstChildTask.push(data);
-                        me.fakeContentCheckList = '';
+                        me.fakeNameChildTask = '';
                         me.addingChildTask = false;
                     }
                 });
             }
             else
             {
-                me.fakeContentCheckList = '';
+                me.fakeNameChildTask = '';
                 me.addingChildTask = false;
             }
         },
@@ -1245,24 +1324,69 @@ export default {
         changeCheckTask(checkTaskId)
         {
             let me = this;
+            let listUpdate = [];
             me.dataEdit.lstCheckTask.forEach(checkTask => {
                 if(checkTask.checkTaskId == checkTaskId)
-                    checkTask.status = !checkTask.status;
+                {
+                    listUpdate.push({
+                        checkTaskId: checkTask.checkTaskId,
+                        status: !checkTask.status
+                    });
+                }
+            });
+
+            me.callApi('put',`api/checktask/updateStatusBatch`,listUpdate,null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.lstCheckTask.forEach(checkTask => {
+                    if(checkTask.checkTaskId == checkTaskId)
+                        checkTask.status = !checkTask.status;
+                    });       
+                }
             });
         },
         checkAll()
         {
             let me = this;
+            let listUpdate = [];
             me.dataEdit.lstCheckTask.forEach(checkTask => {
-                checkTask.status = true;
-            })
+                listUpdate.push({
+                        checkTaskId: checkTask.checkTaskId,
+                        status: true
+                    });
+            });
+
+            me.callApi('put',`api/checktask/updateStatusBatch`,listUpdate,null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.lstCheckTask.forEach(checkTask => {
+                        checkTask.status = true;
+                    }); 
+                }
+            });
         },
         checkFalseAll()
         {
             let me = this;
+            let listUpdate = [];
             me.dataEdit.lstCheckTask.forEach(checkTask => {
-                checkTask.status = false;
-            })
+                listUpdate.push({
+                        checkTaskId: checkTask.checkTaskId,
+                        status: false
+                    });
+            });
+
+            me.callApi('put',`api/checktask/updateStatusBatch`,listUpdate,null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.lstCheckTask.forEach(checkTask => {
+                        checkTask.status = false;
+                    }); 
+                }
+            });
         },
         commitValueFakeContentCkLst(){
             let me = this;
@@ -1355,7 +1479,7 @@ export default {
                                     column.lstTask[indexTaskExist] = me.dataEdit;
                                 }
                             }
-                        })
+                        });
 
                         if(!isExistsTask)
                         {
@@ -1368,6 +1492,15 @@ export default {
                                 objectParent.lstColumnTask[0].lstTask.push(me.dataEdit);
                             }
                         }
+
+                        objectParent.lstColumnTask.forEach(column => {
+                            if(column.lstTask && column.lstTask.length > 0 && column.processId == '1')
+                            {
+                                me.dataEdit.lstChildTask.forEach(childTask => {
+                                    column.lstTask.push(childTask);
+                                });
+                            }
+                        });
 
                         objectParent.toast.success('Thêm công việc thành công.');
                         me.nameNewTask = '';
@@ -1383,7 +1516,27 @@ export default {
                                     column.lstTask[indexTaskExist] = me.dataEdit;
                                 }
                             }
-                        })
+                        });
+
+                        objectParent.lstColumnTask.forEach(column => {
+                            if(column.lstTask && column.lstTask.length > 0 && column.processId == '1')
+                            {
+                                me.dataEdit.lstChildTask.forEach(childTask => {
+                                    let indexChildTaskExists = column.lstTask.findIndex(task => task.taskId == childTask.taskId);
+                                    if(indexChildTaskExists == -1 && childTask.isNewChildTask) 
+                                    {
+                                        column.lstTask.push(childTask);
+                                    }
+                                    else
+                                    {
+                                        column.lstTask[indexChildTaskExists] = childTask;
+                                    }
+                                });
+                                
+                                let stringChildTaskIdDelete = me.lodash.map(me.listChildTaskDelete,'taskId').join(",");
+                                column.lstTask = column.lstTask.filter(task => !stringChildTaskIdDelete.includes(task.taskId));
+                            }
+                        });
 
                         objectParent.toast.success('Cập nhật công việc thành công.');
                     }
@@ -1410,6 +1563,15 @@ export default {
                             }
                         });
 
+                        objectParent.templateGroupTask.listProcess.forEach(process => {
+                            if(process.lstTask && process.lstTask.length > 0 && process.processId == me.dataEdit.processId)
+                            {
+                                me.dataEdit.lstChildTask.forEach(childTask => {
+                                    process.lstTask.push(childTask);
+                                });
+                            }
+                        });
+
                         objectParent.toast.success('Thêm công việc thành công.');
                         
                         me.nameNewTask = '';
@@ -1421,6 +1583,25 @@ export default {
                             {
                                 let indexFind = process.lstTask.findIndex(task => task.taskId == me.dataEdit.taskId);
                                 process.lstTask[indexFind] = me.dataEdit;
+                            }
+                        });
+
+                        objectParent.templateGroupTask.listProcess.forEach(process => {
+                            if(process.lstTask && process.lstTask.length > 0 && process.processId == me.dataEdit.processId)
+                            {
+                                me.dataEdit.lstChildTask.forEach(childTask => {
+                                    let indexChildTaskExists = process.lstTask.findIndex(task => task.taskId == childTask.taskId);
+                                    if(indexChildTaskExists == -1 && childTask.isNewChildTask) 
+                                    {
+                                        process.lstTask.push(childTask);
+                                    }
+                                    else
+                                    {
+                                        process.lstTask[indexChildTaskExists] = childTask;
+                                    }
+                                });
+                                let stringChildTaskIdDelete = me.lodash.map(me.listChildTaskDelete,'taskId').join(",");
+                                process.lstTask = process.lstTask.filter(task => !stringChildTaskIdDelete.includes(task.taskId));
                             }
                         });
 
@@ -1436,6 +1617,8 @@ export default {
     data()
     {
         return{
+            listChildTaskDelete: [],
+
             listFilterAssignedUser: this.option.listAssignedUser,
             searchAssignedUser: '',
             isShowChooseUserDropDown: false,
@@ -1482,15 +1665,6 @@ export default {
                 }
             },
 
-            //data handle
-            // dataRoot:
-            // {
-            //     description: '',
-            //     path: '',
-            //     lstCheckTask: [],
-            //     listLabel: [],
-            //     lstChildTask: []
-            // },
             dataEdit: {
                 taskId: this.option.taskId,
                 taskName: '[In báo cáo/Báo cáo]Truy vấn lấy vé xuất lại',

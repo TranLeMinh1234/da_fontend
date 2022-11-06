@@ -273,11 +273,11 @@ export default {
                     break;
                 case EnumTypeNotification.AssignedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
-                    me.toast.info(`Công việc "${data.Task.TaskName}" đã được phân công cho bạn.`);
+                    me.toast.info(`Công việc "${data.Task?.TaskName ? data.Task?.TaskName : data.TaskName}" đã được phân công cho bạn.`);
                     break;
                 case EnumTypeNotification.DeletedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
-                    me.toast.info(`Công việc "${data.Task.TaskName}" đã bị xóa.`);
+                    me.toast.info(`Công việc "${data.Task?.TaskName ? data.Task?.TaskName : data.TaskName}" đã bị xóa.`);
                     break;
                 case EnumTypeNotification.CommentedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
@@ -474,7 +474,7 @@ export default {
                         taskDetailId: me.$route.params.taskdetailid,
                         templateReferenceId: me.$route.params.templateReferenceId
                     };
-
+                    
                     me.showDetail('TaskDetail',{
                         width: '900px',
                         height: 'auto',
@@ -485,7 +485,8 @@ export default {
                         typeGroupTask: me.paramRouter.typeGroupTask,
                         typeTask: me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal ? EnumTypeTask.GroupPersonal : EnumTypeTask.Group,
                         processId: me.$refs.view.templateGroupTask.listProcess[0].processId,
-                        editMode: EnumEditMode.Add
+                        editMode: EnumEditMode.Add,
+                        listAssignedUser: me.$refs.view.listUser
                     },null);
                     break;
                 default:
