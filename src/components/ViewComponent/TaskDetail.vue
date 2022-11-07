@@ -873,18 +873,7 @@ export default {
             }
             else
             {
-                // me.showDialogNotification(
-                //     {
-                //         width: '400px',
-                //         height: '180px',
-                //         borderTop: true
-                //     },
-                //     {
-                //         'title': 'Cảnh báo',
-                //         'content': 'Tên công việc không được bỏ trống'
-                //     }, 
-                //     undefined
-                // )
+                
             }
         },
         loadAllData()

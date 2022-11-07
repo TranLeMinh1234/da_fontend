@@ -58,6 +58,25 @@ export default {
         TaskDetail
     },
     extends: BaseViewDetail,
+    watch:{
+        $route (to, from){
+            let me = this;
+            if(to.fullPath.includes("DetailGroupTask"))
+            {
+                me.paramRouter = {
+                    groupTaskId: me.$route.params.grouptaskid,
+                    typeGroupTask: parseInt(me.$route.params.typegrouptask),
+                    taskDetailId: me.$route.params.taskdetailid,
+                    templateReferenceId: me.$route.params.templateReferenceId
+                };
+
+                me.groupTaskInfo = me.paramRouter;
+                
+                me.countDoneLoadData = null;
+                me.loadAllData();
+            }
+        }
+    },
     created(){
         let me = this;
 
@@ -69,7 +88,6 @@ export default {
         };
 
         me.groupTaskInfo = me.paramRouter;
-        me.loader = me.$loading.show();
         me.loadAllData();
     },
     methods:{
@@ -286,6 +304,7 @@ export default {
         loadAllData()
         {
             let me = this;
+            me.loader = me.$loading.show();
             me.getListUserJoined();
             me.getInfoTemplate();
             me.getAllTask();

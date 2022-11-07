@@ -86,12 +86,85 @@
                 <div class="clock"></div>
             </div>
             <div :class="['header', 'd-flex', 'al-center', 'j-space-between', isDifferentDailyTask ? 'white-header': '']">
-                <div style="width: 100px">
+                <div style="width: 450px" class="d-flex al-center">
                     <div 
                         class="file-icon black-home-icon c-poiter mg-l-32"
                         v-show="isDifferentDailyTask"
                         @click="changeDailyTaskView"
-                        ></div>
+                    ></div>
+                    <ItemDropDown
+                        :config="{
+                            width: 350,
+                            directArrow: 'top'
+                        }"
+                        v-if="isDifferentDailyTask"
+                        :isShowDropDown="isShowMenuGroupTask"
+                        @showDropDownEvent="showMenuGroupTask"
+                        @closeDropDownEvent="closeMenuGroupTask"
+                        class="mg-l-32"
+                    >
+                        <template #item>
+                            <div
+                                :class="['d-flex','al-center','menu-group-task','c-poiter']"
+                            >
+                                <div class="txt-threedots">{{currentGroupTask?.nameGroupTask}}</div>
+                                <div class="file-icon black-down-arrow-icon mg-l-10"></div>
+                            </div>
+                        </template>
+                        <template #dropdown>
+                            <div class="group-task-select-box">
+                                <div class="search-group-task-header">
+                                    <MInput 
+                                        :isHaveIcon="true"
+                                        padding="10px 14px 10px 32px" 
+                                        icon="medium-search-icon"
+                                        placeholder="Tìm nhóm công việc..."
+                                        @enterEvent="searchGroupTaskOnHeader()"
+                                        v-model="searchGroupTaskOnHeaderValue"
+                                        :isValidate="false"
+                                    />
+                                </div>
+                                <div class="group-task-container">
+                                    <div
+                                        class="w-100 d-flex al-center type-group-task"
+                                    >
+                                        <div
+                                            :class="['file-icon', isShowPersonalGroupHeader ? 'black-down-arrow-icon':'black-expand-menu-icon']"
+                                            @click="showHideMenuPersonalGroupTaskHeader()"
+                                        ></div>
+                                        <div class="fs-15 mg-l-10">Cá nhân</div>
+                                    </div>
+                                    <div v-if="isShowPersonalGroupHeader">
+                                        <div
+                                            v-for="groupTask in lstGroupPersonalTask" :key="groupTask.groupTaskId"
+                                            class="group-task"
+                                            @click="goDetailGroupTask(groupTask)"
+                                        >
+                                            <div class="fs-15">{{groupTask.nameGroupTask}}</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="w-100 d-flex al-center type-group-task"
+                                    >
+                                        <div
+                                            :class="['file-icon', isShowCommunityGroupHeader ? 'black-down-arrow-icon':'black-expand-menu-icon']"
+                                            @click="showHideMenuCommunityGroupTaskHeader()"
+                                        ></div>
+                                        <div class="fs-15 mg-l-10">Hội nhóm</div>
+                                    </div>
+                                    <div v-if="isShowCommunityGroupHeader">
+                                        <div
+                                            v-for="groupTask in lstGroupCommunityTask" :key="groupTask.groupTaskId"
+                                            class="group-task"
+                                            @click="goDetailGroupTask(groupTask)"
+                                        >
+                                            <div class="fs-15">{{groupTask.nameGroupTask}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </ItemDropDown>
                 </div>
                 <div class="header-feature d-flex al-center j-spread-around pd-r-16">
                     <div class="btn-add-all">
@@ -202,7 +275,9 @@ import AddGroupTaskForm from './AddGroupTaskForm.vue';
 import DetailGroupTask from './DetailGroupTask.vue';
 import Notification from '../commonComponent/Notification.vue';
 import PersonalSetting from './PersonalSetting.vue';
-import '@vuepic/vue-datepicker/dist/main.css'
+import '@vuepic/vue-datepicker/dist/main.css';
+import ItemDropDown from '../commonComponent/ItemDropDown.vue';
+import MInput from '../commonComponent/MInput.vue';
 
 export default {
     name: "Home",
@@ -215,7 +290,9 @@ export default {
         AddGroupTaskForm,
         DetailGroupTask,
         Notification,
-        PersonalSetting
+        PersonalSetting,
+        ItemDropDown,
+        MInput
     },
     created(){
         let me = this;
@@ -260,7 +337,6 @@ export default {
         me.$webSocketManage.eventOnMessage = function(event)
         {
             let data = JSON.parse(event.data);
-            debugger;
             switch(data.TypeNoti)
             {
                 case EnumTypeNotification.AddUserGroupTask:
@@ -293,12 +369,29 @@ export default {
         };
     },
     methods: {
+        searchGroupTaskOnHeader()
+        {
+            let me = this;
+            
+        },
+        showMenuGroupTask()
+        {
+            let me = this;
+            me.isShowMenuGroupTask = true;
+        },
+        closeMenuGroupTask()
+        {
+            let me = this;
+            me.isShowMenuGroupTask = false;
+        },
         goDetailGroupTask(groupTask)
         {
             let me = this;
             me.isDifferentDailyTask = true;
             me.isShowClock = false;
             me.isShowMenu = false;
+            me.isShowMenuGroupTask = false;
+            me.currentGroupTask = groupTask;
             me.$router.push({name: 'DetailGroupTask', params: {
                 grouptaskid: groupTask.groupTaskId,
                 typegrouptask: groupTask.typeGroupTask,
@@ -320,6 +413,7 @@ export default {
                     let data = res.data.data;
                     me.lstGroupCommunityTask = data.lstGroupCommunityTask;
                     me.lstGroupPersonalTask = data.lstGroupPersonalTask;
+
                     me.checkDoneLoadData();
                 }
             });
@@ -339,6 +433,14 @@ export default {
             if(me.countDoneLoadData == 1)
             {
                 me.isDoneLoadData = true;
+                if(me.$route.path.includes('DetailGroupTask'))
+                {
+                    me.currentGroupTask = me.lstGroupCommunityTask.find(grTask => grTask.groupTaskId == me.$route.params.grouptaskid);
+                    if(!me.currentGroupTask)
+                    {
+                        me.currentGroupTask = me.lstGroupPersonalTask.find(grTask => grTask.groupTaskId == me.$route.params.grouptaskid);
+                    }
+                }
             }
         },
         openFormAddGroupTask()
@@ -437,6 +539,13 @@ export default {
                 me.isDifferentDailyTask = false;
                 me.isShowClock = true;
                 me.isShowMenu = true;
+
+                me.paramRouter = {
+                    groupTaskId: me.$route.params.grouptaskid,
+                    typeGroupTask: parseInt(me.$route.params.typegrouptask),
+                    taskDetailId: me.$route.params.taskdetailid,
+                    templateReferenceId: me.$route.params.templateReferenceId
+                };
             }
             else
             {
@@ -512,6 +621,16 @@ export default {
             let me = this;
             me.isShowPersonalGroup = !me.isShowPersonalGroup;
         },
+        showHideMenuPersonalGroupTaskHeader()
+        {
+            let me = this;
+            me.isShowPersonalGroupHeader = !me.isShowPersonalGroupHeader;
+        },
+        showHideMenuCommunityGroupTaskHeader()
+        {
+            let me = this;
+            me.isShowCommunityGroupHeader = !me.isShowCommunityGroupHeader;
+        },
         showHideCommunityGroup()
         {
             let me = this;
@@ -538,6 +657,11 @@ export default {
     data()
     {
         return {
+            currentGroupTask: null,
+            isShowPersonalGroupHeader: false,
+            isShowCommunityGroupHeader: false,
+            searchGroupTaskOnHeaderValue: '',
+            isShowMenuGroupTask: false,
             filterDailyTask: {
                 startTime: new Date(),
                 endTime: new Date(),

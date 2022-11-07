@@ -139,6 +139,12 @@
     background-color: white;
 }
 
+.black-expand-menu-icon{
+    background-position: -296px -104px;
+    width: 16px;
+    height: 16px;
+}
+
 .down-arrow-icon
 {
     -webkit-mask-image: url('../icon/ICON.svg') !important;
@@ -147,6 +153,7 @@
     height: 16px;
     background-color: white;
 }
+
 
 .up-arrow-icon
 {

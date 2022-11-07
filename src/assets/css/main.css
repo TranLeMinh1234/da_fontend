@@ -46,3 +46,7 @@ ul{
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(158, 158, 158);
   }
+
+  .is-full-page{
+    z-index: 9999999999999999999 !important;
+  }
