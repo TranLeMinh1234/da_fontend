@@ -226,6 +226,7 @@ import {baseCallApi} from '../../common/js/BaseCallApi.js';
 export default {
     name: "Template",
     extends: BaseComponent,
+    emits: ['closeView'],
     components: {
         MInput
     },

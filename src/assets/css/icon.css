@@ -11,6 +11,12 @@
     background-color: white;
 }
 
+.black-setting-icon{
+    background-position: -580px -580px;
+    width: 22px;
+    height: 23px;
+}
+
 .app-icon{
     background-position: -608px -64px;
     width: 32px;

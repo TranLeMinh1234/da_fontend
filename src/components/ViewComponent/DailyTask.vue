@@ -23,6 +23,7 @@ import {EnumEditMode,EnumTypeTask} from '../../common/js/Enum.js';
 export default {
     name: 'DailyTask',
     extends: BaseViewDetail,
+    emits: ['closeView'],
     components: {
         SortTable,
         TaskDetail: defineAsyncComponent(()=> import('../ViewComponent/TaskDetail.vue')),

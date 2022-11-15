@@ -92,79 +92,105 @@
                         v-show="isDifferentDailyTask"
                         @click="changeDailyTaskView"
                     ></div>
-                    <ItemDropDown
-                        :config="{
-                            width: 350,
-                            directArrow: 'top'
-                        }"
-                        v-if="isDifferentDailyTask"
-                        :isShowDropDown="isShowMenuGroupTask"
-                        @showDropDownEvent="showMenuGroupTask"
-                        @closeDropDownEvent="closeMenuGroupTask"
-                        class="mg-l-32"
-                    >
-                        <template #item>
-                            <div
-                                :class="['d-flex','al-center','menu-group-task','c-poiter']"
-                            >
-                                <div class="txt-threedots">{{currentGroupTask?.nameGroupTask}}</div>
-                                <div class="file-icon black-down-arrow-icon mg-l-10"></div>
-                            </div>
-                        </template>
-                        <template #dropdown>
-                            <div class="group-task-select-box">
-                                <div class="search-group-task-header">
-                                    <MInput 
-                                        :isHaveIcon="true"
-                                        padding="10px 14px 10px 32px" 
-                                        icon="medium-search-icon"
-                                        placeholder="Tìm nhóm công việc..."
-                                        @enterEvent="searchGroupTaskOnHeader()"
-                                        v-model="searchGroupTaskOnHeaderValue"
-                                        :isValidate="false"
-                                    />
+                    <div class="d-flex al-center border-silver-left-right menu-group-task-bg" v-if="isDifferentDailyTask">
+                        <ItemDropDown
+                            :config="{
+                                width: 350,
+                                directArrow: 'top'
+                            }"
+                            :isShowDropDown="isShowMenuGroupTask"
+                            @showDropDownEvent="showMenuGroupTask"
+                            @closeDropDownEvent="closeMenuGroupTask"
+                            class="mg-l-32"
+                        >
+                            <template #item>
+                                <div
+                                    :class="['d-flex','al-center','menu-group-task','c-poiter']"
+                                >
+                                    <div class="txt-threedots name-selected-group-task">{{currentGroupTask?.nameGroupTask}}</div>
+                                    <div class="file-icon black-down-arrow-icon mg-l-10"></div>
                                 </div>
-                                <div class="group-task-container">
-                                    <div
-                                        class="w-100 d-flex al-center type-group-task"
-                                    >
-                                        <div
-                                            :class="['file-icon', isShowPersonalGroupHeader ? 'black-down-arrow-icon':'black-expand-menu-icon']"
-                                            @click="showHideMenuPersonalGroupTaskHeader()"
-                                        ></div>
-                                        <div class="fs-15 mg-l-10">Cá nhân</div>
+                            </template>
+                            <template #dropdown>
+                                <div class="group-task-select-box">
+                                    <div class="search-group-task-header">
+                                        <MInput 
+                                            :isHaveIcon="true"
+                                            padding="10px 14px 10px 32px" 
+                                            icon="medium-search-icon"
+                                            placeholder="Tìm nhóm công việc..."
+                                            @enterEvent="searchGroupTaskOnHeader()"
+                                            v-model="searchGroupTaskOnHeaderValue"
+                                            :isValidate="false"
+                                        />
                                     </div>
-                                    <div v-if="isShowPersonalGroupHeader">
+                                    <div class="group-task-container">
                                         <div
-                                            v-for="groupTask in lstGroupPersonalTask" :key="groupTask.groupTaskId"
-                                            class="group-task"
-                                            @click="goDetailGroupTask(groupTask)"
+                                            class="w-100 d-flex al-center type-group-task"
                                         >
-                                            <div class="fs-15">{{groupTask.nameGroupTask}}</div>
+                                            <div
+                                                :class="['file-icon', isShowPersonalGroupHeader ? 'black-down-arrow-icon':'black-expand-menu-icon']"
+                                                @click="showHideMenuPersonalGroupTaskHeader()"
+                                            ></div>
+                                            <div class="fs-15 mg-l-10">Cá nhân</div>
+                                        </div>
+                                        <div v-if="isShowPersonalGroupHeader">
+                                            <div
+                                                v-for="groupTask in lstGroupPersonalTaskHeader" :key="groupTask.groupTaskId"
+                                                class="group-task"
+                                                @click="goDetailGroupTask(groupTask)"
+                                            >
+                                                <div class="fs-15">{{groupTask.nameGroupTask}}</div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="w-100 d-flex al-center type-group-task"
+                                        >
+                                            <div
+                                                :class="['file-icon', isShowCommunityGroupHeader ? 'black-down-arrow-icon':'black-expand-menu-icon']"
+                                                @click="showHideMenuCommunityGroupTaskHeader()"
+                                            ></div>
+                                            <div class="fs-15 mg-l-10">Hội nhóm</div>
+                                        </div>
+                                        <div v-if="isShowCommunityGroupHeader">
+                                            <div
+                                                v-for="groupTask in lstGroupCommunityTaskHeader" :key="groupTask.groupTaskId"
+                                                class="group-task"
+                                                @click="goDetailGroupTask(groupTask)"
+                                            >
+                                                <div class="fs-15">{{groupTask.nameGroupTask}}</div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div
-                                        class="w-100 d-flex al-center type-group-task"
-                                    >
-                                        <div
-                                            :class="['file-icon', isShowCommunityGroupHeader ? 'black-down-arrow-icon':'black-expand-menu-icon']"
-                                            @click="showHideMenuCommunityGroupTaskHeader()"
-                                        ></div>
-                                        <div class="fs-15 mg-l-10">Hội nhóm</div>
-                                    </div>
-                                    <div v-if="isShowCommunityGroupHeader">
-                                        <div
-                                            v-for="groupTask in lstGroupCommunityTask" :key="groupTask.groupTaskId"
-                                            class="group-task"
-                                            @click="goDetailGroupTask(groupTask)"
-                                        >
-                                            <div class="fs-15">{{groupTask.nameGroupTask}}</div>
-                                        </div>
-                                    </div>
+                                </div>
+                            </template>
+                        </ItemDropDown>
+                        <IconDropDown
+                            :config="{
+                                width: 280,
+                                arrowPositionX:20,
+                                directArrow: 'top',
+                            }"
+                            :isHaveArrow="true"
+                            iconClass="black-setting-icon"
+                            v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')"
+                            :isShowDropDown="isShowSettingGroupTask"
+                            @showDropDownEvent="showSettingGroupTask"
+                            @closeDropDownEvent="closeSettingGroupTask"
+                            class="mg-l-10"
+                        >
+                            <div class="pd-tbt-8">
+                                <div class="option-setting-group-task c-poiter" v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')">Thêm thành viên</div>
+                                <div 
+                                    class="option-setting-group-task c-poiter cl-red" 
+                                    v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')"
+                                    @click="deleteGroupTask"
+                                >
+                                    Xóa
                                 </div>
                             </div>
-                        </template>
-                    </ItemDropDown>
+                        </IconDropDown>
+                    </div>
                 </div>
                 <div class="header-feature d-flex al-center j-spread-around pd-r-16">
                     <div class="btn-add-all">
@@ -254,7 +280,7 @@
             </div>
             <div class="body">
                 <router-view v-slot="{ Component }">
-                    <component ref="view" :is="Component" />
+                    <component ref="view" :is="Component" @closeView="closeView"/>
                 </router-view>
             </div>
         </div>
@@ -319,13 +345,19 @@ export default {
         }
     },
     watch: {
-        '$route.path': function(newValue){
+        '$route': function(newValue,oldValue){
             let me = this;
-            if(newValue.includes('DetailGroupTask'))
+            if(newValue.path.includes('DetailGroupTask'))
             {
                 me.isDifferentDailyTask = true;
                 me.isShowClock = false;
                 me.isShowMenu = false;
+            }
+            else if(newValue.path.includes('DailyTask'))
+            {
+                me.isDifferentDailyTask = false;
+                me.isShowClock = true;
+                me.isShowMenu = true;
             }
         }
     },
@@ -340,6 +372,10 @@ export default {
             switch(data.TypeNoti)
             {
                 case EnumTypeNotification.AddUserGroupTask:
+                    if(me.$route.path.includes('DetailGroupTask'))
+                    {
+                        me.$refs.view.increaseNumberOfNewUpdate();
+                    }
                     me.$refs.notification.increaseNumberOfNewNotification();
                     me.toast.info('Bạn đã được thêm vào nhóm công việc mới.');
                     break;
@@ -349,11 +385,23 @@ export default {
                     break;
                 case EnumTypeNotification.AssignedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
+                    if(me.$route.path.includes('DetailGroupTask'))
+                    {
+                        me.$refs.view.increaseNumberOfNewUpdate();
+                    }
                     me.toast.info(`Công việc "${data.Task?.TaskName ? data.Task?.TaskName : data.TaskName}" đã được phân công cho bạn.`);
                     break;
                 case EnumTypeNotification.DeletedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
+                    if(me.$route.path.includes('DetailGroupTask'))
+                    {
+                        me.$refs.view.increaseNumberOfNewUpdate();
+                    }
                     me.toast.info(`Công việc "${data.Task?.TaskName ? data.Task?.TaskName : data.TaskName}" đã bị xóa.`);
+                    break;
+                case EnumTypeNotification.DeleteGroupTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info(`Nhóm công việc "${data.nameGroupTask}" đã bị xóa.`);
                     break;
                 case EnumTypeNotification.CommentedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
@@ -364,15 +412,38 @@ export default {
                     me.toast.info('Bạn có hạn hoàn thành công việc');
                     break;
                 default:
+                    if(me.$route.path.includes('DetailGroupTask'))
+                    {
+                        me.$refs.view.increaseNumberOfNewUpdate();
+                    }
                     break;
             }
         };
     },
     methods: {
+        closeView(callBack)
+        {
+            let me = this;
+            if(typeof callBack == 'function')
+            {
+                callBack(me);
+            }
+        },
+        showSettingGroupTask()
+        {
+            let me = this;
+            me.isShowSettingGroupTask = true;
+        },
+        closeSettingGroupTask()
+        {
+            let me = this;
+            me.isShowSettingGroupTask = false;
+        },
         searchGroupTaskOnHeader()
         {
             let me = this;
-            
+            me.lstGroupCommunityTaskHeader = me.lstGroupCommunityTask.filter(groupTask => groupTask.nameGroupTask.includes(me.searchGroupTaskOnHeaderValue));
+            me.lstGroupPersonalTaskHeader = me.lstGroupPersonalTask.filter(groupTask => groupTask.nameGroupTask.includes(me.searchGroupTaskOnHeaderValue));
         },
         showMenuGroupTask()
         {
@@ -411,9 +482,11 @@ export default {
                 if( res.data.success )
                 {
                     let data = res.data.data;
-                    me.lstGroupCommunityTask = data.lstGroupCommunityTask;
-                    me.lstGroupPersonalTask = data.lstGroupPersonalTask;
-
+                    me.lstGroupCommunityTask = data?.lstGroupCommunityTask ? data?.lstGroupCommunityTask : [];
+                    me.lstGroupPersonalTask = data?.lstGroupPersonalTask ? data?.lstGroupPersonalTask : [];
+                    me.lstGroupCommunityTaskHeader = data?.lstGroupCommunityTask ? data?.lstGroupCommunityTask : [];
+                    me.lstGroupPersonalTaskHeader = data?.lstGroupPersonalTask ? data?.lstGroupPersonalTask : [];
+                    
                     me.checkDoneLoadData();
                 }
             });
@@ -539,6 +612,12 @@ export default {
                 me.isDifferentDailyTask = false;
                 me.isShowClock = true;
                 me.isShowMenu = true;
+            }
+            else
+            {
+                me.isShowClock = false;
+                me.isShowMenu = false;
+                me.isDifferentDailyTask = true;
 
                 me.paramRouter = {
                     groupTaskId: me.$route.params.grouptaskid,
@@ -547,12 +626,11 @@ export default {
                     templateReferenceId: me.$route.params.templateReferenceId
                 };
             }
-            else
-            {
-                me.isShowClock = false;
-                me.isShowMenu = false;
-                me.isDifferentDailyTask = true;
-            }
+        },
+        deleteGroupTask()
+        {
+            let me = this;
+            me.$refs.view.deleteCustom();
         },
         closePopup(callbackInsideComponent, typeComponent)
         {
@@ -564,7 +642,13 @@ export default {
             if(callbackInsideComponent)
             {
                 if(typeComponent == "ViewComponent")
+                {
                     callbackInsideComponent(me.$refs.view);
+                }
+                else if(typeComponent == "HomeComponent")
+                {
+                    callbackInsideComponent(me);
+                }
                 else
                     callbackInsideComponent(me.$refs.dynamicComponent);
             }
@@ -657,6 +741,9 @@ export default {
     data()
     {
         return {
+            isShowSettingGroupTask: false,
+            lstGroupCommunityTaskHeader: [],
+            lstGroupPersonalTaskHeader: [],
             currentGroupTask: null,
             isShowPersonalGroupHeader: false,
             isShowCommunityGroupHeader: false,

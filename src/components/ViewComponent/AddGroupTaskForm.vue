@@ -188,7 +188,18 @@ export default {
                         let data = res.data.data;
                         me.toast.success('Thêm nhóm công việc thành công.');
                         me.loader.hide();
-                        me.$emit('closePopup', ()=>{});
+                        me.$emit('closePopup', (objectParent)=>{
+                            if(data.typeGroupTask == EnumTypeGroupTask.Personal)
+                            {
+                                objectParent.lstGroupPersonalTask.push(data);
+                                objectParent.lstGroupPersonalTaskHeader.push(data);
+                            }
+                            else if(data.typeGroupTask == EnumTypeGroupTask.Group)
+                            {
+                                objectParent.lstGroupCommunityTask.push(data);
+                                objectParent.lstGroupCommunityTaskHeader.push(data);
+                            }
+                        },"HomeComponent");
                     }
                     else
                     {

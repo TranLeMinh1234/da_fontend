@@ -40,7 +40,8 @@ var EnumTypeNotification = {
     AssignedTask: 3,
     DeletedTask: 4,
     CommentedTask: 5,
-    RemindTask: 6
+    RemindTask: 6,
+    DeleteGroupTask: 7
 }
 
 export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask, EnumTypeNotification};

@@ -74,6 +74,16 @@
     display: none !important;
 }
 
+.pd-tbt-16
+{
+    padding: 16px 0px 16px 0px;
+}
+
+.pd-tbt-8
+{
+    padding: 8px 0px 9px 0px;
+}
+
 .pd-l-16
 {
     padding-left: 16px;

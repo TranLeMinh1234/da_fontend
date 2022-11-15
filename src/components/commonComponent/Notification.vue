@@ -95,6 +95,11 @@ export default {
     components: {
         IconDropDown
     },
+    created()
+    {
+        let me = this;
+        me.loadNumberOfNewNotification();
+    },
     mounted()
     {
         let me = this;
@@ -120,6 +125,18 @@ export default {
     computed: {
     },
     methods: {
+        loadNumberOfNewNotification()
+        {
+            let me = this;
+            me.callApi('get','api/notification/numberofnewnotification',null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    me.numberOfNewNotification = data;
+                }
+            });
+        },
         increaseNumberOfNewNotification()
         {
             let me = this;
@@ -191,6 +208,9 @@ export default {
                 case EnumTypeNotification.CommentedTask:
                     stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã bình luận công việc <b>${notification.task?.taskName ? notification.task.taskName : notification.taskName}</b>.`;
                     break;
+                case EnumTypeNotification.DeleteGroupTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa nhóm công việc <b>${notification.nameGroupTask}</b>.`;
+                    break;
                 default: 
                     break;
             }
@@ -218,7 +238,7 @@ export default {
             let me = this;
             let startIndexPaging = me.listNotification.length,
                 numberOfRecordTake = 0;
-            debugger;
+                
             if(typeLoading == 'show')
             {
                 if(me.isLoadFirstTime)
@@ -286,7 +306,7 @@ export default {
                                     me.boxNotificationElement.scrollTo(0,me.boxNotificationElement.offsetHeight - 160 > 0 ? me.boxNotificationElement.offsetHeight - 160 : 0);
                                 }
                             }
-
+                            me.numberOfNewNotification = 0;
                             me.isLoading = false;
                         }
                     });

@@ -49,3 +49,19 @@
     border-radius: 15px;
     object-fit: cover;
 }
+
+.filter-bar .reload-task
+{
+    position: relative;
+}
+
+.filter-bar .num-of-notification
+{
+    position: absolute;
+    padding: 2px 6px 2px 6px;
+    background-color: red;
+    border-radius: 6px;
+    font-size: 10px;
+    top: 4px;
+    right: 12px;
+}

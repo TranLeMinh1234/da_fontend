@@ -18,11 +18,14 @@
         <div
             :class="['filter-bar']"
         >
-            <div class="d-flex center-items filter-item">
-                <div class="file-icon white-refresh-icon c-poiter" @click="getTasksFilter"></div>
+            <div class="d-flex center-items filter-item reload-task">
+                <div class="file-icon white-refresh-icon c-poiter" @click="loadAllData">
+                </div>
+                <div class="num-of-notification" v-if="numberOfNewUpdate">{{numberOfNewUpdate}}</div>
             </div>
-            <div class="d-flex center-items filter-item">
-                <div class="file-icon normal-white-filter-icon c-poiter"></div>
+            <div class="d-flex center-items filter-item reload">
+                <div class="file-icon normal-white-filter-icon c-poiter">
+                </div>
             </div>
             <div class="list-user-joined">
                 <div 
@@ -58,6 +61,7 @@ export default {
         TaskDetail
     },
     extends: BaseViewDetail,
+    emits: ['closeView'],
     watch:{
         $route (to, from){
             let me = this;
@@ -91,6 +95,65 @@ export default {
         me.loadAllData();
     },
     methods:{
+        increaseNumberOfNewUpdate()
+        {
+            let me = this;
+            me.numberOfNewUpdate = me.numberOfNewUpdate + 1;
+        },
+        setNumberOfNewUpdate(value){
+            let me = this;
+            me.numberOfNewUpdate = value;
+        },
+        deleteCustom()
+        {
+            let me = this;
+            let listTaskIdDelete = [];
+            me.templateGroupTask.listProcess.forEach(process => {
+                process.lstTask.forEach(task => {
+                    listTaskIdDelete.push(task.taskId);
+                });
+            });
+            me.showDialogConfirm(
+                {
+                    width: '600px',
+                    height: '200px',
+                    borderTop: true
+                },
+                {
+                    'title': 'Cảnh báo',
+                    'content': 'Bạn có chắc muốn xóa nhóm công việc này?'
+                },
+                () =>{
+                    me.loader = me.$loading.show();
+                    me.callApi('put',`api/grouptask/deleteCustom`,
+                    {
+                        listTaskId: listTaskIdDelete,
+                        groupTaskId: me.paramRouter.groupTaskId
+                    }
+                    ,null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+                            me.$emit('closeView',(objectParent)=>{
+                                if( me.paramRouter.typeGroupTask == EnumTypeGroupTask.Personal)
+                                {
+                                    objectParent.lstGroupPersonalTask = objectParent.lstGroupPersonalTask.filter(groupTask => groupTask.groupTaskId != me.paramRouter.groupTaskId);
+                                    objectParent.lstGroupPersonalTaskHeader = objectParent.lstGroupPersonalTask.filter(groupTask => groupTask.groupTaskId != me.paramRouter.groupTaskId);
+                                }
+                                else if( me.paramRouter.typeGroupTask == EnumTypeGroupTask.Group)
+                                {
+                                    objectParent.lstGroupCommunityTask = objectParent.lstGroupCommunityTask.filter(groupTask => groupTask.groupTaskId != me.paramRouter.groupTaskId);
+                                    objectParent.lstGroupCommunityTaskHeader = objectParent.lstGroupCommunityTask.filter(groupTask => groupTask.groupTaskId != me.paramRouter.groupTaskId);
+                                }
+
+                                objectParent.$router.push({name: 'DailyTask'});
+                                me.loader.hide();
+                            });
+                        }
+                    });
+                }
+            );
+        },
         addNewProcess(newProcess)
         {
             let me = this;
@@ -125,7 +188,8 @@ export default {
                 processesAffected.push(
                     {
                         processId: processInfo.processId,
-                        sortOrder: processInfo.newIndex
+                        sortOrder: processInfo.newIndex,
+                        groupTaskId: me.paramRouter.groupTaskId
                     }
                 );
 
@@ -143,7 +207,8 @@ export default {
                         processesAffected.push(
                             {
                                 processId: process.processId,
-                                sortOrder: process.sortOrder
+                                sortOrder: process.sortOrder,
+                                groupTaskId: me.paramRouter.groupTaskId
                             }
                         );
                     }
@@ -158,7 +223,8 @@ export default {
                         processesAffected.push(
                             {
                                 processId: process.processId,
-                                sortOrder: process.sortOrder
+                                sortOrder: process.sortOrder,
+                                groupTaskId: me.paramRouter.groupTaskId
                             }
                         );
                     }
@@ -304,6 +370,7 @@ export default {
         loadAllData()
         {
             let me = this;
+            me.countDoneLoadData = 0;
             me.loader = me.$loading.show();
             me.getListUserJoined();
             me.getInfoTemplate();
@@ -329,6 +396,9 @@ export default {
                 {   
                     let data = res.data.data;
                     me.templateGroupTask = data;
+                    me.templateGroupTask.listProcess.forEach(process => {
+                        process.lstTask = [];
+                    });
                     me.checkDoneLoadData();
                 }
             });
@@ -344,6 +414,10 @@ export default {
                 {   
                     let data = res.data.data;
                     me.listTask = data;
+                    if(!data)
+                    {
+                        me.listTask = [];
+                    }
                     me.checkDoneLoadData();
                 }
             });
@@ -405,6 +479,7 @@ export default {
             {
                 me.isDoneLoadData = true;
                 me.loader.hide();
+                me.numberOfNewUpdate = 0;
                 let taskOpen = null;
                 me.listTask.forEach(task => {
                     me.templateGroupTask.listProcess.forEach(process => {
@@ -477,6 +552,7 @@ export default {
     data()
     {
         return {
+            numberOfNewUpdate: 0,
             isDoneLoadData: false,
             templateGroupTask: {
                 listProcess: []

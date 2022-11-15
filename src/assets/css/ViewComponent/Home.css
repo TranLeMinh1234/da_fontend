@@ -260,14 +260,16 @@
     border: 0px 1px 0px 1px silver;
     color: black;
     font-weight: 500;
-    height: 30px;
-    border-color: silver;
-    border-style: solid solid solid solid;
-    border-width: 0px 1px 0px 1px;
-    padding: 0px 16px 0px 16px;
 }
 
-#Home .header .menu-group-task div:nth-child(1)
+#Home .header .menu-group-task-bg
+{
+    padding: 0px 16px 0px 16px;
+    height: 30px;
+    margin-left: 20px;
+}
+
+#Home .header .menu-group-task .name-selected-group-task
 {
     width: 200px;
 }
@@ -303,5 +305,22 @@
 }
 
 .group-task-select-box .group-task:hover{
+    background-color: #f1f1f1;
+}
+
+.border-silver-left-right
+{
+    border-color: silver;
+    border-style: solid solid solid solid;
+    border-width: 0px 1px 0px 1px;
+    border: 0px 1px 0px 1px silver;
+}
+
+.option-setting-group-task
+{
+    padding: 8px 12px 8px 12px;
+}
+
+.option-setting-group-task:hover{
     background-color: #f1f1f1;
 }
