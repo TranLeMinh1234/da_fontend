@@ -180,7 +180,13 @@
                             class="mg-l-10"
                         >
                             <div class="pd-tbt-8">
-                                <div class="option-setting-group-task c-poiter" v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')">Thêm thành viên</div>
+                                <div 
+                                    class="option-setting-group-task c-poiter" 
+                                    v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')"
+                                    @click="openAddMemberForm"
+                                >
+                                    Thêm thành viên
+                                </div>
                                 <div 
                                     class="option-setting-group-task c-poiter cl-red" 
                                     v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')"
@@ -407,9 +413,13 @@ export default {
                     me.$refs.notification.increaseNumberOfNewNotification();
                     me.toast.info(`${data.CreatedBy.FirstName} ${data.CreatedBy.LastName} đã bình luận công việc "${data.Task.TaskName}".`);
                     break;
-                case EnumTypeNotification.RemindTask:
+                case EnumTypeNotification.RemindStartTimeTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
-                    me.toast.info('Bạn có hạn hoàn thành công việc');
+                    me.toast.info(`Công việc "${data.Task?.TaskName ? data.Task?.TaskName : data.TaskName}" sẽ bắt đầu vào lúc ${me.$commonFunction.parseDateTimeJsToTimeString(data?.Task?.StartTime)} ngày ${me.$commonFunction.parseDateJsToString(data?.Task?.StartTime)}.`);
+                    break;
+                case EnumTypeNotification.RemindEndTimeTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    me.toast.info(`Công việc "${data.Task?.TaskName ? data.Task?.TaskName : data.TaskName}" đến hạn hoàn thành vào lúc ${me.$commonFunction.parseDateTimeJsToTimeString(data?.Task?.EndTime)} ngày ${me.$commonFunction.parseDateJsToString(data?.Task?.EndTime)}.`);
                     break;
                 default:
                     if(me.$route.path.includes('DetailGroupTask'))
@@ -421,6 +431,12 @@ export default {
         };
     },
     methods: {
+        openAddMemberForm()
+        {
+            let me = this;
+            me.$refs.view.openAddMemberForm();
+            me.isShowSettingGroupTask = false;
+        },
         closeView(callBack)
         {
             let me = this;

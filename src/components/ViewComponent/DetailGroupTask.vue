@@ -52,13 +52,15 @@ import BaseViewDetail from '../commonComponent/BaseViewDetail.vue';
 import SortTable from '../commonComponent/SortTable.vue';
 import {baseCallApi} from '../../common/js/BaseCallApi.js';
 import TaskDetail from './TaskDetail.vue'; 
+import AddMemberForm from './AddMemberForm.vue';
 
 export default {
     name: 'DetailGroupTask',
     components: {
         Modal,
         SortTable,
-        TaskDetail
+        TaskDetail,
+        AddMemberForm
     },
     extends: BaseViewDetail,
     emits: ['closeView'],
@@ -89,12 +91,37 @@ export default {
             typeGroupTask: parseInt(me.$route.params.typegrouptask),
             taskDetailId: me.$route.params.taskdetailid,
             templateReferenceId: me.$route.params.templateReferenceId
-        };
+    }
 
         me.groupTaskInfo = me.paramRouter;
         me.loadAllData();
     },
     methods:{
+        closePopup(callBack)
+        {
+            let me = this;
+            if(typeof callBack == 'function')
+            {
+                callBack(me);
+            }
+
+            me.isShowDetail = false;
+        },
+        openAddMemberForm()
+        {
+            let me = this;
+            me.showDetail('AddMemberForm',{
+                width: '900px',
+                height: 'auto',
+                borderTop: true
+            },
+            {
+                listUser: me.listUser,
+                emailUserCreatedGroupTask: me.groupTaskInfoFromServer.createdByEmail,
+                groupTaskId: me.paramRouter.groupTaskId,
+                nameGroupTask: me.groupTaskInfoFromServer.nameGroupTask
+            },null);
+        },
         increaseNumberOfNewUpdate()
         {
             let me = this;
@@ -372,9 +399,23 @@ export default {
             let me = this;
             me.countDoneLoadData = 0;
             me.loader = me.$loading.show();
+            me.getById();
             me.getListUserJoined();
             me.getInfoTemplate();
             me.getAllTask();
+        },
+        getById()
+        {
+            let me = this;
+            me.callApi('get', `api/grouptask/${me.paramRouter.groupTaskId}`, null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    let data = res.data.data;
+                    me.groupTaskInfoFromServer = data;
+                    me.checkDoneLoadData();
+                }
+            });
         },
         getListUserJoined(){
             let me = this;
@@ -384,6 +425,11 @@ export default {
                 {
                     let data = res.data.data;
                     me.listUser = data;
+                    let indexExists = me.listUser.findIndex(user => user.email == me.userInfo.email);
+                    if(indexExists == -1)
+                    {
+                        me.$router.push({name:'DailyTask'});
+                    }
                     me.checkDoneLoadData();
                 }
             });
@@ -475,7 +521,7 @@ export default {
                 me.countDoneLoadData++;
             }
 
-            if(me.countDoneLoadData == 3)
+            if(me.countDoneLoadData == 4)
             {
                 me.isDoneLoadData = true;
                 me.loader.hide();

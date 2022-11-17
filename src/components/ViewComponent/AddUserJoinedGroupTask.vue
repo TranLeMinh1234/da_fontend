@@ -40,7 +40,9 @@
                                 <td style="width: 5%">
                                     <div
                                         :class="['check-select-table','mg-auto',
-                                        user.isSelected ? 'file-icon checkbox-blue-icon': '']"
+                                        user.isSelected ? 'file-icon checkbox-blue-icon': '',
+                                        isUserExistsInGroupTask(user)? 'pe-none':'',
+                                        isUserExistsInGroupTask(user)? 'disable-div':'']"
                                         @click="selectUser(user)"
                                     >
                                     </div>
@@ -137,7 +139,7 @@ import BaseComponent from '../commonComponent/BaseComponent.vue';
 export default {
     name: 'AddUserJoinedGroupTask',
     extends: BaseComponent,
-    emits: ['closeSubPopup'],
+    emits: ['closeSubPopup','closePopup'],
     components: {
         MInput
     },
@@ -165,7 +167,7 @@ export default {
             let me = this;
             let isCheckAll = true;
             me.listUserChoose.forEach(user => {
-                if(!user.isSelected)
+                if(!user.isSelected && !user.cantSelect)
                 {
                     isCheckAll = false;
                 }
@@ -175,6 +177,18 @@ export default {
         }
     },
     methods: {
+        isUserExistsInGroupTask(user)
+        {
+            let me = this;
+            let index = me.option.listUserExists.findIndex(userExists => userExists.email == user.email);
+            if(index == -1)
+                return false;
+            else
+            {
+                user.cantSelect = true;
+                return true;
+            }
+        },
         commitListUserJoin()
         {
             let me = this;
@@ -183,13 +197,33 @@ export default {
             });
 
             me.$emit('closePopup', (objectParent)=>{
-                me.listUserChosen.forEach(userChosen => {
-                    let indexFind = objectParent.listUser.findIndex(user => user.email == userChosen.email);
-                    if(indexFind == -1)
-                    {
-                        objectParent.listUser.push(userChosen);
-                    }
-                })
+                if(me.option.nameParentComponent == "AddGroupTaskForm")
+                {
+                    me.listUserChosen.forEach(userChosen => {
+                        let indexFind = objectParent.listUser.findIndex(user => user.email == userChosen.email);
+                        if(indexFind == -1)
+                        {
+                            objectParent.listUser.push(userChosen);
+                        }
+                    })
+                }
+                else
+                {
+                    me.callApi('post','api/groupTask/addMembers',{
+                        listUser: me.listUserChosen,
+                        groupTaskId: objectParent.option.groupTaskId
+                    },null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+                            objectParent.listUserNew = me.listUserChosen;
+                            me.listUserChosen.forEach(userNew => {
+                                objectParent.listUser.push(userNew);
+                            });
+                            objectParent.prePareListUserDisplay();
+                        }
+                    });
+                }
             })
         },
         deleteChosenUser(user)
@@ -255,13 +289,15 @@ export default {
             if(me.isCheckAll)
             {
                 me.listUserChoose.forEach(user => {
-                    user.isSelected = false;
+                    if(!user.cantSelect)
+                        user.isSelected = false;
                 })
             }
             else
             {
                 me.listUserChoose.forEach(user => {
-                    user.isSelected = true;
+                    if(!user.cantSelect)
+                        user.isSelected = true;
                 })
             }
         },

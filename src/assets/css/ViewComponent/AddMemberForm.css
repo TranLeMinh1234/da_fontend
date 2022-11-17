@@ -1,0 +1,56 @@
+.add-member-form
+{
+    width: 100%;
+    height: auto;
+}
+
+.add-member-form .header
+{
+    padding: 16px;
+}
+
+.add-member-form .body
+{
+    padding: 16px;
+}
+
+.add-member-form .footer
+{
+    padding: 8px;
+}
+
+.add-member-form .body table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.add-member-form .body table thead {
+    border-bottom: 1px solid silver;
+}
+
+.add-member-form .body table thead td{
+    font-weight: 600;
+    padding: 10px 0px 10px 0px;
+}
+
+.add-member-form .body thead, tbody tr {
+    display: table;
+    width: 100%;
+    height: 39px;
+    table-layout: fixed;/* even columns width , fix width of table too*/
+}
+
+.add-member-form .body tbody{
+    display: block;
+    height: 300px;
+    overflow: auto;
+}
+
+.add-member-form .body tbody .odd-row
+{
+    background-color:  rgb(245, 245, 245);
+}
+
+.add-member-form .body tbody tr:hover{
+    background-color: #e1fcff;
+}

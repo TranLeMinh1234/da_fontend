@@ -232,12 +232,15 @@ export default {
         openAddUserForm()
         {
             let me = this;
+            
             me.showDetail('AddUserJoinedGroupTask',{
                     width: '630px',
                     height: 'auto',
                     borderTop: true
                 }, {
-                    listRole: me.listRole
+                    listRole: me.listRole,
+                    listUserExists: me.listUser,
+                    nameParentComponent: 'AddGroupTaskForm'
                 }, null);
         },
         closePopup(callback)
