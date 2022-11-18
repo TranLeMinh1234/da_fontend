@@ -34,7 +34,7 @@ import DropDown from './DropDown.vue';
 export default {
     name: 'LocalCombobox',
     extends: BaseDataControl,
-    
+    emits: ['selectItem','closeDropDownEvent','update:modelValue'],
     components: {
         DropDown
     },
@@ -70,6 +70,17 @@ export default {
         disabled: {
             type: Boolean,
             default: false
+        },
+        dataRow: {
+            type: Object,
+            default: function(rawProps)
+            {
+                return rawProps.dataRow? rawProps.datdataRowa : [
+                    {
+                        
+                    }
+                ];
+            }
         },
         configField: {
             type: Object,
@@ -121,7 +132,8 @@ export default {
         {
             let me = this;
             me.indexItemSelected = index;
-            me.$emit('update:modelValue',dataItem[me.configField.valueField]);
+            me.$emit('update:modelValue',dataItem[me.configField.valueField],me.dataRow);
+            me.$emit('selectItem',dataItem[me.configField.valueField],me.dataRow);
             me.isShowDropDown = false;
         },
         findPositionIcon()

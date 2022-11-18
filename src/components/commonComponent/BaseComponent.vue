@@ -76,6 +76,11 @@ export default {
             newDialog.mount("#dialogBind");
             me.dialog= newDialog;
         },
+        closeDialog()
+        {
+            let me = this;
+            me.dialog?.unmount();
+        },
         callApi(method, routeApi, data, option)
         {
             let me = this;

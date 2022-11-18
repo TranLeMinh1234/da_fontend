@@ -9,6 +9,7 @@
     height: 40px;
     border-radius: 8px;
     position: relative;
+    padding: 0px 9px 0px 0px;
 }
 
 .local-combobox .display-value-box:hover{

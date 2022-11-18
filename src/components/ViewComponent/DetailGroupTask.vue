@@ -91,7 +91,7 @@ export default {
             typeGroupTask: parseInt(me.$route.params.typegrouptask),
             taskDetailId: me.$route.params.taskdetailid,
             templateReferenceId: me.$route.params.templateReferenceId
-    }
+        }
 
         me.groupTaskInfo = me.paramRouter;
         me.loadAllData();
@@ -549,7 +549,7 @@ export default {
 
                 let currentUser = me.listUser.find(user => user.email == me.userInfo.email);
                 me.setRoleForUser(currentUser.role);
-
+                
                 if(me.paramRouter.taskDetailId != 'all')
                 {
                     let me = this;

@@ -5,17 +5,19 @@
             <div class="file-icon exit-popup-icon c-poiter" @click="closePopup"></div>
         </div>
         <div class="body">
-            <div class="d-flex al-center j-end c-poiter" @click="openFormChooseUser">
-                <div class="file-icon plush-blue-icon"></div>
-                <div class="fw-500 fs-18 color-blue-taskdetail">Thêm nhân viên</div>
+            <div class="d-flex al-center j-end">
+                <div class="d-flex al-center j-end c-poiter" @click="openFormChooseUser">
+                    <div class="file-icon plush-blue-icon"></div>
+                    <div class="fw-500 fs-18 color-blue-taskdetail">Thêm nhân viên</div>
+                </div>
             </div>
             <div class="table mg-t-10">
                 <table>
                     <thead>
                         <tr>
                             <td style="width: 30%">Họ và tên</td>
-                            <td style="width: 50%">Email</td>
-                            <td style="width: 15%;padding-left: 12px">Vai trò</td>
+                            <td style="width: 45%">Email</td>
+                            <td style="width: 20%;padding-left: 12px">Vai trò</td>
                             <td style="width: 5%"></td>
                         </tr>
                     </thead>
@@ -30,12 +32,12 @@
                                 {{user.firstName}} {{user.lastName}}
                             </td>
                             <td 
-                                style="width: 50%"
+                                style="width: 45%"
                             >
                                 {{user.email}}
                                 </td>
                             <td 
-                                style="width: 15%"
+                                style="width: 20%"
                             >
                                 <LocalCombobox 
                                     :disabled="user.email == option.emailUserCreatedGroupTask"
@@ -48,10 +50,12 @@
                                     }"
                                     :configDropDown="{
                                         height: 80,
-                                        width: 120
                                     }"
                                     :data="listRole"
-                                    v-model="user.role.roleId"
+                                    :dataRow="user"
+                                    :modelValue="user.role.roleId" 
+                                    @update:modelValue="commitRoleOfUser"
+                                    @selectItem="selectRoleUser"
                                 />
                             </td>
                             <td style="width: 5%" class="h-100 c-poiter">
@@ -121,6 +125,26 @@ export default {
     },
     methods:
     {
+        commitRoleOfUser(dataSelect,dataRow)
+        {
+            let me = this;
+        },
+        selectRoleUser(dataSelect,dataRow)
+        {
+            let me = this;
+            me.callApi('put',`api/grouptask/updaterolemember`,{
+                roleId: dataSelect,
+                groupTaskId: me.option.groupTaskId,
+                email: dataRow.email,
+                nameGroupTask: me.option.nameGroupTask
+            },null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    
+                }
+            });
+        },
         deleteMember(user)
         {
             let me = this;

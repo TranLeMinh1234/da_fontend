@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import { commonFunction } from '../common/js/commFunction.js';
 
 const userManage = {
     namespaced: true,
@@ -22,7 +23,13 @@ const userManage = {
         },
         setRoleForUser(state, role)
         {
-            state.userInfo.role = role;
+            let newRole = {};
+            for(var propertyName in role)
+            {
+                let propertyNameFormat = commonFunction.capitalizeFirstLetter(propertyName);
+                newRole[propertyNameFormat] = role[propertyName];
+            }
+            state.userInfo.role = newRole;
         },
         clearUserInfo(state){
             state.userInfo = null;

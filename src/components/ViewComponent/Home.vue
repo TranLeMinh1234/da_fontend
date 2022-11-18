@@ -387,7 +387,32 @@ export default {
                     break;
                 case EnumTypeNotification.DeleteUserFromGroupTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
-                    me.toast.info(`Bạn đã bị xóa khỏi nhóm công việc ${data.GroupTask.NameGroupTask}`);
+                    if(!me.$route.path.includes("DetailGroupTask"))
+                    {
+                        me.toast.info(`Bạn đã bị xóa khỏi nhóm công việc ${data.NameGroupTask}`);
+                    }
+                    else
+                    {
+                        setTimeout(()=>{
+                            if(me.$route.path.includes("DetailGroupTask") && data.GroupTaskRelateId == me.$route.params.grouptaskid)
+                            {
+                                me.$router.push({name: 'DailyTask'});
+                                me.getAllGroup();
+                                me.closeDialog();
+                            }
+                        },3000);
+                        me.showDialogNotification({
+                            width: "450px",
+                            height: "210px",
+                            borderTop: true
+                        },{
+                            'title': "Cảnh báo",
+                            'content': `Bạn đã bị xóa khỏi nhóm công việc ${data.NameGroupTask}. Chương trình sẽ quay về trang chủ trong 3s.`
+                        }, ()=>{
+                            me.$router.push({name: 'DailyTask'});
+                            me.getAllGroup();
+                        });
+                    }
                     break;
                 case EnumTypeNotification.AssignedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
@@ -420,6 +445,18 @@ export default {
                 case EnumTypeNotification.RemindEndTimeTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
                     me.toast.info(`Công việc "${data.Task?.TaskName ? data.Task?.TaskName : data.TaskName}" đến hạn hoàn thành vào lúc ${me.$commonFunction.parseDateTimeJsToTimeString(data?.Task?.EndTime)} ngày ${me.$commonFunction.parseDateJsToString(data?.Task?.EndTime)}.`);
+                    break;
+                case EnumTypeNotification.ChangeRoleGroupTask:
+                    me.$refs.notification.increaseNumberOfNewNotification();
+                    if(!me.$route.path.includes("DetailGroupTask"))
+                    {
+                        me.toast.info(`Vai trò trong nhóm công việc ${data.NameGroupTask} của bạn đã bị thay đổi.`);
+                    }
+                    else
+                    {
+                        me.toast.info(`Vai trò trong nhóm công việc ${data.NameGroupTask} của bạn đã bị thay đổi.`);
+                        me.setRoleForUser(data.Role);
+                    }
                     break;
                 default:
                     if(me.$route.path.includes('DetailGroupTask'))

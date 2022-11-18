@@ -198,6 +198,8 @@ export default {
                         templateReferenceId: notification.groupTask.templateReferenceId,
                     }});
                     break;
+                case EnumTypeNotification.ChangeRoleGroupTask:
+                    break;
                 default: 
                     break;
             }
@@ -233,6 +235,9 @@ export default {
                     break;
                 case EnumTypeNotification.DeleteGroupTask:
                     stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa nhóm công việc <b>${notification.nameGroupTask}</b>.`;
+                    break;
+                case EnumTypeNotification.ChangeRoleGroupTask:
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã phân vai trò <b>${notification.role.nameRole}</b> cho bạn trong nhóm <b>${notification.groupTask.nameGroupTask}</b>.`;
                     break;
                 default: 
                     break;
