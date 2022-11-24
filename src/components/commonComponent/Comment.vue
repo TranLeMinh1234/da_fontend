@@ -22,7 +22,7 @@
                     :commentId="data.commentId"
                 />
             </div>
-            <div class="feature-comment" v-if="!isEditing && modeOwn == modeCommentControl.Edit">
+            <div class="feature-comment" v-if="!isEditing && modeOwn == modeCommentControl.Edit && canEditComment()">
                 <IconDropDown
                     :config="{
                         width: 160,
@@ -106,6 +106,10 @@ export default {
             type: String,
             default: ''
         },
+        typeTask: {
+            type: [String,Number],
+            default: EnumTypeTask.Personal
+        },
     },
     computed:{
         ...mapGetters('userManage', ['userInfo','isExistsUserInfo']),
@@ -115,6 +119,25 @@ export default {
         let me = this;
     },
     methods: {
+        canEditComment()
+        {
+            let me = this;
+            if(me.typeTask == EnumTypeTask.Group)
+            {
+                if(me.data.createdByEmail == me.userInfo.email
+                || me.userInfo.role.listPermissionCode.includes("AllPermission") 
+                || me.userInfo.role.listPermissionCode.includes("ManageTaskGroup"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }   
+            else
+                return true;
+        },
         deleteComment(){
             let me = this;
             me.$emit('deleteComment', me.data.commentId);

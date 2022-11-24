@@ -38,7 +38,7 @@
                 <div class="user-assigned" v-if="!isAddingTask">Người giao việc: <span>{{dataEdit.assignedBy?.firstName}} {{dataEdit.assignedBy?.lastName}}</span></div>
                 <div class="user-assigned" v-if="isAddingTask">Người giao việc:</div>
                 <div class="one-edit-task d-flex w-100 pd-t-16 j-spread-around">
-                    <div class="one-edit-item assigned-user w-48 d-flex al-center" v-if="!isGroupTypeTask">
+                    <div class="one-edit-item assigned-user w-48 d-flex al-center" v-if="!isCanAssignTask">
                         <img :src="linkImg(dataEdit.assignedFor?.fileAvatarName)" alt="" class="avatar mg-l-10">
                         <div class="info-assigned-user pd-l-16">
                             <div>Người thực hiện</div>
@@ -51,7 +51,7 @@
                             height: 340,
                             directArrow: 'top'
                         }"
-                        v-if="isGroupTypeTask"
+                        v-if="isCanAssignTask"
                         :isShowDropDown="isShowChooseUserDropDown"
                         @showDropDownEvent="showChooseUserDropDown"
                         @closeDropDownEvent="closeChooseUserDropDown"
@@ -206,7 +206,7 @@
                             </div>
                             <div class="pd-l-10 flex-1 w-90">{{index+1}}.{{checkTask.content}}</div>
                             <div class="feature-line-checktask d-none">
-                                <div class="file-icon hole-trash-icon c-poiter" @click="deleteCheckTask(checkTask.checkTaskId)"></div>
+                                <div class="file-icon hole-trash-icon c-poiter" v-if="canDeleteCheckTask(checkTask)" @click="deleteCheckTask(checkTask.checkTaskId)"></div>
                             </div>
                         </div>
                         <div v-if="addingCheckList" class="d-flex al-center pd-8">
@@ -241,7 +241,10 @@
                                 backgroundColor: label.color,
                             }"
                         >
-                            <div class="feature-label file-icon exit-cirle-icon d-none c-poiter" @click="deleteLabelFromList(label.labelId)"></div>
+                            <div 
+                                class="feature-label file-icon exit-cirle-icon d-none c-poiter" 
+                                v-if="canDeleteLabelFromTask(label)"
+                                @click="deleteLabelFromList(label.labelId)"></div>
                             <div>{{label.nameLabel}}</div>
                         </div>
                         <div class="file-icon add-label-detail-icon mg-l-6 c-poiter" @click="showFormAddLabel()"></div>
@@ -263,7 +266,7 @@
                                 <div 
                                     class="file-icon hole-trash-icon c-poiter" 
                                     @click="deleteChildTask(childTask)"
-                                    v-show="checkPermissionDeleteChildTask(childTask)"
+                                    v-if="checkPermissionDeleteChildTask(childTask)"
                                     ></div>
                             </div>
                         </div>
@@ -292,7 +295,7 @@
                                 v-for="fileAttach in dataEdit.lstFileAttachment" :key="fileAttach.fileId"
                                 :data="fileAttach"
                                 @deleteFileAttach="deleteFileAttach"
-                                :displayFeature="true"
+                                :displayFeature="canEditFileAttach(fileAttach)"
                             />
                         </div>
                     </div>
@@ -317,6 +320,7 @@
                         :taskId="option.taskId"
                         @deleteComment="deleteComment"
                         @attachNewFileCommentAdd="attachNewFileCommentAdd"
+                        :typeTask="option.typeTask"
                     />
                     <Comment 
                         class="mg-t-10"
@@ -332,7 +336,19 @@
             <div class="not-primary-content">
                 <div class="d-flex al-center remind-task extra-feature c-poiter" @click="openSettingRemindTask">
                     <div class="file-icon remind-task-icon mg-l-10"></div>
-                    <div class="pd-l-10">Nhắc việc</div>
+                    <div class="pd-l-14">Nhắc việc</div>
+                </div>
+                <div class="d-flex al-center remind-task extra-feature c-poiter" @click="confirmFinishedWork" v-if="checkCanConfirmFinishedWork">
+                    <div class="file-icon confirm-finished-work-icon mg-l-14"></div>
+                    <div class="pd-l-14">Xác nhận hoàn thành công việc</div>
+                </div>
+                <div class="d-flex al-center remind-task extra-feature c-poiter" @click="confirmNotFinishedWork" v-if="checkCanConfirmFinishedWork">
+                    <div class="file-icon confirm-not-finished-work-icon mg-l-14"></div>
+                    <div class="pd-l-14">Đánh dấu chưa hoàn thành công việc</div>
+                </div>
+                <div class="d-flex al-center remind-task extra-feature c-poiter" @click="checkFinishedWork" v-if="checkCanCheckFinishedWork">
+                    <div class="file-icon finished-work-icon mg-l-14"></div>
+                    <div class="pd-l-14">Đánh dấu hoàn thành công việc</div>
                 </div>
                 <div class="d-flex extra-info-task created-by-task" v-if="!isAddingTask">
                     <div class="file-icon created-by-icon mg-t-2"></div> 
@@ -356,7 +372,7 @@
 </template>
 
 <script>
-import {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl, EnumTypeDeadline, EnumTypeGroupTask} from '../../common/js/Enum.js';
+import {EnumStatusTask,EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl, EnumTypeDeadline, EnumTypeGroupTask} from '../../common/js/Enum.js';
 import { uuid } from 'vue-uuid';
 import Modal from '../commonComponent/Modal.vue';
 import IconDropDown from '../commonComponent/IconDropDown.vue';
@@ -430,10 +446,77 @@ export default {
     computed:
     {
         ...mapGetters('userManage', ['userInfo','isExistsUserInfo']),
+        checkCanConfirmFinishedWork()
+        {
+            let me = this;
+            if(me.option.typeTask == EnumTypeTask.Group)
+            {
+                if((me.userInfo.role?.listPermissionCode?.includes("AllPermission") 
+                || me.userInfo.role?.listPermissionCode?.includes("ManageTaskGroup"))
+                && me.dataEdit.assignForEmail != me.userInfo.email && me.dataEdit.status == EnumStatusTask.CheckFinished)
+                {
+                    return true;
+                }
+                else 
+                    return false;
+            }
+            else 
+            {
+                return false;
+            }
+        },
+        checkCanCheckFinishedWork()
+        {
+            let me = this;
+            if(me.option.typeTask == EnumTypeTask.Group)
+            {
+                if(me.dataEdit.status == EnumStatusTask.NeedExecute
+                && me.dataEdit.assignForEmail == me.userInfo.email)
+                {
+                    return true;
+                }
+                else 
+                    return false;
+            }
+            else 
+            {
+                return false;
+            }   
+        },
         isGroupTypeTask: function()
         {
             let me = this;
             return me.option.typeTask == EnumTypeTask.Group;
+        },
+        isCanManageTask: function()
+        {
+            let me = this;
+            if(me.userInfo.role.listPermissionCode.includes('AllPermission') 
+                || me.userInfo.role.listPermissionCode.includes('ManageTaskGroup') 
+            )
+            {
+                return true;
+            }
+            return false;
+        },
+        isCanAssignTask: function()
+        {
+            let me = this;
+            if(me.option.typeTask == EnumTypeTask.Group)
+            {
+                if(me.userInfo.role.listPermissionCode.includes('AllPermission') 
+                    || me.userInfo.role.listPermissionCode.includes('ManageTaskGroup') 
+                )
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+                return false;
         },
         isCheckAll: function()
         {
@@ -455,6 +538,132 @@ export default {
     watch:{
     },
     methods: {
+        canDeleteLabelFromTask(label)
+        {
+            let me = this;
+            if(me.option.typeTask == EnumTypeTask.Group)
+            {
+                if(me.userInfo.role.listPermissionCode.includes('AllPermission') 
+                || me.userInfo.role.listPermissionCode.includes('ManageTaskGroup') 
+                || (label.attachToTaskByEmail == me.userInfo.email))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        },
+        canEditFileAttach(canEditFileAttach)
+        {
+            let me = this;
+            if(me.option.typeTask == EnumTypeTask.Group)
+            {
+                if(me.userInfo.role.listPermissionCode.includes('AllPermission') 
+                || me.userInfo.role.listPermissionCode.includes('ManageTaskGroup') 
+                || (canEditFileAttach.createdByEmail == me.userInfo.email))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                return true;
+            }
+        },
+        canDeleteCheckTask(checkTask)
+        {
+            let me = this;
+            if(me.option.typeTask == EnumTypeTask.Group)
+            {
+                if(me.userInfo.role.listPermissionCode.includes('AllPermission') 
+                || me.userInfo.role.listPermissionCode.includes('ManageTaskGroup') 
+                || (checkTask.createdByEmail == me.userInfo.email))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                return true;
+            }
+        },
+        confirmFinishedWork()
+        {
+            let me = this;
+            me.showDialogConfirm(
+                {
+                    width: '600px',
+                    height: '180px',
+                    borderTop: true
+                },
+                {
+                    'title': 'Cảnh báo',
+                    'content': 'Bạn có chắc muốn xác nhận công việc này đã hoàn thành?'
+                },
+                () =>{
+                    me.callApi('put','api/task/confirmfinishwork',[
+                        me.dataEdit.taskId,
+                        EnumStatusTask.ConfirmedFinished + ""
+                    ],null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+                            me.dataEdit.status = EnumStatusTask.ConfirmedFinished;
+                        }
+                    });
+                }
+            );
+        },
+        confirmNotFinishedWork()
+        {
+            let me = this;
+            me.showDialogConfirm(
+                {
+                    width: '600px',
+                    height: '180px',
+                    borderTop: true
+                },
+                {
+                    'title': 'Cảnh báo',
+                    'content': 'Bạn có chắc muốn đánh dấu công việc này chưa hoàn thành?'
+                },
+                () =>{
+                    me.callApi('put','api/task/confirmfinishwork',[
+                        me.dataEdit.taskId,
+                        EnumStatusTask.NeedExecute + ""
+                    ],null)
+                    .then(res => {
+                        if(res.data.success)
+                        {
+                            me.dataEdit.status = EnumStatusTask.NeedExecute;
+                        }
+                    });
+                }
+            );
+        },
+        checkFinishedWork()
+        {
+            let me = this;
+            me.callApi('put','api/task/checkfinished',{
+                taskId: me.dataEdit.taskId
+            },null)
+            .then(res => {
+                if(res.data.success)
+                {
+                    me.dataEdit.status = EnumStatusTask.CheckFinished;
+                }
+            });
+        },
         checkPermissionDeleteChildTask(childTask)
         {
             let me = this;
@@ -486,35 +695,49 @@ export default {
         openSettingRemindTask()
         {
             let me = this;
-            if(me.dataEdit.startTime || me.dataEdit.endTime)
+            if(me.isCanManageTaskInGroup())
             {
-                me.showDetail('SettingRemindTask',{
-                    width: '430px',
-                    height: 'auto',
-                    borderTop: true
-                }, {
-                    userDoTask: me.dataEdit.assignedFor,
-                    userAssigned: me.dataEdit.assignedBy,
-                    taskId: me.option.taskId,
-                    startTime: me.dataEdit.startTime,
-                    endTime: me.dataEdit.endTime
-                }, null);
+                if(me.dataEdit.startTime || me.dataEdit.endTime)
+                {
+                    me.showDetail('SettingRemindTask',{
+                        width: '430px',
+                        height: 'auto',
+                        borderTop: true
+                    }, {
+                        userDoTask: me.dataEdit.assignedFor,
+                        userAssigned: me.dataEdit.assignedBy,
+                        taskId: me.option.taskId,
+                        startTime: me.dataEdit.startTime,
+                        endTime: me.dataEdit.endTime
+                    }, null);
+                }
+                else
+                {
+                    me.showDialogNotification(
+                        {
+                            width: '430px',
+                            height: '200px',
+                            borderTop: true
+                        },
+                        {
+                            'title': 'Nhắc việc',
+                            'content': 'Vui lòng thiết lập lại thời gian bắt đầu hoặc thời gian kết thúc công việc để thực hiện tính năng này.'
+                        },
+                        () =>{
+                        }
+                    );
+                }
             }
             else
             {
-                me.showDialogNotification(
-                    {
-                        width: '430px',
-                        height: '200px',
-                        borderTop: true
-                    },
-                    {
-                        'title': 'Nhắc việc',
-                        'content': 'Vui lòng thiết lập lại thời gian bắt đầu hoặc thời gian kết thúc công việc để thực hiện tính năng này.'
-                    },
-                    () =>{
-                    }
-                );
+                me.showDialogNotification({
+                    width: "420px",
+                    height: "180px",
+                    borderTop: true
+                },{
+                    'title': "Cảnh báo",
+                    'content': "Bạn không có quyền thực hiện chức năng này."
+                }, undefined);
             }
         },
         commitEndTime(newValue)
@@ -704,14 +927,46 @@ export default {
         showDeadLineTaskDetail()
         {
             let me = this;
-            me.$zindexManage.generateBiggestZindex();
-            me.isShowDeadlineDropDown = true;
+            if(me.isCanManageTaskInGroup())
+            {
+                me.$zindexManage.generateBiggestZindex();
+                me.isShowDeadlineDropDown = true;    
+            }
+            else
+            {
+                me.showDialogNotification({
+                    width: "420px",
+                    height: "180px",
+                    borderTop: true
+                },{
+                    'title': "Cảnh báo",
+                    'content': "Bạn không có quyền thực hiện chức năng này."
+                }, undefined);
+            }
         },
         closeDeadLineTaskDetail()
         {
             let me = this;
             me.$zindexManage.clearBiggestIndex();
             me.isShowDeadlineDropDown = false;
+        },
+        isCanManageTaskInGroup()
+        {
+            let me = this;
+            if(me.option.typeTask == EnumTypeTask.Group)
+            {
+                if(me.userInfo.role.listPermissionCode.includes('AllPermission') 
+                || me.userInfo.role.listPermissionCode.includes('ManageTaskGroup'))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+                return true;
         },
         showChooseUserDropDown()
         {
@@ -913,6 +1168,7 @@ export default {
                         me.dataEdit.assignedFor = data.assignedFor;
                         me.dataEdit.assignedBy = data.assignedBy;
                         me.dataEdit.createdBy = data.createdBy;
+                        me.dataEdit.status = data.status;
 
                         if(data.startTime != null)
                         {
@@ -1386,7 +1642,8 @@ export default {
                     checkTaskId: uuid.v1(),
                     content: me.fakeContentCheckList,
                     status: false,
-                    taskId: me.option.taskId
+                    taskId: me.option.taskId,
+                    createdByEmail: me.userInfo.email
                 };
 
                 me.callApi('post',`api/checktask`,dataSave,null)

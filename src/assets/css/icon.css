@@ -515,3 +515,24 @@
     width: 24px;
     height: 24px;
 }
+
+.finished-work-icon
+{
+    background-position: -136px -424px;
+    width: 24px;
+    height: 24px;
+}
+
+.confirm-finished-work-icon
+{
+    background-position: -648px -354px;
+    width: 24px;
+    height: 24px;
+}
+
+.confirm-not-finished-work-icon
+{
+    background-position: -648px -388px;
+    width: 24px;
+    height: 24px;
+}

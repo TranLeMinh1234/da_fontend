@@ -30,6 +30,8 @@
         <img 
             v-if="checkImgFileExtension(data.extensionOfFile)" 
             :src="linkImg(data.fileName)" 
+            class="c-poiter"
+            @click="Download"
             alt=""
         >
         <div 

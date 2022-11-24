@@ -6,7 +6,7 @@
             :isAddTaskOnColumn="true"
             ref="sorttable"
             :groupTaskInfo="groupTaskInfo"
-            :isAddProcess="true"
+            :isAddProcess="isCanManageTaskInGroup"
             :isUpdateSortableOnServer="true"
             @showDetailTask="showDetailTask"
             @updateDroppedTask="updateDroppedTask"
@@ -95,6 +95,26 @@ export default {
 
         me.groupTaskInfo = me.paramRouter;
         me.loadAllData();
+    },
+    computed:{
+        isCanManageTaskInGroup: function()
+        {
+            let me = this;
+            if(me.paramRouter.typeGroupTask == EnumTypeGroupTask.Group)
+            {
+                if(me.userInfo.role.listPermissionCode.includes('AllPermission') 
+                || me.userInfo.role.listPermissionCode.includes('ManageTaskGroup'))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+                return true;
+        },
     },
     methods:{
         closePopup(callBack)

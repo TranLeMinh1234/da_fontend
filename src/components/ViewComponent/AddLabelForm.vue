@@ -104,6 +104,7 @@ export default {
 
                     if(!isStored)
                     {
+                        labelAdd.attachToTaskByEmail = me.userInfo.email;
                         arrayPush.push(labelAdd);
                         arrayLabelIdAdd.push(labelAdd.labelId);
                     }

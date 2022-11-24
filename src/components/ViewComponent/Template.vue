@@ -22,18 +22,18 @@
                         class="template-item"
                         @click="changeDetailTemplate(index)"
                     >
-                        <div class="delete-template-item d-flex center-items" @click="deleteTemplate(template.templateGroupTaskId)">
+                        <div v-if="canDeleteTemplate(template)" class="delete-template-item d-flex center-items" @click="deleteTemplate(template.templateGroupTaskId)">
                             <div class="file-icon exit-popup-icon"></div>
                         </div>
-                        <div class="txt-threedots">{{template.nameTemplateGroupTask}}</div>
+                        <div class="txt-threedots">{{template?.nameTemplateGroupTask}}</div>
                         <div class="d-flex mg-t-10">
                             <img :src="linkImg(template?.createdBy?.fileAvatarName)" alt="" class="user-avar">
                             <div class="pd-l-12">
-                                <div><i>{{template?.createdBy?.firstName}} {{template?.createdBy?.lastName}}</i></div>
-                                <div><i>{{template?.createdBy?.email}}</i></div>
+                                <div><i>{{nameAuthor(template)}}</i></div>
+                                <div><i>{{emailAuthor(template)}}</i></div>
                             </div>
                         </div>
-                        <div class="mg-t-10">Tạo ngày: {{$commonFunction.parseDateJsToString(template?.createdTime)}}</div>
+                        <div class="mg-t-10">Tạo ngày: {{dateCreated(template)}}</div>
                     </div>
                 </div>
             </div>
@@ -99,11 +99,11 @@
                                 </td>
                                 <td>
                                     <div class="p-relative">
-                                        <div class="d-flex center-items d-none feature-line" v-if="process.isEditing">
+                                        <div class="d-flex center-items d-none feature-line" v-if="process.isEditing && canEditTemplate()">
                                             <div class="file-icon delete-line-icon c-poiter" @click="commitOriginal(process)"></div>
                                             <div class="file-icon green-tick-icon c-poiter mg-l-6" @click="commitEditProcess(process)"></div>
                                         </div> 
-                                        <div class="d-flex center-items d-none feature-line" v-if="!process.isEditing">
+                                        <div class="d-flex center-items d-none feature-line" v-if="!process.isEditing && canEditTemplate()">
                                             <div class="file-icon exit-popup-icon c-poiter" @click="deleteProcess(process)"></div>
                                             <div class="file-icon edit-icon c-poiter mg-l-6" @click="prepareEditProcess(process)"></div>
                                         </div> 
@@ -113,7 +113,7 @@
                             <tr>
                                 <td>
                                     <div class="d-flex center-items">
-                                        <div class="add-new-process d-flex center-items c-poiter" @click="addFakeProcess">
+                                        <div v-if="canEditTemplate()" class="add-new-process d-flex center-items c-poiter" @click="addFakeProcess">
                                             <div class="file-icon plush-white-icon"></div>
                                         </div>
                                     </div>
@@ -234,7 +234,44 @@ export default {
         let me = this;
         me.loadAllData();
     },
+    computed: {
+        
+    },
     methods:{
+        canDeleteTemplate(template)
+        {
+            let me = this;
+            if(template?.createdByEmail != 'admin')
+            {
+                return true;
+            }
+            return false;
+        },
+        canEditTemplate()
+        {
+            let me = this;
+            if(me.listTemplate[me.indexTemplateEdit]?.createdByEmail != 'admin')
+            {
+                return true;
+            }
+            return false;
+        },
+        dateCreated(template)
+        {
+            let me = this;
+            let dateDisplay = me.$commonFunction.parseDateJsToString(template?.createdTime);
+            return dateDisplay ? dateDisplay : '--/--/----';
+        },
+        nameAuthor()
+        {
+            let me = this;
+            return (!template?.createdBy?.firstName && !template?.createdBy?.lastName) ? 'admin' : `${template?.createdBy?.firstName} ${template?.createdBy?.lastName}`;
+        },
+        emailAuthor(template)
+        {
+            let me = this;
+            return template?.createdBy?.email ? template?.createdBy?.email : 'tlminh10300@gmail.com';
+        },
         loadAllData()
         {
             let me = this;

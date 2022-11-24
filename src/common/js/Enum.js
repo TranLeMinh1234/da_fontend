@@ -47,4 +47,10 @@ var EnumTypeNotification = {
     ChangeRoleGroupTask: 11
 }
 
-export {EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask, EnumTypeNotification};
+var EnumStatusTask = { 
+    NeedExecute: 1,
+    CheckFinished: 2,
+    ConfirmedFinished: 3
+}
+
+export {EnumStatusTask, EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask, EnumTypeNotification};

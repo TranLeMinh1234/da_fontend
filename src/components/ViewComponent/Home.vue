@@ -82,7 +82,7 @@
         </div>
         <div id="primary-content">
             <div class="welcome-info" v-show="isShowClock">
-                <div class="hello-sentence">Xin chào Trần Lê Minh</div>
+                <div class="hello-sentence">Xin chào {{userInfo.firstName}} {{userInfo.lastName}}</div>
                 <div class="clock"></div>
             </div>
             <div :class="['header', 'd-flex', 'al-center', 'j-space-between', isDifferentDailyTask ? 'white-header': '']">
@@ -92,7 +92,7 @@
                         v-show="isDifferentDailyTask"
                         @click="changeDailyTaskView"
                     ></div>
-                    <div class="d-flex al-center border-silver-left-right menu-group-task-bg" v-if="isDifferentDailyTask">
+                    <div class="d-flex al-center border-silver-left-right menu-group-task-bg" v-if="isHaveSettingGroupTask">
                         <ItemDropDown
                             :config="{
                                 width: 350,
@@ -345,6 +345,11 @@ export default {
     },
     computed:
     {
+        isHaveSettingGroupTask()
+        {
+            let me = this;
+            return this.$route.fullPath.includes('DetailGroupTask');
+        },
         isDailyTaskView() {
             let me = this;
             return this.$route.fullPath.includes('DailyTask');

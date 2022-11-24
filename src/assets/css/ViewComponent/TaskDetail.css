@@ -186,9 +186,15 @@
 
 .not-primary-content .extra-feature
 {
-    height: 60px;
+    min-height: 60px;
     width: 100%;
     border-bottom: 1px solid silver;
+}
+
+.not-primary-content .extra-feature div:nth-child(2)
+{
+    margin-left: 13px;
+    max-width: 170px;
 }
 
 .not-primary-content .created-by-task{
