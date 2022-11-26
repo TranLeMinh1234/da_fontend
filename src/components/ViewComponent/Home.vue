@@ -20,7 +20,7 @@
                     <div class="logo-option file-icon task-myself-icon"></div>
                     <div class="name-option">Việc của tôi</div>
                 </router-link>
-                <router-link class="option-link d-flex" to="/">
+                <router-link class="option-link d-flex" to="/Statistic" @click.native="goStatisTicView">
                     <div class="logo-option file-icon chart-icon"></div>
                     <div class="name-option">Báo cáo</div>
                 </router-link>
@@ -85,11 +85,11 @@
                 <div class="hello-sentence">Xin chào {{userInfo.firstName}} {{userInfo.lastName}}</div>
                 <div class="clock"></div>
             </div>
-            <div :class="['header', 'd-flex', 'al-center', 'j-space-between', isDifferentDailyTask ? 'white-header': '']">
+            <div :class="['header', 'd-flex', 'al-center', 'j-space-between', isDifferentDailyTask && !isStatisticView ? 'white-header': '']">
                 <div style="width: 450px" class="d-flex al-center">
                     <div 
                         class="file-icon black-home-icon c-poiter mg-l-32"
-                        v-show="isDifferentDailyTask"
+                        v-show="isDifferentDailyTask && !isStatisticView"
                         @click="changeDailyTaskView"
                     ></div>
                     <div class="d-flex al-center border-silver-left-right menu-group-task-bg" v-if="isHaveSettingGroupTask">
@@ -173,7 +173,7 @@
                             }"
                             :isHaveArrow="true"
                             iconClass="black-setting-icon"
-                            v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')"
+                            v-if="userInfo?.role?.listPermissionCode.includes('AllPermission') && !isStatisticView"
                             :isShowDropDown="isShowSettingGroupTask"
                             @showDropDownEvent="showSettingGroupTask"
                             @closeDropDownEvent="closeSettingGroupTask"
@@ -203,7 +203,7 @@
                         <button 
                             :class="['btn-icon', 'btn-silver', 
                             'd-flex', 'al-center', 'c-poiter',
-                            isDifferentDailyTask ? 'blue-add-btn':'']"
+                            isDifferentDailyTask && !isStatisticView ? 'blue-add-btn':'']"
                         >
                             <div class="d-flex al-center" @click="openFormAddNewTask">
                                 <div class="file-icon plush-white-icon"></div>
@@ -275,18 +275,18 @@
                             <button class="btn btn-primary mg-l-10" @click="excuteFilterDailyTask">Lọc</button>
                         </div>
                     </IconDropDown>
-                    <div :class="['file-icon',isDifferentDailyTask? 'big-black-search-icon':'big-white-search-icon','c-poiter']"></div>
+                    <div :class="['file-icon',isDifferentDailyTask && !isStatisticView? 'big-black-search-icon':'big-white-search-icon','c-poiter']"></div>
                     <Notification 
                         ref="notification"
-                        :icon="isDifferentDailyTask? 'bell-black-icon':'bell-white-icon'"
+                        :icon="isDifferentDailyTask && !isStatisticView? 'bell-black-icon':'bell-white-icon'"
                     />
-                    <div :class="['file-icon',isDifferentDailyTask? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
+                    <div :class="['file-icon',isDifferentDailyTask && !isStatisticView? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
                     <PersonalSetting />
                 </div>
             </div>
             <div class="body">
                 <router-view v-slot="{ Component }">
-                    <component ref="view" :is="Component" @closeView="closeView"/>
+                    <component ref="view" :is="Component" @closeView="closeView" :option="optionView"/>
                 </router-view>
             </div>
         </div>
@@ -348,11 +348,16 @@ export default {
         isHaveSettingGroupTask()
         {
             let me = this;
-            return this.$route.fullPath.includes('DetailGroupTask');
+            return me.$route.fullPath.includes('DetailGroupTask');
+        },
+        isStatisticView()
+        {
+            let me = this;
+            return me.$route.fullPath.includes('Statistic');
         },
         isDailyTaskView() {
             let me = this;
-            return this.$route.fullPath.includes('DailyTask');
+            return me.$route.fullPath.includes('DailyTask');
         }
     },
     watch: {
@@ -363,6 +368,10 @@ export default {
                 me.isDifferentDailyTask = true;
                 me.isShowClock = false;
                 me.isShowMenu = false;
+            }
+            else if(newValue.path.includes('Statistic'))
+            {
+                me.isDifferentDailyTask = true;
             }
             else if(newValue.path.includes('DailyTask'))
             {
@@ -473,6 +482,27 @@ export default {
         };
     },
     methods: {
+        goStatisTicView()
+        {
+            let me = this;
+
+            if(me.lstGroupCommunityTask?.length > 0)
+            {
+                me.currentGroupTask = me.lstGroupCommunityTask[0];
+            }
+
+            if(!me.currentGroupTask && me.lstGroupPersonalTask?.length > 0)
+            {
+                me.currentGroupTask = me.lstGroupPersonalTask[0];
+            }
+
+            me.isDifferentDailyTask = true;
+            me.isShowClock = false;
+
+            me.optionView = {
+                groupTask: me.currentGroupTask
+            };
+        },
         openAddMemberForm()
         {
             let me = this;
@@ -516,17 +546,24 @@ export default {
         goDetailGroupTask(groupTask)
         {
             let me = this;
-            me.isDifferentDailyTask = true;
-            me.isShowClock = false;
-            me.isShowMenu = false;
-            me.isShowMenuGroupTask = false;
-            me.currentGroupTask = groupTask;
-            me.$router.push({name: 'DetailGroupTask', params: {
-                grouptaskid: groupTask.groupTaskId,
-                typegrouptask: groupTask.typeGroupTask,
-                taskdetailid: 'all',
-                templateReferenceId: groupTask.templateReferenceId,
-            }});
+            if(!me.$route.path.includes('Statistic'))
+            {
+                me.isDifferentDailyTask = true;
+                me.isShowClock = false;
+                me.isShowMenu = false;
+                me.isShowMenuGroupTask = false;
+                me.currentGroupTask = groupTask;
+                me.$router.push({name: 'DetailGroupTask', params: {
+                    grouptaskid: groupTask.groupTaskId,
+                    typegrouptask: groupTask.typeGroupTask,
+                    taskdetailid: 'all',
+                    templateReferenceId: groupTask.templateReferenceId,
+                }});
+            }
+            else
+            {
+
+            }
         },
         loadAllData()
         {
@@ -799,6 +836,7 @@ export default {
     data()
     {
         return {
+            optionView: {},
             isShowSettingGroupTask: false,
             lstGroupCommunityTaskHeader: [],
             lstGroupPersonalTaskHeader: [],

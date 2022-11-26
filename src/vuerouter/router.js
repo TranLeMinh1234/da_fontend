@@ -2,8 +2,9 @@ import Home from '../components/ViewComponent/Home.vue';
 import Test from '../components/ViewComponent/Test.vue';
 import Login from '../components/ViewComponent/Login.vue';
 import DailyTask from '../components/ViewComponent/DailyTask.vue';
-import Template from '../components/ViewComponent/Template.vue'
-import DetailGroupTask from '../components/ViewComponent/DetailGroupTask.vue'
+import Template from '../components/ViewComponent/Template.vue';
+import DetailGroupTask from '../components/ViewComponent/DetailGroupTask.vue';
+import Statistic from '../components/ViewComponent/Statistic.vue';
 import { createRouter,createWebHistory} from 'vue-router';
 
 var routes = [
@@ -25,7 +26,12 @@ var routes = [
                 name: 'DetailGroupTask',
                 path: '/DetailGroupTask/:grouptaskid/:templateReferenceId/:typegrouptask/:taskdetailid',
                 component: DetailGroupTask
-            }
+            },
+            {
+                name: 'Statistic',
+                path: '/Statistic',
+                component: Statistic
+            },
         ]
     },
     { path: '/Test', component: Test },

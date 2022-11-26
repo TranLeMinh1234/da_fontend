@@ -42,7 +42,13 @@ export default {
        
     },
     props:{
-        
+        option: {
+            type: Object,
+            default: function(rawProps)
+            {
+                return rawProps?.option;
+            }
+        }
     },
     methods: {
         getDailyTask(startTime,endTime)

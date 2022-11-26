@@ -1,0 +1,43 @@
+#statistic{
+    width: 100%;
+    height: 100%;
+    overflow: overlay;
+}
+
+#statistic .general{
+    padding: 10px 100px 10px 100px;
+}
+
+#statistic .general .general-item
+{
+    width: 400px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+#statistic .general .general-item .header
+{
+    color: black;
+    box-shadow: none;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+#statistic .general .general-item .content{
+    color: black;
+    font-size: 32px;
+    padding-left: 24px;
+}
+
+#statistic .task-each-member
+{
+    padding: 10px 100px 10px 100px;
+}
+
+#statistic .task-each-member .container-chart
+{
+    background-color: white;
+    border-radius: 20px;
+    padding: 24px;
+}

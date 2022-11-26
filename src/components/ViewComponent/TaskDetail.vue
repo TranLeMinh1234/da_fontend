@@ -451,8 +451,11 @@ export default {
             let me = this;
             if(me.option.typeTask == EnumTypeTask.Group)
             {
-                if((me.userInfo.role?.listPermissionCode?.includes("AllPermission") 
-                || me.userInfo.role?.listPermissionCode?.includes("ManageTaskGroup"))
+                if(me.userInfo.role?.listPermissionCode?.includes("AllPermission") && me.dataEdit.status == EnumStatusTask.CheckFinished)
+                {
+                    return true;
+                }
+                else if(me.userInfo.role?.listPermissionCode?.includes("ManageTaskGroup")
                 && me.dataEdit.assignForEmail != me.userInfo.email && me.dataEdit.status == EnumStatusTask.CheckFinished)
                 {
                     return true;
@@ -470,7 +473,11 @@ export default {
             let me = this;
             if(me.option.typeTask == EnumTypeTask.Group)
             {
-                if(me.dataEdit.status == EnumStatusTask.NeedExecute
+                if(me.userInfo.role?.listPermissionCode?.includes("AllPermission") && me.dataEdit.status == EnumStatusTask.NeedExecute)
+                {
+                    return true;
+                }
+                else if(me.dataEdit.status == EnumStatusTask.NeedExecute
                 && me.dataEdit.assignForEmail == me.userInfo.email)
                 {
                     return true;
