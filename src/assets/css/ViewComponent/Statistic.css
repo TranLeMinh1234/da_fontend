@@ -2,6 +2,7 @@
     width: 100%;
     height: 100%;
     overflow: overlay;
+    padding: 20px 40px 20px 40px;
 }
 
 #statistic .general{
@@ -14,9 +15,10 @@
     background-color: rgb(255, 255, 255);
     border-radius: 20px;
     padding: 24px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.274);
 }
 
-#statistic .general .general-item .header
+#statistic .general .general-item .header-general-item
 {
     color: black;
     box-shadow: none;
@@ -41,3 +43,122 @@
     border-radius: 20px;
     padding: 24px;
 }
+
+#statistic .task-each-member
+{
+    width: 73%;
+    padding: 10px 100px 10px 100px;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.349);
+    border-radius: 20px;
+    margin-left: 16px;
+}
+
+#statistic .general-chart{
+    padding: 10px 100px 10px 100px;
+    width: 26%;
+    height: 384px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.349);
+}
+
+#statistic .status-tasks-each-member
+{
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.349);
+    height: 600px;
+    border-radius: 20px;
+}
+
+#statistic .title-chart{
+    color: #585858;
+    font-size: 19px;
+    font-weight: 600;
+}
+
+#statistic .status-tasks-each-member .filter-chart
+{
+    width: 300px;
+}
+
+#statistic .status-tasks-each-member .table-statistic
+{
+    width: 100%;
+    height: 525px;
+}
+
+#statistic .status-tasks-each-member .table-statistic table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#statistic .status-tasks-each-member .table-statistic table thead {
+    border-bottom: 1px solid silver;
+}
+
+#statistic .status-tasks-each-member .table-statistic table thead td{
+    font-weight: 600;
+    color: #666;
+    padding: 14px;
+    text-align: center;
+}
+
+#statistic .status-tasks-each-member .table-statistic thead, tbody tr {
+    display: table;
+    width: 100%;
+    height: 58px;
+    table-layout: fixed;/* even columns width , fix width of table too*/
+}
+
+#statistic .status-tasks-each-member .table-statistic tbody tr td{
+    text-align: center;
+    border: 1px solid silver;
+    padding: 14px;
+}
+
+#statistic .status-tasks-each-member .table-statistic tbody{
+    display: block;
+    height: 475px;
+    overflow: overlay;
+}
+
+#statistic .status-tasks-each-member .table-statistic tbody tr td:last-child{
+    border-width: 1px 0px 1px 1px;   
+    border-color: silver;
+    border-style: solid;
+}
+
+#statistic .status-tasks-each-member .table-statistic tbody tr td:first-child{
+    border-width: 1px 1px 1px 0px;   
+    border-color: silver;
+    border-style: solid;
+}
+
+#statistic .table-statistic img
+{
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    object-fit: cover;
+}
+
+.num-personal-tasks
+{
+    width: 100%;
+    height: 70%;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.349);
+    border-radius: 20px;
+    padding: 16px;
+}
+
+#statistic .num-personal-tasks .filter-chart
+{
+    width: 300px;
+}
+
+.tab-view-background .body .tab-content .num-personal-tasks-chart
+{
+    width: 100%;
+}
+    

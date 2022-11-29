@@ -1,7 +1,7 @@
 <template>
-    <Bar
+    <Line
         :chart-options="chartOptions"
-        :chart-data="chartData"
+        :chartData="chartData"
         :chart-id="chartId"
         :dataset-id-key="datasetIdKey"
         :plugins="plugins"
@@ -13,16 +13,17 @@
 </template>
 
 <script>
-import { Bar } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
+import { Line } from 'vue-chartjs';
+import 'chartjs-adapter-moment';
+import { Chart as ChartJS,TimeScale,PointElement, LineElement, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Filler} from 'chart.js';
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
+ChartJS.register(TimeScale, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement, Filler);
 
 export default {
-    name:"Test",
+    name:"LineChart",
     components: 
     {
-        Bar
+        Line
     },
     created(){
         let me = this;
@@ -37,7 +38,7 @@ export default {
     props: {
         chartId: {
             type: String,
-            default: 'bar-chart'
+            default: 'line-chart'
         },
         datasetIdKey: {
             type: String,
@@ -67,14 +68,6 @@ export default {
             type: Object,
             default: () => {}
         },
-        stacked: {
-            type: Boolean,
-            default: false
-        },
-        indexAxis: {
-            type: String,
-            default: 'x'
-        },
         chartData: {
             type: Object,
             default: () => {}
@@ -87,35 +80,22 @@ export default {
     {
         return {
             chartOptions: {
-                animation: {
-                    duration: 0
-                },
-                responsiveAnimationDuration: 0,
-                borderWidth: 1,
-                indexAxis: this.indexAxis,
-                barPercentage: 0.8,
-                categoryPercentage: 1,
-                // bỏ kẻ sọc ngnang
                 scales: {
                     x: {
-                        type: 'linear',
-                        ticks: {
-                            stepSize: 1
-                        },
-                        stacked: this.stacked,
                         grid: {
                             display:false
                         }
                     },
                     y: {
-                        stacked: this.stacked,
+                        type: 'linear',
+                        ticks: {
+                            stepSize: 1,
+                        },
+                        beginAtZero: true,
                         grid: {
                             display:false
-                        },
-                        ticks:{
-                            stepSize: 1
                         }
-                    }
+                    },
                 },
                 plugins: {
                     title: {
@@ -128,13 +108,14 @@ export default {
                     },
                     legend: {
                         labels: {
-                            // This more specific font property overrides the global property
                             font: {
                                 size: 14
                             }
                         },
                     },    
-
+                    datalabels: {
+                        align: 'center'
+                    }
                 },
                 
             }

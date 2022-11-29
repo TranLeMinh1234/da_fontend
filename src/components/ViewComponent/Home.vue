@@ -85,11 +85,11 @@
                 <div class="hello-sentence">Xin chào {{userInfo.firstName}} {{userInfo.lastName}}</div>
                 <div class="clock"></div>
             </div>
-            <div :class="['header', 'd-flex', 'al-center', 'j-space-between', isDifferentDailyTask && !isStatisticView ? 'white-header': '']">
+            <div :class="['header', 'd-flex', 'al-center', 'j-space-between', isDifferentDailyTask? 'white-header': '']">
                 <div style="width: 450px" class="d-flex al-center">
                     <div 
                         class="file-icon black-home-icon c-poiter mg-l-32"
-                        v-show="isDifferentDailyTask && !isStatisticView"
+                        v-show="isDifferentDailyTask"
                         @click="changeDailyTaskView"
                     ></div>
                     <div class="d-flex al-center border-silver-left-right menu-group-task-bg" v-if="isHaveSettingGroupTask">
@@ -173,7 +173,7 @@
                             }"
                             :isHaveArrow="true"
                             iconClass="black-setting-icon"
-                            v-if="userInfo?.role?.listPermissionCode.includes('AllPermission') && !isStatisticView"
+                            v-if="userInfo?.role?.listPermissionCode.includes('AllPermission')"
                             :isShowDropDown="isShowSettingGroupTask"
                             @showDropDownEvent="showSettingGroupTask"
                             @closeDropDownEvent="closeSettingGroupTask"
@@ -203,7 +203,7 @@
                         <button 
                             :class="['btn-icon', 'btn-silver', 
                             'd-flex', 'al-center', 'c-poiter',
-                            isDifferentDailyTask && !isStatisticView ? 'blue-add-btn':'']"
+                            isDifferentDailyTask ? 'blue-add-btn':'']"
                         >
                             <div class="d-flex al-center" @click="openFormAddNewTask">
                                 <div class="file-icon plush-white-icon"></div>
@@ -275,12 +275,12 @@
                             <button class="btn btn-primary mg-l-10" @click="excuteFilterDailyTask">Lọc</button>
                         </div>
                     </IconDropDown>
-                    <div :class="['file-icon',isDifferentDailyTask && !isStatisticView? 'big-black-search-icon':'big-white-search-icon','c-poiter']"></div>
+                    <div :class="['file-icon',isDifferentDailyTask? 'big-black-search-icon':'big-white-search-icon','c-poiter']"></div>
                     <Notification 
                         ref="notification"
-                        :icon="isDifferentDailyTask && !isStatisticView? 'bell-black-icon':'bell-white-icon'"
+                        :icon="isDifferentDailyTask? 'bell-black-icon':'bell-white-icon'"
                     />
-                    <div :class="['file-icon',isDifferentDailyTask && !isStatisticView? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
+                    <div :class="['file-icon',isDifferentDailyTask? 'more-feature-black-icon':'more-feature-white-icon','c-poiter']"></div>
                     <PersonalSetting />
                 </div>
             </div>
@@ -348,7 +348,7 @@ export default {
         isHaveSettingGroupTask()
         {
             let me = this;
-            return me.$route.fullPath.includes('DetailGroupTask');
+            return me.$route.fullPath.includes('DetailGroupTask') || me.$route.fullPath.includes('Statistic');
         },
         isStatisticView()
         {
@@ -498,6 +498,7 @@ export default {
 
             me.isDifferentDailyTask = true;
             me.isShowClock = false;
+            me.isShowMenu = false;
 
             me.optionView = {
                 groupTask: me.currentGroupTask

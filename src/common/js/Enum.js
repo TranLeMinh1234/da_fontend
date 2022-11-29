@@ -53,4 +53,14 @@ var EnumStatusTask = {
     ConfirmedFinished: 3
 }
 
-export {EnumStatusTask, EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask, EnumTypeNotification};
+var EnumTimeFilter = {
+    CurrentWeek: 1,
+    CurrentMonth: 2,
+    Today: 3,
+    BeforeMonth: 4,
+    BeforeWeek: 5,
+    NextWeek: 6,
+    NextMonth: 7
+}
+
+export {EnumTimeFilter, EnumStatusTask, EnumEditMode,EnumTypeTask,EnumAttachment, EnumModeUseControl,EnumTypeDeadline, EnumTypeGroupTask, EnumTypeNotification};

@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import DialogNotification from '../../components/commonComponent/DialogNotification.vue';
+import {EnumTimeFilter} from '../js/Enum.js';
 
 var commonFunction = {
     isNumeric: (str) => {
@@ -79,6 +80,124 @@ var commonFunction = {
     },
     capitalizeFirstLetter(string) {
         return string.charAt(0).toLowerCase() + string.slice(1);
+    },
+    getDataTimeFilter()
+    {
+        return [
+            {
+                valueTime: EnumTimeFilter.CurrentWeek,
+                titleTime: "Tuần này"
+            },
+            {
+                valueTime: EnumTimeFilter.CurrentMonth,
+                titleTime: "Tháng này"
+            },
+            {
+                valueTime: EnumTimeFilter.Today,
+                titleTime: "Hôm nay" 
+            },
+            {
+                valueTime: EnumTimeFilter.BeforeMonth,
+                titleTime: "Tháng trước" 
+            },
+            {
+                valueTime: EnumTimeFilter.BeforeWeek,
+                titleTime: "Tuần trước" 
+            },
+            {
+                valueTime: EnumTimeFilter.NextWeek,
+                titleTime: "Tuần sau" 
+            },
+            {
+                valueTime: EnumTimeFilter.NextMonth,
+                titleTime: "Tháng sau" 
+            },
+        ];
+    },
+    getDistanceTimeFilter(valueTime)
+    {
+        let dataReturn = {
+            startTime: null,
+            endTime: null
+        };
+
+        switch(valueTime)
+        {
+            case EnumTimeFilter.CurrentWeek:
+                var curr = new Date(); // get current date
+                var firstDay = new Date(curr.setDate(curr.getDate() - curr.getDay() + 1)); // First day is the day of the month - the day of the week
+                var lastDay = new Date(curr.setDate(firstDay.getDate() + 6)); // last day is the first day + 6
+
+                firstDay.setHours(0, 0, 0);
+                lastDay.setHours(23, 59, 59);
+                dataReturn.startTime = firstDay;
+                dataReturn.endTime = lastDay;
+                break;
+            case EnumTimeFilter.CurrentMonth:
+                var date = new Date();
+                var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+                var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+                firstDay.setHours(0, 0, 0);
+                lastDay.setHours(23, 59, 59);
+                dataReturn.startTime = firstDay;
+                dataReturn.endTime = lastDay;
+                break;
+            case EnumTimeFilter.Today:
+                var curr = new Date(); // get current date
+                var firstDay = new Date(curr); // First day is the day of the month - the day of the week
+                var lastDay = new Date(curr); // last day is the first day + 6
+
+                firstDay.setHours(0, 0, 0);
+                lastDay.setHours(23, 59, 59);
+                dataReturn.startTime = firstDay;
+                dataReturn.endTime = lastDay;
+                break;
+            case EnumTimeFilter.BeforeMonth:
+                var date = new Date();
+                var firstDay = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+                var lastDay = new Date(date.getFullYear(), date.getMonth(), 0);
+
+                firstDay.setHours(0, 0, 0);
+                lastDay.setHours(23, 59, 59);
+                dataReturn.startTime = firstDay;
+                dataReturn.endTime = lastDay;
+                break;
+            case EnumTimeFilter.BeforeWeek:
+                var curr = new Date(); // get current date
+                var firstDay = new Date(curr.setDate(curr.getDate() - curr.getDay() - 6)); // First day is the day of the month - the day of the week
+                var lastDay = new Date(curr.setDate(firstDay.getDate() + 6)); // last day is the first day + 6
+
+                firstDay.setHours(0, 0, 0);
+                lastDay.setHours(23, 59, 59);
+                dataReturn.startTime = firstDay;
+                dataReturn.endTime = lastDay;
+                break;
+            case EnumTimeFilter.NextWeek:
+                var curr = new Date(); // get current date
+                var firstDay = new Date(curr.setDate(curr.getDate() - curr.getDay() + 8)); // First day is the day of the month - the day of the week
+                var lastDay = new Date(curr.setDate(firstDay.getDate() + 6)); // last day is the first day + 6
+
+                firstDay.setHours(0, 0, 0);
+                lastDay.setHours(23, 59, 59);
+                dataReturn.startTime = firstDay;
+                dataReturn.endTime = lastDay;
+                break;
+            case EnumTimeFilter.NextMonth:
+                var date = new Date();
+                var firstDay = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+                var lastDay = new Date(date.getFullYear(), date.getMonth() + 2, 0);
+
+                firstDay.setHours(0, 0, 0);
+                lastDay.setHours(23, 59, 59);
+                dataReturn.startTime = firstDay;
+                dataReturn.endTime = lastDay;
+                break;
+            default: 
+                break;
+        }
+
+        return dataReturn;
     }
 };
 
