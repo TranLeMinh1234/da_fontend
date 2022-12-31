@@ -1,16 +1,16 @@
 <template>
     <div class="add-grouptask-form">
         <div class="header pd-16 fs-24 fw-600">
-            Thêm nhóm công việc
+            Thêm công việc phức tạp
         </div>
         <div class="body-content pd-16">
-            <div class="fs-18">Tên nhóm công việc*:</div>
+            <div class="fs-18">Tên công việc*:</div>
             <MInput 
                 placeholder="Nhập tên nhóm công việc..."
                 v-model="newGroupTask.nameGroupTask"
                 :isValidate="false"
             />
-            <div class="fs-18 pd-t-16 fw-500">Loại nhóm công việc:</div>
+            <div class="fs-18 pd-t-16 fw-500">Loại công việc:</div>
             <LocalCombobox 
                 :configField="{
                     displayField: 'nameTypeGroupTask',
@@ -22,7 +22,7 @@
                 :data="dataTypeGroupTask"
                 v-model="newGroupTask.typeGroupTask"
             />
-            <div class="fs-18 pd-t-16 fw-500">Mẫu quy trìn công việc:</div>
+            <div class="fs-18 pd-t-16 fw-500">Mẫu quy trình công việc:</div>
             <LocalCombobox 
                 :configField="{
                     displayField: 'nameTemplateGroupTask',

@@ -264,3 +264,13 @@
     width: 100%;
     overflow: auto;
 }
+
+.task-detail .loadding-form{
+    width: 100%;
+    padding: 24px;
+}
+
+.task-detail .loadding-form div.loadding-skeleton
+{
+    border-radius: 8px;
+}

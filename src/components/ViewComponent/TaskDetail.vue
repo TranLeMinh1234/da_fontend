@@ -1,10 +1,22 @@
 <template>
-    
     <div class="task-detail">
         <div class="background-adding-task" v-if="isAddingTask">
             <input type="text" v-model="nameNewTask" placeholder="Nhập tên công việc" ref="inpNewTask" @blur="addNewTask">
         </div>
-        <div class="header-feature d-flex j-end">
+        <div class="loadding-form" v-if="isLoadingData && !isAddingTask">
+            <div class="d-flex j-end">
+                <div class="file-icon c-poiter exit-popup-icon" @click="closeTaskDetailPopup()"></div>
+            </div>
+            <div class="loadding-skeleton" style="height: 60px;margin-top: 10px"></div>
+            <div class="loadding-skeleton" style="height: 40px;width: 350px;;margin-top:10px"></div>
+            <div class="d-flex" style="margin-top:10px">
+                <div class="loadding-skeleton" style="height: 70px;flex: 1"></div>
+                <div style="flex: 0.1"></div>
+                <div class="loadding-skeleton" style="height: 70px;flex: 1"></div>
+            </div>
+            <div class="loadding-skeleton" style="height: 300px;width: 100%;margin-top:10px"></div>
+        </div>
+        <div class="header-feature d-flex j-end" v-if="!isLoadingData || isAddingTask">
             <div class="lst-feature d-flex al-center j-spread-around">
                 <div class="file-icon c-poiter command-direct-icon"></div>
                 <div class="file-icon c-poiter child-task-icon"></div>
@@ -32,7 +44,7 @@
                 <div class="file-icon c-poiter exit-popup-icon" @click="closeTaskDetailPopup()"></div>
             </div>
         </div>
-        <div class="body-task d-flex">
+        <div class="body-task d-flex"  v-if="!isLoadingData || isAddingTask">
             <div :class="['primary-content', isAddingTask? 'mg-t-60':'']">
                 <div class="name-task txt-threedots fw-600" v-if="!isAddingTask">{{dataEdit.taskName}}</div>
                 <div class="user-assigned" v-if="!isAddingTask">Người giao việc: <span>{{dataEdit.assignedBy?.firstName}} {{dataEdit.assignedBy?.lastName}}</span></div>
@@ -1455,11 +1467,11 @@ export default {
             me.countLoad++;
             if(me.countLoad == 5 && me.option.editMode == EnumEditMode.Edit)
             {
-                
+                me.isLoadingData = false;
             }
             else if(me.countLoad == 4 && me.option.editMode == EnumEditMode.Add)
             {
-
+                me.isLoadingData = false;
             }
         },
         linkImg(fileName)
@@ -1713,6 +1725,14 @@ export default {
         closeTaskDetailPopup()
         {
             let me = this;
+            if(me.isLoadingData)
+            {
+                me.$emit('closePopup',
+                    null,
+                    null);
+                return;
+            }
+
             let callbackWhenClosePopup = function(){};
             
             if(me.option.typeTask == EnumTypeTask.Personal)

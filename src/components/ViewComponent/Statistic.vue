@@ -214,7 +214,6 @@ export default {
         {
             let me = this;
             me.dataTime = me.$commonFunction.getDistanceTimeFilter(timeValueSelect);
-            debugger
             if(me.dataTime)
             {
                 me.getNumOfTaskPersonal();

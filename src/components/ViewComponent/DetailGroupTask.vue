@@ -13,7 +13,7 @@
             @updateDroppedProcess="updateDroppedProcess"
             @addNewTaskInProcess="addNewTaskInProcess"
             @addNewProcess="addNewProcess"
-            v-if="isDoneLoadData"
+            v-if="isDoneLoadData && !isRefreshSortable"
         />
         <div
             :class="['filter-bar']"
@@ -240,9 +240,9 @@ export default {
                     }
                 );
 
+                let maxIndexChange = Math.max(processInfo.newIndex,processInfo.oldIndex),
+                    minIndexChange = Math.min(processInfo.newIndex,processInfo.oldIndex);
                 me.templateGroupTask.listProcess.forEach(process => {
-                    let maxIndexChange = Math.max(processInfo.newIndex,processInfo.oldIndex),
-                        minIndexChange = Math.min(processInfo.newIndex,processInfo.oldIndex);
                     if(
                         process.processId != processInfo.processId &&
                         processInfo.newIndex < processInfo.oldIndex &&
@@ -278,6 +278,12 @@ export default {
                 });
                 
                 processDroped.sortOrder = processInfo.newIndex;
+                me.templateGroupTask.listProcess.sort((objectLeft,objectRight) => {
+                    return objectLeft.sortOrder - objectRight.sortOrder;
+                });
+
+                me.loader = me.$loading.show();
+                me.isRefreshSortable = true;
 
                 if(processesAffected.length > 0)
                 {
@@ -285,7 +291,10 @@ export default {
                     .then(res => {
                         if(res.data.success)
                         {
-
+                            me.isRefreshSortable = false;
+                            setTimeout(() => {
+                               me.loader.hide(); 
+                            }, 1000);
                         }
                     });
                 }
@@ -325,7 +334,8 @@ export default {
                                 {
                                     taskId: taskDropped.taskId,
                                     processId: taskInfo.toProcessId,
-                                    sortOrder: taskDropped.sortOrder
+                                    sortOrder: taskDropped.sortOrder,
+                                    groupTaskId: me.groupTaskInfo.groupTaskId
                                 }
                             );
 
@@ -333,7 +343,8 @@ export default {
                                 {
                                     taskId: taskMoved.taskId,
                                     processId: taskInfo.toProcessId,
-                                    sortOrder: taskMoved.sortOrder
+                                    sortOrder: taskMoved.sortOrder,
+                                    groupTaskId: me.groupTaskInfo.groupTaskId
                                 }
                             );
                         }
@@ -355,7 +366,8 @@ export default {
                                     {
                                         taskId: task.taskId,
                                         processId: taskInfo.fromProcessId,
-                                        sortOrder: task.sortOrder
+                                        sortOrder: task.sortOrder,
+                                        groupTaskId: me.groupTaskInfo.groupTaskId
                                     }
                                 );
                             }
@@ -379,7 +391,8 @@ export default {
                                     {
                                         taskId: task.taskId,
                                         processId: taskInfo.toProcessId,
-                                        sortOrder: task.sortOrder
+                                        sortOrder: task.sortOrder,
+                                        groupTaskId: me.groupTaskInfo.groupTaskId
                                     }
                                 );
                             }
@@ -394,7 +407,8 @@ export default {
                             {
                                 taskId: taskDropped.taskId,
                                 processId: taskInfo.toProcessId,
-                                sortOrder: taskDropped.sortOrder
+                                sortOrder: taskDropped.sortOrder,
+                                groupTaskId: me.groupTaskInfo.groupTaskId
                             }
                         );
                     }
@@ -418,6 +432,7 @@ export default {
         {
             let me = this;
             me.countDoneLoadData = 0;
+            me.isDoneLoadData = false;
             me.loader = me.$loading.show();
             me.getById();
             me.getListUserJoined();
@@ -547,6 +562,11 @@ export default {
                 me.loader.hide();
                 me.numberOfNewUpdate = 0;
                 let taskOpen = null;
+
+                me.templateGroupTask.listProcess.sort((objectLeft,objectRight) => {
+                    return objectLeft.sortOrder - objectRight.sortOrder;
+                });
+
                 me.listTask.forEach(task => {
                     me.templateGroupTask.listProcess.forEach(process => {
                         if(!process.lstTask)
@@ -638,6 +658,7 @@ export default {
             isShowDetail: false,
             configModal: null,
             callbackOutsideComponent: null,
+            isRefreshSortable: false
         }
     }
 }

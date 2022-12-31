@@ -41,7 +41,7 @@
                             @click="showHidePersonalGroup()"
                         >
                         </div>
-                        <div class="lst-group-title">Cá nhân</div>
+                        <div class="lst-group-title">Công việc cá nhân</div>
                     </div>
                     <div class="lst-group" v-show="isShowPersonalGroup">
                         <div v-for="groupPersonal in lstGroupPersonalTask" :key="groupPersonal.groupTaskId" 
@@ -59,7 +59,7 @@
                             @click="showHideCommunityGroup()"
                         >
                         </div>
-                        <div class="lst-group-title">Hội nhóm</div>
+                        <div class="lst-group-title">Công việc hội nhóm</div>
                     </div>
                     <div class="lst-group" v-show="isShowCommunityGroup">
                         <div v-for="groupCommunity in lstGroupCommunityTask" :key="groupCommunity.groupTaskId" 
@@ -232,7 +232,7 @@
                                         </div>
                                         <div class="d-flex al-center menu-add-item c-poiter" @click="openFormAddGroupTask">
                                             <div class="file-icon add-group-task-icon mg-l-10"></div>
-                                            <div class="pd-l-10">Thêm nhóm công việc</div>
+                                            <div class="pd-l-10">Thêm công việc phức tạp</div>
                                         </div>
                                     </div>
                                 </IconDropDown>    

@@ -3,14 +3,15 @@
         <div v-for="(column,index) in lstColumnTask" :key="column.proccessId"
             class="column-task"
             :processId="column.processId"
+            :index="column.sortOrder"
             :style="{
-                backgroundColor: columnColorResult(index)
+                backgroundColor: columnColorResult(index, column)
             }"
             >
                 <div 
                     :class="
                         [
-                            'header-column', 'd-flex', 'center-items', 'c-poiter', 
+                            'header-column', 'd-flex', 'center-items', isAdminGroupTask? 'c-poiter dragable-header' : '', 
                             isHaveHeader? '': 'd-none',
                         ]"
                     :style="{
@@ -48,7 +49,7 @@
         <div
             :class="['column-add-new-process']"
             :style="{
-                backgroundColor: columnColorResult(lstColumnTask.length)
+                backgroundColor: columnColorResult(lstColumnTask?.length)
             }"
             v-if="isAddProcess"
         >
@@ -86,7 +87,7 @@ import { uuid } from 'vue-uuid';
 export default {
     name: "SortTable",
     extends: BaseViewDetail,
-    emits: ['addNewTaskInProcess','updateDroppedTask','addNewProcess'],
+    emits: ['addNewTaskInProcess','updateDroppedTask','addNewProcess','updateDroppedProcess'],
     components: {
         Task,
         Modal,
@@ -94,7 +95,7 @@ export default {
         MInput
     },
     created(){
-
+        let me = this;
     },
     mounted(){
         let me = this;
@@ -106,10 +107,9 @@ export default {
             animation: 600,
             delay: 0,
             touchStartThreshold: 50, // bao nhiều px thì thực hiện sort, 
-            handle: ".column-task",// phần tử click kéo đi để sort - phần tử chấp nhận tương tác   
+            handle: ".dragable-header",// phần tử click kéo đi để sort - phần tử chấp nhận tương tác   
             preventOnFilter: true,
-            handle: '.header-column',
-            // draggable: ".header-column", // cấu hình những ele có thể tham gia sort (khuyen khich class) - không có trong này thì không sort dc
+            draggable: ".column-task", // cấu hình những ele có thể tham gia sort (khuyen khich class) - không có trong này thì không sort dc
             // ghostClass: "sortable-ghost",  // class làm mờ khi đang bị kéo
             // chosenClass: "chosen", // class áp dụng cho ele được chọn để kéo
             swapThreshold: 1,
@@ -128,7 +128,7 @@ export default {
                 },
                 sort: true,
                 animation: 300,
-                emptyInsertThreshold: 100,
+                emptyInsertThreshold: 10,
                 delay: 0,
                 touchStartThreshold: 1, // bao nhiều px thì thực hiện sort, 
                 handle: ".task",// phần tử click kéo đi để sort - phần tử chấp nhận tương tác   
@@ -152,7 +152,21 @@ export default {
         }
     },
     computed: {
-        
+        isAdminGroupTask()
+        {
+            let me = this;
+            if(me.groupTaskInfo?.groupTaskId)
+            {
+                if(me.userInfo?.role?.listPermissionCode?.includes('AllPermission'))
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     },
     props: {
         groupTaskInfo: {
@@ -229,7 +243,7 @@ export default {
                                 },
                                 sort: true,
                                 animation: 300,
-                                emptyInsertThreshold: 100,
+                                emptyInsertThreshold: 200,
                                 delay: 0,
                                 touchStartThreshold: 1, // bao nhiều px thì thực hiện sort, 
                                 handle: ".task",// phần tử click kéo đi để sort - phần tử chấp nhận tương tác   
@@ -302,7 +316,7 @@ export default {
                 })
             }
         },
-         columnColorResult: function(index)
+         columnColorResult: function(index, column)
         {
             let me = this;
             if(me.columnColor)

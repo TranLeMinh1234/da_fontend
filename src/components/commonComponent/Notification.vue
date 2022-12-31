@@ -37,7 +37,7 @@
                 @click="goViewRelate(notification)"
             >
                 <div>
-                    <img :src="linkImg(notification?.createdBy?.fileAvatarName)" alt="">
+                    <img :src="linkImg(notification?.createdBy?.fileAvatarName, notification)" alt="">
                 </div>
                 <div
                     :class="['info-notification','pd-l-16']"
@@ -245,7 +245,7 @@ export default {
 
             return stringInfo;
         },
-        linkImg(fileName)
+        linkImg(fileName, notification)
         {
             let me = this;
             if(fileName)
@@ -253,7 +253,10 @@ export default {
                 return baseCallApi.doMain + '' + `/file/img/${fileName}`;
             }
             
-            return require('../../assets/remind.jpg');
+            if(notification?.typeNoti == EnumTypeNotification.RemindEndTimeTask)
+                return require('../../assets/remind.jpg');
+            else
+                return require('../../assets/defaultAvatar.png');
         },
         showListNotification()
         {
