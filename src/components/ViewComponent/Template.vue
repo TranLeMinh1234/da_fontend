@@ -18,9 +18,9 @@
                 </div>
                 <div class="cl-black list">
                     <div
-                        v-for="(template,index) in listTemplate" :key="template.templateGroupTaskId"
+                        v-for="(template,index) in listDisplayTemplate" :key="template.templateGroupTaskId"
                         class="template-item"
-                        @click="changeDetailTemplate(index)"
+                        @click="changeDetailTemplate(index,template)"
                     >
                         <div v-if="canDeleteTemplate(template)" class="delete-template-item d-flex center-items" @click="deleteTemplate(template.templateGroupTaskId)">
                             <div class="file-icon exit-popup-icon"></div>
@@ -262,7 +262,7 @@ export default {
             let dateDisplay = me.$commonFunction.parseDateJsToString(template?.createdTime);
             return dateDisplay ? dateDisplay : '--/--/----';
         },
-        nameAuthor()
+        nameAuthor(template)
         {
             let me = this;
             return (!template?.createdBy?.firstName && !template?.createdBy?.lastName) ? 'admin' : `${template?.createdBy?.firstName} ${template?.createdBy?.lastName}`;
@@ -295,6 +295,8 @@ export default {
                     {
                         me.isAddingNewTemplate = false;
                     }
+
+                    me.listDisplayTemplate = me.listTemplate;
                     me.checkLoadDone();
                 }
              });
@@ -314,6 +316,23 @@ export default {
                             processEdit[propertyName] = data[propertyName];
                         }
                         processEdit.isEditing = false;
+                        processEdit.isNewProcess = false;
+                        
+                        let plushForNewSortOrderOfNewProcess = 1;
+                        me.listTemplate[me.indexTemplateEdit].listProcess.forEach(process => {
+                            if(process.isNewProcess)
+                            {
+                                if(process.sortOrder <= processEdit.sortOrder)
+                                {
+                                    process.sortOrder = processEdit.sortOrder + plushForNewSortOrderOfNewProcess;
+                                    plushForNewSortOrderOfNewProcess++;
+                                }
+                            }
+                        });
+
+                        me.listTemplate[me.indexTemplateEdit].listProcess.sort((leftOb,rightOb) => {
+                            return leftOb.sortOrder - rightOb.sortOrder;
+                        });
                     }
                 });
             }
@@ -332,12 +351,19 @@ export default {
         deleteProcess(processDelete)
         {
             let me = this;
-            me.callApi('delete', `api/template/process/${processDelete.processId}/${processDelete.columnSetting.columnSettingId}`)
+            me.callApi('delete', `api/template/process/${processDelete.processId}/${processDelete.columnSetting.columnSettingId}/${processDelete.sortOrder}`)
             .then(res => {
                 if(res.data.success)
                 {
                     me.listTemplate[me.indexTemplateEdit].listProcess = 
                         me.listTemplate[me.indexTemplateEdit].listProcess.filter(process => process.processId != processDelete.processId);
+
+                    me.listTemplate[me.indexTemplateEdit].listProcess.forEach(process => {
+                        if(process.sortOrder >= processDelete.sortOrder)
+                        {
+                            process.sortOrder = process.sortOrder - 1;
+                        }
+                    });                        
                 }
                 else
                 {
@@ -369,6 +395,13 @@ export default {
             {
                 me.listTemplate[me.indexTemplateEdit].listProcess = 
                     me.listTemplate[me.indexTemplateEdit].listProcess.filter(process => process.processId != processEditing.processId);
+
+                me.listTemplate[me.indexTemplateEdit].listProcess.forEach(process => {
+                    if(process.sortOrder >= processEditing.sortOrder)
+                    {
+                        process.sortOrder = process.sortOrder - 1;
+                    }
+                });
             }
             else
             {
@@ -433,12 +466,30 @@ export default {
                     if(res.data.success)
                     {
                         let data = res.data.data;
+                        let indexDelete = me.listTemplate.findIndex(template => template.templateGroupTaskId == templateId);
+                        
                         me.listTemplate = me.listTemplate.filter(template => template.templateGroupTaskId != templateId);
                         if(!me.listTemplate || (me.listTemplate && me.listTemplate.length == 0))
                         {
                             me.listTemplate = [];
                             me.addNewTemplate();
                         }
+
+                        if(indexDelete == me.indexTemplateEdit)
+                        {
+                            if(me.listTemplate.length == 0)
+                            {
+                                me.isAddingNewTemplate = true;
+                            }
+                            else
+                            {
+                                me.indexTemplateEdit = 0;
+                            }
+                        }
+
+                        me.listDisplayTemplate = me.listTemplate.filter(template => {
+                            return template.nameTemplateGroupTask.toLowerCase().includes(me.searchTemplateValue.toLowerCase()) ;
+                        });
                     }
                 }
             );
@@ -500,6 +551,11 @@ export default {
                         me.toast.success('Thêm mẫu quy trình công việc thành công');
                         let data = res.data.data;
                         me.listTemplate.push(data);
+
+                        if(data.nameTemplateGroupTask.toLowerCase().includes(me.searchTemplateValue.toLowerCase()))
+                        {
+                            me.listDisplayTemplate.push(data);
+                        }
                     }
                 });
             }
@@ -561,7 +617,7 @@ export default {
                         processName: '',
                         description: '',
                         templateGroupTaskReferenceId: me.listTemplate[me.indexTemplateEdit].templateGroupTaskId,
-                        sortOrder: null,
+                        sortOrder: me.listTemplate[me.indexTemplateEdit].listProcess.length + 1,
                         columnSetting: {
                             columnSettingId: uuid.v1(),
                             color: "#00ffff",
@@ -574,9 +630,11 @@ export default {
                 );
             }
         },
-        changeDetailTemplate(index)
+        changeDetailTemplate(index,templateInListDisplay)
         {
             let me = this;
+            let indexInOriginListTemplate = me.listTemplate.findIndex(template => template.templateGroupTaskId == templateInListDisplay.templateGroupTaskId);
+
             me.listTemplate[me.indexTemplateEdit].listProcess.forEach(process => {
                 me.listTempProcess.forEach(processTemp => {
                     if(processTemp.processId == process.processId)
@@ -590,11 +648,14 @@ export default {
             
             me.isAddingNewTemplate = false;
             me.listTempProcess = [];
-            me.indexTemplateEdit = index; 
+            me.indexTemplateEdit = indexInOriginListTemplate; 
         },
         searchTemplate()
         {
             let me = this;
+            me.listDisplayTemplate = me.listTemplate.filter(template => {
+               return template.nameTemplateGroupTask.toLowerCase().includes(me.searchTemplateValue.toLowerCase()) ;
+            });
         },
         linkImg(fileName)
         {
@@ -618,77 +679,8 @@ export default {
             isAddingNewTemplate: false,
             isLoadingDataDone: false,
             listTemplate: [],
-                // {
-                //     TemplateGroupTaskId: '1',
-                //     nameTemplateGroupTask: 'Template 1 Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1Template 1',
-                //     listProcess: [
-                //         {
-                //             proccessId: '1',
-                //             processName: 'Quá',
-                //             description: '',
-                //             columnSetting: {
-                //                 columnSettingId: '2',
-                //                 color: "#000000",
-                //                 colorText: '#000000',
-                //                 ColorHeader: '#000000'
-                //             }
-                //         },
-                //         {
-                //             proccessId: '2',
-                //             processName: 'Quá trình 2',
-                //             description: '',
-                //             columnSetting: {
-                //                 columnSettingId: '2',
-                //                 color: "#000000",
-                //                 colorText: '#000000',
-                //                 ColorHeader: '#000000'
-                //             }
-                //         },
-                //         {
-                //             proccessId: '3',
-                //             processName: 'Quá trình 3',
-                //             description: '',
-                //             columnSetting: {
-                //                 columnSettingId: '3',
-                //                 color: "#000000",
-                //                 colorText: '#000000',
-                //                 ColorHeader: '#000000'
-                //             }
-                //         }
-                //     ],
-                //     createdBy: {
-                //         email: 'tlminh10300@gmail.com',
-                //         firstName: 'Trần',
-                //         lastName: 'Lê Minh'
-                //     },
-                //     createdByEmail: '',
-                //     createdTime: new Date()
-                // },
-                // {
-                //     TemplateGroupTaskId: '2',
-                //     nameTemplateGroupTask: 'Template 2',
-                //     listProcess: [
-                //         {
-                //             processName: 'Quá trình 1',
-                //             description: '',
-                //             columnSetting: {
-                //                 columnSettingId: '1',
-                //                 color: "#000000",
-                //                 colorText: '#000000',
-                //                 ColorHeader: '#000000'
-                //             }
-                //         }
-                //     ],
-                //     createdByEmail: '',
-                //     createdBy: {
-                //         email: 'tlminh10300@gmail.com',
-                //         firstName: 'Trần',
-                //         lastName: 'Lê Minh'
-                //     },
-                //     createdTime: new Date()
-                // }
-            //],
             listTempProcess: [],
+            listDisplayTemplate: [],
             newTemplate: {
                 templateGroupTaskId: uuid.v1(),
                 nameTemplateGroupTask: '',

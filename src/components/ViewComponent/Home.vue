@@ -563,7 +563,15 @@ export default {
             }
             else
             {
+                me.optionView = {
+                    groupTask: groupTask
+                };
 
+                me.currentGroupTask = groupTask;
+                
+                me.$nextTick(()=>{
+                    me.$refs.view.loadAllData();
+                });
             }
         },
         loadAllData()
@@ -580,8 +588,8 @@ export default {
                     let data = res.data.data;
                     me.lstGroupCommunityTask = data?.lstGroupCommunityTask ? data?.lstGroupCommunityTask : [];
                     me.lstGroupPersonalTask = data?.lstGroupPersonalTask ? data?.lstGroupPersonalTask : [];
-                    me.lstGroupCommunityTaskHeader = data?.lstGroupCommunityTask ? data?.lstGroupCommunityTask : [];
-                    me.lstGroupPersonalTaskHeader = data?.lstGroupPersonalTask ? data?.lstGroupPersonalTask : [];
+                    me.lstGroupCommunityTaskHeader = data?.lstGroupCommunityTask ? [...data?.lstGroupCommunityTask] : [];
+                    me.lstGroupPersonalTaskHeader = data?.lstGroupPersonalTask ? [...data?.lstGroupPersonalTask] : [];
                     
                     me.checkDoneLoadData();
                 }

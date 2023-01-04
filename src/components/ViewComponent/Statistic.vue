@@ -222,6 +222,8 @@ export default {
         loadAllData()
         {
             let me = this;
+            me.countDoneLoadDataTab2 = null;
+            me.countDoneLoadDataTab1 = null;
             me.getGeneralCount();
             me.getTaskEachMember();
             me.getStatusExecuteTask();

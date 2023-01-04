@@ -56,8 +56,8 @@
                         <div class="d-flex al-center pd-l-12 user-info">
                             <img :src="linkImg(user.fileAvatarName)" alt="" class="user-avar">
                             <div class="pd-l-12">
-                                <div>{{user?.firstName}} {{user?.lastName}}</div>
-                                <div>{{user?.email}}</div>
+                                <div class="txt-threedots" style="width: 200px">{{user?.firstName}} {{user?.lastName}}</div>
+                                <div class="txt-threedots" style="width: 200px">{{user?.email}}</div>
                             </div>
                         </div>
                         <div class="role-user d-flex al-center j-space-between">

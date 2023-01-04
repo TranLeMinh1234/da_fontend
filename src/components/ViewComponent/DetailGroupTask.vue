@@ -38,10 +38,11 @@
                 </div>
             </div>
         </div>
+        <Modal :isShow="isShowDetail" :configModal="configModal">
+            <component :is="nameDetailComponent" :option="props" @closePopup="closePopup"></component>
+        </Modal>
     </div>
-    <Modal :isShow="isShowDetail" :configModal="configModal">
-        <component :is="nameDetailComponent" :option="props" @closePopup="closePopup"></component>
-    </Modal>
+    
 </template>
 
 <script>
@@ -654,7 +655,7 @@ export default {
             listUser: [],
 
             nameDetailComponent: '',
-            props: null,
+            props: {},
             isShowDetail: false,
             configModal: null,
             callbackOutsideComponent: null,
