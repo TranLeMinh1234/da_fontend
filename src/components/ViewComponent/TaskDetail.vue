@@ -380,7 +380,8 @@
     <Modal :isShow="isShowDetail" :configModal="configModal" ref="modal">
         <component :is="nameDetailComponent" :option="props" @closePopup="closeSubPopup"></component>
     </Modal>
-    <input type="file" class="d-none" id="inp-attach-file" accept="image/*">
+    <!-- <input type="file" class="d-none" id="inp-attach-file" accept="image/*"> -->
+    <input type="file" class="d-none" id="inp-attach-file">
 </template>
 
 <script>

@@ -365,6 +365,12 @@ export default {
             let me = this;
             if(newValue.path.includes('DetailGroupTask'))
             {
+                let groupTaskArrive = me.lstGroupCommunityTask.find(groupTask => groupTask.groupTaskId == newValue?.params?.grouptaskid)
+                if(groupTaskArrive)
+                {
+                    me.currentGroupTask = groupTaskArrive;
+                }
+
                 me.isDifferentDailyTask = true;
                 me.isShowClock = false;
                 me.isShowMenu = false;
@@ -446,7 +452,7 @@ export default {
                     break;
                 case EnumTypeNotification.DeleteGroupTask:
                     me.$refs.notification.increaseNumberOfNewNotification();
-                    me.toast.info(`Nhóm công việc "${data.nameGroupTask}" đã bị xóa.`);
+                    me.toast.info(`Nhóm công việc "${data?.NameGroupTask}" đã bị xóa.`);
                     break;
                 case EnumTypeNotification.CommentedTask:
                     me.$refs.notification.increaseNumberOfNewNotification();

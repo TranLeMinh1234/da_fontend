@@ -209,11 +209,11 @@ export default {
         getInfoNotification: function(notification)
         {
             let me = this;
-            let stringInfo = '<b>Hoàng Thu Hằng</b> đã mời bạn vào dự án/nhóm <b>Phát hành R55</b> với vai trò <b>Thành viên</b>';
+            let stringInfo = '';
             switch(notification.typeNoti)
             {
                 case EnumTypeNotification.AddUserGroupTask:
-                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã mời bạn vào nhóm công việc <b>${notification.groupTask.nameGroupTask}</b> với vai trò <b>${notification.role.nameRole}</b>.`;
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã mời bạn vào nhóm công việc <b>${notification?.groupTask?.nameGroupTask ? notification?.groupTask?.nameGroupTask : notification?.nameGroupTask}</b> với vai trò <b>${notification.role.nameRole}</b>.`;
                     break;
                 case EnumTypeNotification.DeleteUserFromGroupTask:
                     stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa bạn khỏi nhóm công việc <b>${notification.groupTask.nameGroupTask}</b>.`;
@@ -237,7 +237,7 @@ export default {
                     stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã xóa nhóm công việc <b>${notification.nameGroupTask}</b>.`;
                     break;
                 case EnumTypeNotification.ChangeRoleGroupTask:
-                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã phân vai trò <b>${notification.role.nameRole}</b> cho bạn trong nhóm <b>${notification.groupTask.nameGroupTask}</b>.`;
+                    stringInfo = `<b>${notification.createdBy.firstName} ${notification.createdBy.lastName}</b> đã phân vai trò <b>${notification.role.nameRole}</b> cho bạn trong nhóm <b>${notification?.groupTask?.nameGroupTask ? notification?.groupTask?.nameGroupTask : notification?.nameGroupTask}</b>.`;
                     break;
                 default: 
                     break;
@@ -253,7 +253,7 @@ export default {
                 return baseCallApi.doMain + '' + `/file/img/${fileName}`;
             }
             
-            if(notification?.typeNoti == EnumTypeNotification.RemindEndTimeTask)
+            if(notification?.typeNoti == EnumTypeNotification.RemindEndTimeTask || notification?.typeNoti == EnumTypeNotification.RemindStartTimeTask)
                 return require('../../assets/remind.jpg');
             else
                 return require('../../assets/defaultAvatar.png');
