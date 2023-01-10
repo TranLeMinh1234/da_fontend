@@ -536,3 +536,10 @@
     width: 24px;
     height: 24px;
 }
+
+.comunity-group-icon{
+    background-image: url('../groupTask.png');
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+}

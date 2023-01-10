@@ -67,7 +67,7 @@
                             :title="groupCommunity.nameGroupTask"
                             @click="goDetailGroupTask(groupCommunity)"
                         >
-                            <div class="file-icon personal-group-icon"></div>
+                            <div class="file-icon comunity-group-icon"></div>
                             <div class="name-group txt-threedots">{{groupCommunity.nameGroupTask}}</div>
                         </div>
                     </div>

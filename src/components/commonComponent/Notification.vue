@@ -334,7 +334,7 @@ export default {
                                 }
                                 else
                                 {
-                                    me.boxNotificationElement.scrollTo(0,me.boxNotificationElement.offsetHeight - 160 > 0 ? me.boxNotificationElement.offsetHeight - 160 : 0);
+                                    me.boxNotificationElement.scrollTo(0,0);
                                 }
                             }
                             me.numberOfNewNotification = 0;
